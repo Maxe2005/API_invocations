@@ -1,4 +1,4 @@
-package com.imt.Api_invocations.persistence.dto;
+package com.imt.api_invocations.persistence.dto;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;

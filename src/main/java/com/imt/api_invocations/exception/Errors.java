@@ -1,4 +1,4 @@
-package com.imt.Api_invocations.exception;
+package com.imt.api_invocations.exception;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -9,10 +9,10 @@ import java.util.List;
 @AllArgsConstructor
 public class Errors {
 
-    private List<CustomError> errors;
+    private List<CustomError> eerrors;
 
     public void addError(CustomError error) {
-        this.errors.add(error);
+        this.eerrors.add(error);
     }
 
 }

@@ -1,4 +1,4 @@
-package com.imt.Api_invocations.service.port;
+package com.imt.api_invocations.service.port;
 
 public interface ProductPort {
 

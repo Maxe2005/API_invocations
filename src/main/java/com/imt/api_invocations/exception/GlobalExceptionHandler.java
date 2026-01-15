@@ -1,4 +1,4 @@
-package com.imt.Api_invocations.exception;
+package com.imt.api_invocations.exception;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;

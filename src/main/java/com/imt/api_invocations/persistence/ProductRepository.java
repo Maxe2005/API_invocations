@@ -1,11 +1,11 @@
-package com.imt.Api_invocations.persistence;
+package com.imt.api_invocations.persistence;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
-import com.imt.Api_invocations.persistence.dao.ProductMongoDao;
-import com.imt.Api_invocations.persistence.dto.ProductMongoDto;
-import com.imt.Api_invocations.service.port.ProductPort;
+import com.imt.api_invocations.persistence.dao.ProductMongoDao;
+import com.imt.api_invocations.persistence.dto.ProductMongoDto;
+import com.imt.api_invocations.service.port.ProductPort;
 
 import static java.util.UUID.randomUUID;
 

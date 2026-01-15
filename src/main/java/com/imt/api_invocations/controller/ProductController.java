@@ -1,4 +1,4 @@
-package com.imt.Api_invocations.controller;
+package com.imt.api_invocations.controller;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -11,9 +11,9 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.imt.Api_invocations.controller.dto.input.ProductHttpDto;
-import com.imt.Api_invocations.controller.dto.output.ProductDto;
-import com.imt.Api_invocations.service.ProductService;
+import com.imt.api_invocations.controller.dto.input.ProductHttpDto;
+import com.imt.api_invocations.controller.dto.output.ProductDto;
+import com.imt.api_invocations.service.ProductService;
 
 @RestController
 @RequestMapping("/products")

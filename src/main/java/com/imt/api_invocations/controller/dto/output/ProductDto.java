@@ -1,4 +1,4 @@
-package com.imt.Api_invocations.controller.dto.output;
+package com.imt.api_invocations.controller.dto.output;
 
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
