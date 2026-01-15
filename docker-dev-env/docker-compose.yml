@@ -1,14 +1,12 @@
 services:
   mongo:
     image: mongo
-    container_name: mongo
+    container_name: api_invocations_mongo
     ports:
       - "27017:27017"
 
-
-  demo2026:
-    image: demo2026
+  api_invocations:
     build: ../
-    container_name: demo2026
+    container_name: api_invocations
     ports:
-        - "8080:8080"
+      - "8080:8080"

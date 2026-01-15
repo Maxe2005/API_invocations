@@ -9,9 +9,9 @@
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
     <groupId>com.imt</groupId>
-    <artifactId>demo2026</artifactId>
+    <artifactId>Api_invocation</artifactId>
     <version>0.0.1-SNAPSHOT</version>
-    <name>demo2026</name>
+    <name>Api_invocation</name>
     <description>Demo project for Spring Boot</description>
     <url/>
     <licenses>
@@ -42,6 +42,11 @@
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-web</artifactId>
         </dependency>
+        <dependency>
+			<groupId>org.springdoc</groupId>
+			<artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
+			<version>2.8.5</version>
+		</dependency>
 
         <dependency>
             <groupId>org.springframework.boot</groupId>

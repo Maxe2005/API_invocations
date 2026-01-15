@@ -1,8 +1,8 @@
-package com.imt.Api_authentification.persistence.dao;
+package com.imt.Api_invocations.persistence.dao;
 
 import org.springframework.data.mongodb.repository.MongoRepository;
 
-import com.imt.Api_authentification.persistence.dto.ProductMongoDto;
+import com.imt.Api_invocations.persistence.dto.ProductMongoDto;
 
 import java.util.UUID;
 

@@ -1,10 +1,10 @@
-package com.imt.demo2026;
+package com.imt.Api_invocations;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
 @SpringBootTest
-class Demo2026ApplicationTests {
+class ApiInvocationsApplicationTests {
 
     @Test
     void contextLoads() {

@@ -1,13 +1,13 @@
-package com.imt.Api_authentification;
+package com.imt.Api_invocations;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
-public class Demo2026Application {
+public class ApiInvocationsApplication {
 
     public static void main(String[] args) {
-        SpringApplication.run(Demo2026Application.class, args);
+        SpringApplication.run(ApiInvocationsApplication.class, args);
     }
 
 }

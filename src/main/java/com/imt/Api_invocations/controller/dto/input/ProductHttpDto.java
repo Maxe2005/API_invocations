@@ -1,4 +1,4 @@
-package com.imt.Api_authentification.controller.dto.input;
+package com.imt.Api_invocations.controller.dto.input;
 
 import lombok.Getter;
 

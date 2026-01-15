@@ -1,4 +1,4 @@
-package com.imt.Api_authentification.exception;
+package com.imt.Api_invocations.exception;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
@@ -15,8 +15,7 @@ public class GlobalExceptionHandler {
         Errors errors = new Errors(new ArrayList<>());
         CustomError customError = new CustomError(
                 400,
-                ex.getMessage()
-        );
+                ex.getMessage());
         errors.addError(customError);
 
         return ResponseEntity.badRequest().body(errors);

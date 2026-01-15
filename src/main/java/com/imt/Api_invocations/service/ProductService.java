@@ -1,8 +1,8 @@
-package com.imt.Api_authentification.service;
+package com.imt.Api_invocations.service;
 
 import org.springframework.stereotype.Service;
 
-import com.imt.Api_authentification.service.port.ProductPort;
+import com.imt.Api_invocations.service.port.ProductPort;
 
 @Service
 public class ProductService {

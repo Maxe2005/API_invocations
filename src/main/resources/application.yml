@@ -1,8 +1,8 @@
-spring.application.name: demo2026
+spring.application.name: Api_invocations
 
 spring:
   data:
     mongodb:
       uuid-representation: standard
-      database: demo2026db
+      database: Api_invocationsdb
       port: 27017
