@@ -21,4 +21,15 @@ public class GlobalExceptionHandler {
         return ResponseEntity.badRequest().body(errors);
     }
 
+    @ExceptionHandler(IllegalArgumentException.class)
+    public ResponseEntity<Errors> handleIllegalArgumentException(IllegalArgumentException ex) {
+        Errors errors = new Errors(new ArrayList<>());
+        CustomError customError = new CustomError(
+                400,
+                ex.getMessage());
+        errors.addError(customError);
+
+        return ResponseEntity.badRequest().body(errors);
+    }
+
 }

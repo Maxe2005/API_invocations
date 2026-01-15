@@ -9,10 +9,10 @@ import java.util.List;
 @AllArgsConstructor
 public class Errors {
 
-    private List<CustomError> eerrors;
+    private List<CustomError> theErrorsYOUMade;
 
     public void addError(CustomError error) {
-        this.eerrors.add(error);
+        this.theErrorsYOUMade.add(error);
     }
 
 }
