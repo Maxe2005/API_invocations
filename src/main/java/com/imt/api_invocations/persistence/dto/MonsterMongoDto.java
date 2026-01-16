@@ -6,6 +6,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.MongoId;
 
 import com.imt.api_invocations.enums.Elementary;
+import com.imt.api_invocations.enums.Rank;
 
 import java.util.UUID;
 
@@ -20,11 +21,11 @@ public class MonsterMongoDto {
     private final Double atk;
     private final Double def;
     private final Double vit;
-    private final Double lootRate;
+    private final Rank lootRate;
 
     @PersistenceCreator
     public MonsterMongoDto(String id, Elementary element, Double hp, Double atk, Double def, Double vit,
-            Double lootRate) {
+            Rank lootRate) {
         this.id = id;
         this.element = element;
         this.hp = hp;
@@ -34,7 +35,7 @@ public class MonsterMongoDto {
         this.lootRate = lootRate;
     }
 
-    public MonsterMongoDto(Elementary element, Double hp, Double atk, Double def, Double vit, Double lootRate) {
+    public MonsterMongoDto(Elementary element, Double hp, Double atk, Double def, Double vit, Rank lootRate) {
         this(UUID.randomUUID().toString(), element, hp, atk, def, vit, lootRate);
     }
 

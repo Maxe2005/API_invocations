@@ -3,6 +3,7 @@ package com.imt.api_invocations.controller.dto.output;
 import java.util.List;
 
 import com.imt.api_invocations.enums.Elementary;
+import com.imt.api_invocations.enums.Rank;
 
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
@@ -20,6 +21,6 @@ public class MonsterDto {
     private final double def;
     private final double vit;
     private final List<String> skills;
-    private final double lootRate;
+    private final Rank lootRate;
 
 }

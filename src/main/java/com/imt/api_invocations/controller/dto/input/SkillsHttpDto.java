@@ -6,6 +6,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import com.imt.api_invocations.enums.Rank;
 import com.imt.api_invocations.persistence.dto.RatioDto;
 
 @Getter
@@ -27,7 +28,6 @@ public class SkillsHttpDto {
     @Positive(message = "Level max must be positive")
     private Double lvlMax;
 
-    @Positive(message = "Loot rate must be positive")
-    private Float lootRate;
+    private Rank lootRate;
 
 }

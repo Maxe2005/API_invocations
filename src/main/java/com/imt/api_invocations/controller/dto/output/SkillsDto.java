@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 
+import com.imt.api_invocations.enums.Rank;
 import com.imt.api_invocations.persistence.dto.RatioDto;
 
 @Getter
@@ -17,6 +18,6 @@ public class SkillsDto {
     private final RatioDto ratio;
     private final double cooldown;
     private final double lvlMax;
-    private final float lootRate;
+    private final Rank lootRate;
 
 }

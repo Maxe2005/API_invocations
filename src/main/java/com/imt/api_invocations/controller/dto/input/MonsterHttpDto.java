@@ -6,6 +6,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import com.imt.api_invocations.enums.Elementary;
+import com.imt.api_invocations.enums.Rank;
 
 @Getter
 @NoArgsConstructor
@@ -26,7 +27,6 @@ public class MonsterHttpDto {
     @Positive(message = "VIT must be positive")
     private Double vit;
 
-    @Positive(message = "Loot rate must be positive")
-    private Double lootRate;
+    private Rank lootRate;
 
 }

@@ -7,6 +7,5 @@ import com.imt.api_invocations.persistence.dto.SkillsMongoDto;
 
 public interface SkillsMongoDao extends MongoRepository<SkillsMongoDto, String> {
     List<SkillsMongoDto> findByMonsterId(String monsterId);
-
     Long deleteByMonsterId(String monsterId);
 }

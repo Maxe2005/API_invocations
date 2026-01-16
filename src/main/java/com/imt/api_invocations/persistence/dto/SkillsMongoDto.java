@@ -5,6 +5,8 @@ import org.springframework.data.annotation.PersistenceCreator;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.MongoId;
 
+import com.imt.api_invocations.enums.Rank;
+
 import java.util.UUID;
 
 @Getter
@@ -18,11 +20,11 @@ public class SkillsMongoDto {
     private final RatioDto ratio;
     private final double cooldown;
     private final double lvlMax;
-    private final float lootRate;
+    private final Rank lootRate;
 
     @PersistenceCreator
     public SkillsMongoDto(String id, String monsterId, double damage, RatioDto ratio, double cooldown, double lvlMax,
-            float lootRate) {
+            Rank lootRate) {
         this.id = id;
         this.monsterId = monsterId;
         this.damage = damage;
@@ -33,7 +35,7 @@ public class SkillsMongoDto {
     }
 
     public SkillsMongoDto(String monsterId, double damage, RatioDto ratio, double cooldown, double lvlMax,
-            float lootRate) {
+            Rank lootRate) {
         this(UUID.randomUUID().toString(), monsterId, damage, ratio, cooldown, lvlMax, lootRate);
     }
 
