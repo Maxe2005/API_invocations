@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
 
@@ -22,13 +24,15 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class DatabaseSeeder implements CommandLineRunner {
 
+    private static final Logger logger = LoggerFactory.getLogger(DatabaseSeeder.class);
+
     private final MonsterMongoDao monsterRepository;
     private final SkillsMongoDao skillsRepository;
 
     @Override
     public void run(String... args) throws Exception {
         if (monsterRepository.count() == 0) {
-            System.out.println("Seeding database...");
+            logger.info("Seeding database...");
 
             // Initialize Monsters
             // Monster 1: Fire
@@ -80,7 +84,7 @@ public class DatabaseSeeder implements CommandLineRunner {
 
             skillsRepository.saveAll(skills);
 
-            System.out.println("Base data inserted into MongoDB via DatabaseSeeder!");
+            logger.info("Base data inserted into MongoDB via DatabaseSeeder!");
         }
     }
 }
