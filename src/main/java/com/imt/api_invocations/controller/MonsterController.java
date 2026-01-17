@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.*;
 
 import com.imt.api_invocations.controller.dto.input.MonsterHttpDto;
 import com.imt.api_invocations.controller.dto.output.MonsterDto;
-import com.imt.api_invocations.controller.mapper.DtoMapper;
+import com.imt.api_invocations.controller.mapper.DtoMapperMonster;
 import com.imt.api_invocations.service.MonsterService;
 
 import java.util.List;
@@ -20,7 +20,7 @@ import java.util.Map;
 public class MonsterController {
 
     private final MonsterService monsterService;
-    private final DtoMapper dtoMapper;
+    private final DtoMapperMonster dtoMapper;
 
     /**
      * Create a new monster

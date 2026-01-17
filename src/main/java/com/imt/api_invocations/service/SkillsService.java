@@ -88,8 +88,9 @@ public class SkillsService implements DataServiceInterface {
 
     public List<SkillForMonsterDto> getRandomSkillsForMonster(String monsterId, int numberOfSkills) throws IllegalStateException {
         possibleSkills = skillsRepository.findByMonsterId(monsterId);
+        int maxSkillsAvailable = possibleSkills.size();
         List<SkillsMongoDto> selectedSkills = new ArrayList<>();
-        for (int i = 0; i < numberOfSkills && i < possibleSkills.size(); i++) {
+        for (int i = 0; i < numberOfSkills && i < maxSkillsAvailable; i++) {
             Rank rank = getRandomRankBasedOnAvailableData(this);
             List<SkillsMongoDto> skillsOfRank = filterSkillsByRank(rank);
             if (!skillsOfRank.isEmpty()) {

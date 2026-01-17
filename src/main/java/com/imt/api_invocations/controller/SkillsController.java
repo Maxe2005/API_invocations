@@ -10,7 +10,7 @@ import java.util.Map;
 
 import com.imt.api_invocations.controller.dto.input.SkillsHttpDto;
 import com.imt.api_invocations.controller.dto.output.SkillsDto;
-import com.imt.api_invocations.controller.mapper.DtoMapper;
+import com.imt.api_invocations.controller.mapper.DtoMapperSkills;
 import com.imt.api_invocations.service.SkillsService;
 
 @RestController
@@ -19,7 +19,7 @@ import com.imt.api_invocations.service.SkillsService;
 public class SkillsController {
 
     private final SkillsService skillsService;
-    private final DtoMapper dtoMapper;
+    private final DtoMapperSkills dtoMapper;
 
     /**
      * Create a new skill
