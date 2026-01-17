@@ -3,11 +3,14 @@ package com.imt.api_invocations.service;
 import org.springframework.stereotype.Service;
 import java.util.List;
 
+import com.imt.api_invocations.enums.Rank;
 import com.imt.api_invocations.persistence.MonsterRepository;
 import com.imt.api_invocations.persistence.dto.MonsterMongoDto;
+import static com.imt.api_invocations.utils.Random.random;
+import com.imt.api_invocations.utils.DataServiceInterface;
 
 @Service
-public class MonsterService {
+public class MonsterService implements DataServiceInterface {
 
     private final MonsterRepository monsterRepository;
 
@@ -27,8 +30,8 @@ public class MonsterService {
         return monsterRepository.findAll();
     }
 
-    public List<String> getAllMonsterIds() {
-        return monsterRepository.findAllIds().stream().map(MonsterMongoDto::getId).toList();
+    public List<String> getAllMonsterIdByRank(Rank rank) {
+        return monsterRepository.findAllMonsterIdByRank(rank).stream().map(MonsterMongoDto::getId).toList();
     }
 
     public void updateMonster(String monsterId, MonsterMongoDto monsterMongoDto) {
@@ -39,12 +42,24 @@ public class MonsterService {
                 monsterMongoDto.getAtk(),
                 monsterMongoDto.getDef(),
                 monsterMongoDto.getVit(),
-                monsterMongoDto.getLootRate());
+                monsterMongoDto.getRank());
         monsterRepository.update(monsterToUpdate);
     }
 
     public boolean deleteMonsterById(String id) {
         return monsterRepository.deleteByID(id);
+    }
+
+    public MonsterMongoDto getRandomMonsterByRank(Rank rank) {
+        List<String> monsterIds = getAllMonsterIdByRank(rank);
+        String selectedMonsterId = monsterIds.get(random(0, monsterIds.size() - 1));
+        return getMonsterById(selectedMonsterId);
+    }
+
+    @Override
+    public boolean hasAvailableData(Rank rank) {
+        List<String> monsterIds = getAllMonsterIdByRank(rank);
+        return !monsterIds.isEmpty();
     }
 
 }

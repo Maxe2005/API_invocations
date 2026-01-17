@@ -21,22 +21,22 @@ public class MonsterMongoDto {
     private final Double atk;
     private final Double def;
     private final Double vit;
-    private final Rank lootRate;
+    private final Rank rank;
 
     @PersistenceCreator
     public MonsterMongoDto(String id, Elementary element, Double hp, Double atk, Double def, Double vit,
-            Rank lootRate) {
+            Rank rank) {
         this.id = id;
         this.element = element;
         this.hp = hp;
         this.atk = atk;
         this.def = def;
         this.vit = vit;
-        this.lootRate = lootRate;
+        this.rank = rank;
     }
 
-    public MonsterMongoDto(Elementary element, Double hp, Double atk, Double def, Double vit, Rank lootRate) {
-        this(UUID.randomUUID().toString(), element, hp, atk, def, vit, lootRate);
+    public MonsterMongoDto(Elementary element, Double hp, Double atk, Double def, Double vit, Rank rank) {
+        this(UUID.randomUUID().toString(), element, hp, atk, def, vit, rank);
     }
 
 }

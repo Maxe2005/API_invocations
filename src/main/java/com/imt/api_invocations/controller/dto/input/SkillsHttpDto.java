@@ -28,6 +28,6 @@ public class SkillsHttpDto {
     @Positive(message = "Level max must be positive")
     private Double lvlMax;
 
-    private Rank lootRate;
+    private Rank rank;
 
 }

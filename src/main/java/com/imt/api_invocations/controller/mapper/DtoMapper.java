@@ -23,7 +23,7 @@ public class DtoMapper {
      */
     public MonsterMongoDto toMonsterMongoDto(MonsterHttpDto httpDto) {
         if (httpDto.getElement() == null || httpDto.getHp() == null || httpDto.getAtk() == null ||
-                httpDto.getDef() == null || httpDto.getVit() == null || httpDto.getLootRate() == null) {
+                httpDto.getDef() == null || httpDto.getVit() == null || httpDto.getRank() == null) {
             throw new IllegalArgumentException("All fields must be provided for creation");
         }
         return new MonsterMongoDto(
@@ -32,7 +32,7 @@ public class DtoMapper {
                 httpDto.getAtk(),
                 httpDto.getDef(),
                 httpDto.getVit(),
-                httpDto.getLootRate());
+                httpDto.getRank());
     }
 
     /**
@@ -46,7 +46,7 @@ public class DtoMapper {
                 partial.getAtk() != null ? partial.getAtk() : existing.getAtk(),
                 partial.getDef() != null ? partial.getDef() : existing.getDef(),
                 partial.getVit() != null ? partial.getVit() : existing.getVit(),
-                partial.getLootRate() != null ? partial.getLootRate() : existing.getLootRate());
+                partial.getRank() != null ? partial.getRank() : existing.getRank());
     }
 
     /**
@@ -61,7 +61,7 @@ public class DtoMapper {
                 mongoDto.getDef(),
                 mongoDto.getVit(),
                 List.of(), // Skills will be fetched separately if needed
-                mongoDto.getLootRate());
+                mongoDto.getRank());
     }
 
     /**
@@ -69,7 +69,7 @@ public class DtoMapper {
      */
     public SkillsMongoDto toSkillsMongoDto(SkillsHttpDto httpDto) {
         if (httpDto.getMonsterId() == null || httpDto.getDamage() == null || httpDto.getRatio() == null ||
-                httpDto.getCooldown() == null || httpDto.getLvlMax() == null || httpDto.getLootRate() == null) {
+                httpDto.getCooldown() == null || httpDto.getLvlMax() == null || httpDto.getRank() == null) {
             throw new IllegalArgumentException("All fields must be provided for creation");
         }
         return new SkillsMongoDto(
@@ -78,7 +78,7 @@ public class DtoMapper {
                 httpDto.getRatio(),
                 httpDto.getCooldown(),
                 httpDto.getLvlMax(),
-                httpDto.getLootRate());
+                httpDto.getRank());
     }
 
     /**
@@ -92,7 +92,7 @@ public class DtoMapper {
                 partial.getRatio() != null ? partial.getRatio() : existing.getRatio(),
                 partial.getCooldown() != null ? partial.getCooldown() : existing.getCooldown(),
                 partial.getLvlMax() != null ? partial.getLvlMax() : existing.getLvlMax(),
-                partial.getLootRate() != null ? partial.getLootRate() : existing.getLootRate());
+                partial.getRank() != null ? partial.getRank() : existing.getRank());
     }
 
     /**
@@ -106,7 +106,7 @@ public class DtoMapper {
                 mongoDto.getRatio(),
                 mongoDto.getCooldown(),
                 mongoDto.getLvlMax(),
-                mongoDto.getLootRate());
+                mongoDto.getRank());
     }
 
 }

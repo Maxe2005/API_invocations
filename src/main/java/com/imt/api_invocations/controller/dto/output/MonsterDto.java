@@ -21,6 +21,6 @@ public class MonsterDto {
     private final double def;
     private final double vit;
     private final List<String> skills;
-    private final Rank lootRate;
+    private final Rank rank;
 
 }

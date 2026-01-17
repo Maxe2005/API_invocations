@@ -20,23 +20,23 @@ public class SkillsMongoDto {
     private final RatioDto ratio;
     private final double cooldown;
     private final double lvlMax;
-    private final Rank lootRate;
+    private final Rank rank;
 
     @PersistenceCreator
     public SkillsMongoDto(String id, String monsterId, double damage, RatioDto ratio, double cooldown, double lvlMax,
-            Rank lootRate) {
+            Rank rank) {
         this.id = id;
         this.monsterId = monsterId;
         this.damage = damage;
         this.ratio = ratio;
         this.cooldown = cooldown;
         this.lvlMax = lvlMax;
-        this.lootRate = lootRate;
+        this.rank = rank;
     }
 
     public SkillsMongoDto(String monsterId, double damage, RatioDto ratio, double cooldown, double lvlMax,
-            Rank lootRate) {
-        this(UUID.randomUUID().toString(), monsterId, damage, ratio, cooldown, lvlMax, lootRate);
+            Rank rank) {
+        this(UUID.randomUUID().toString(), monsterId, damage, ratio, cooldown, lvlMax, rank);
     }
 
 }

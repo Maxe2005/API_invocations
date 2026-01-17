@@ -1,6 +1,8 @@
 package com.imt.api_invocations.persistence;
 
 import lombok.RequiredArgsConstructor;
+
+import com.imt.api_invocations.enums.Rank;
 import org.springframework.stereotype.Component;
 import java.util.List;
 
@@ -26,8 +28,8 @@ public class MonsterRepository {
         return monsterMongoDao.findAll();
     }
 
-    public List<MonsterMongoDto> findAllIds() {
-        return monsterMongoDao.findAllIds();
+    public List<MonsterMongoDto> findAllMonsterIdByRank(Rank rank) {
+        return monsterMongoDao.findAllMonsterIdByRank(rank);
     }
 
     public MonsterMongoDto findByElement(String element) {

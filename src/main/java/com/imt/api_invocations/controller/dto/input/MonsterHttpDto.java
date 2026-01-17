@@ -27,6 +27,6 @@ public class MonsterHttpDto {
     @Positive(message = "VIT must be positive")
     private Double vit;
 
-    private Rank lootRate;
+    private Rank rank;
 
 }

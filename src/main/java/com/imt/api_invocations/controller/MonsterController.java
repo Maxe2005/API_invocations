@@ -15,7 +15,7 @@ import java.util.List;
 import java.util.Map;
 
 @RestController
-@RequestMapping("/api/v1/monsters")
+@RequestMapping("/api/invocation/monsters")
 @RequiredArgsConstructor
 public class MonsterController {
 
@@ -62,17 +62,6 @@ public class MonsterController {
                 .map(dtoMapper::toMonsterDto)
                 .toList();
         return ResponseEntity.ok(monsterDtos);
-    }
-
-    /**
-     * Get all monster IDs
-     * 
-     * @return list of all monster IDs
-     */
-    @GetMapping("/allIds")
-    public ResponseEntity<List<String>> getAllMonsterIds() {
-        var ids = monsterService.getAllMonsterIds();
-        return ResponseEntity.ok(ids);
     }
 
     /**

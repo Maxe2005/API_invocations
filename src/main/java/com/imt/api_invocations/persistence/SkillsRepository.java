@@ -42,4 +42,8 @@ public class SkillsRepository {
         return false;
     }
 
+    public List<SkillsMongoDto> findByRank(com.imt.api_invocations.enums.Rank rank) {
+        return skillsMongoDao.findByRank(rank);
+    }
+
 }

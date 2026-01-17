@@ -14,7 +14,7 @@ import com.imt.api_invocations.controller.mapper.DtoMapper;
 import com.imt.api_invocations.service.SkillsService;
 
 @RestController
-@RequestMapping("/api/v1/skills")
+@RequestMapping("/api/invocation/skills")
 @RequiredArgsConstructor
 public class SkillsController {
 
