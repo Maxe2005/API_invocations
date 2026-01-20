@@ -32,4 +32,15 @@ public class GlobalExceptionHandler {
         return ResponseEntity.badRequest().body(errors);
     }
 
+    @ExceptionHandler(ExternalApiException.class)
+    public ResponseEntity<Errors> handleExternalApiException(ExternalApiException ex) {
+        Errors errors = new Errors(new ArrayList<>());
+        CustomError customError = new CustomError(
+                502,
+                "Erreur de communication avec une API externe: " + ex.getMessage());
+        errors.addError(customError);
+
+        return ResponseEntity.status(502).body(errors);
+    }
+
 }
