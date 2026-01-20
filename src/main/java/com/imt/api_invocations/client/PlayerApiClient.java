@@ -8,8 +8,8 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 
-import com.imt.api_invocations.client.dto.AddMonsterRequest;
-import com.imt.api_invocations.client.dto.AddMonsterResponse;
+import com.imt.api_invocations.client.dto.PlayerAddMonsterRequest;
+import com.imt.api_invocations.client.dto.PlayerResponse;
 import com.imt.api_invocations.config.ExternalApiProperties;
 import com.imt.api_invocations.exception.ExternalApiException;
 
@@ -21,7 +21,6 @@ import com.imt.api_invocations.exception.ExternalApiException;
 public class PlayerApiClient {
 
     private static final Logger logger = LoggerFactory.getLogger(PlayerApiClient.class);
-    private static final String ADD_MONSTER_ENDPOINT = "/api/joueur/add_monster";
 
     private final RestTemplate restTemplate;
     private final ExternalApiProperties apiProperties;
@@ -34,35 +33,33 @@ public class PlayerApiClient {
     /**
      * Ajoute un monstre à un joueur dans l'API externe.
      * 
-     * @param playerId  L'ID du joueur
+     * @param username  Le nom d'utilisateur du joueur
      * @param monsterId L'ID du monstre à ajouter
+     * @return Le joueur mis à jour
      * @throws ExternalApiException En cas d'erreur de communication
      */
-    public void addMonsterToPlayer(String playerId, String monsterId) {
-        String url = apiProperties.getPlayerBaseUrl() + ADD_MONSTER_ENDPOINT;
+    public PlayerResponse addMonsterToPlayer(String username, String monsterId) {
+        String url = apiProperties.getPlayerBaseUrl() + "/api/players/" + username + "/add_monster";
 
-        AddMonsterRequest request = new AddMonsterRequest(playerId, monsterId);
+        PlayerAddMonsterRequest request = new PlayerAddMonsterRequest(monsterId);
 
         try {
-            logger.info("Ajout du monstre {} au joueur {} via l'API Player: {}", monsterId, playerId, url);
+            logger.info("Ajout du monstre {} au joueur {} via l'API Player: {}", monsterId, username, url);
 
-            ResponseEntity<AddMonsterResponse> response = restTemplate.postForEntity(
+            ResponseEntity<PlayerResponse> response = restTemplate.postForEntity(
                     url,
                     request,
-                    AddMonsterResponse.class);
+                    PlayerResponse.class);
 
-            if (response.getStatusCode() == HttpStatus.OK || response.getStatusCode() == HttpStatus.CREATED) {
-                AddMonsterResponse body = response.getBody();
-                if (body != null && body.isSuccess()) {
-                    logger.info("Monstre {} ajouté avec succès au joueur {}", monsterId, playerId);
-                    return;
-                }
+            if (response.getStatusCode() == HttpStatus.OK && response.getBody() != null) {
+                logger.info("Monstre {} ajouté avec succès au joueur {}", monsterId, username);
+                return response.getBody();
             }
 
             throw new ExternalApiException("Échec de l'ajout du monstre au joueur");
 
         } catch (RestClientException e) {
-            logger.error("Erreur lors de la communication avec l'API Player", e);
+            logger.error("Erreur lors de l'ajout du monstre {} au joueur {}", monsterId, username, e);
             throw new ExternalApiException("Échec de l'ajout du monstre au joueur dans l'API Player", e);
         }
     }

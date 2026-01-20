@@ -5,8 +5,6 @@ import lombok.Getter;
 
 @Getter
 @AllArgsConstructor
-public class AddMonsterRequest {
-
-    private String playerId;
+public class PlayerAddMonsterRequest {
     private String monsterId;
 }
