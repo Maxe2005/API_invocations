@@ -20,3 +20,9 @@ docker compose up
 docker compose down -v
 docker compose up -d --build
 ```
+
+## Swager
+
+```html
+http://localhost:8081/swagger-ui/index.html
+```
