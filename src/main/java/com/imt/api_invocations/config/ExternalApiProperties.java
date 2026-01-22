@@ -14,6 +14,7 @@ public class ExternalApiProperties {
 
     private String monstersBaseUrl;
     private String playerBaseUrl;
+    private String authBaseUrl;
     private int connectionTimeout = 5000;
     private int readTimeout = 5000;
 }
