@@ -6,6 +6,10 @@ spring:
       uuid-representation: standard
       database: api_invocationsdb
       port: 27017
+  
+app:
+  auth:
+    enabled: false
 
 # Configuration des APIs externes
 external:

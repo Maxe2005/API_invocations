@@ -6,7 +6,7 @@ services:
       - "27017:27017"
 
   api_invocations:
-    build: ../
+    build: ./
     container_name: api_invocations
     ports:
       - "8085:8080"
