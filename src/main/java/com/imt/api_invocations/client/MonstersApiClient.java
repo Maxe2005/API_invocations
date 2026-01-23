@@ -12,7 +12,6 @@ import com.imt.api_invocations.client.dto.monsters.CreateMonsterRequest;
 import com.imt.api_invocations.client.dto.monsters.CreateMonsterResponse;
 import com.imt.api_invocations.config.ExternalApiProperties;
 import com.imt.api_invocations.exception.ExternalApiException;
-import com.imt.api_invocations.service.dto.GlobalMonsterDto;
 
 /**
  * Client pour communiquer avec l'API Monsters externe.
@@ -36,21 +35,12 @@ public class MonstersApiClient {
     /**
      * Crée un monstre dans l'API externe.
      * 
-     * @param monster Le monstre à créer
-     * @return L'ID du monstre créé
+     * @param request Les données du monstre à créer
+     * @return La réponse complète retournée par l'API externe
      * @throws ExternalApiException En cas d'erreur de communication
      */
-    public String createMonster(GlobalMonsterDto monster) {
+    public CreateMonsterResponse createMonster(CreateMonsterRequest request) {
         String url = apiProperties.getMonstersBaseUrl() + CREATE_MONSTER_ENDPOINT;
-
-        CreateMonsterRequest request = new CreateMonsterRequest(
-                monster.getElement(),
-                (int) monster.getHp(),
-                (int) monster.getAtk(),
-                (int) monster.getDef(),
-                (int) monster.getVit(),
-                monster.getSkills(),
-                monster.getRank());
 
         try {
             logger.info("Envoi du monstre à l'API Monsters: {}", url);
@@ -64,7 +54,7 @@ public class MonstersApiClient {
                 CreateMonsterResponse body = response.getBody();
                 if (body != null && body.getMonsterId() != null) {
                     logger.info("Monstre créé avec succès. ID: {}", body.getMonsterId());
-                    return body.getMonsterId();
+                    return body;
                 }
             }
 

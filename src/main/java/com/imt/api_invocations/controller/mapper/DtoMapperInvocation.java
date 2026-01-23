@@ -3,8 +3,10 @@ package com.imt.api_invocations.controller.mapper;
 import org.springframework.stereotype.Component;
 
 import com.imt.api_invocations.controller.dto.output.GlobalMonsterWithoutRankDto;
+import com.imt.api_invocations.controller.dto.output.InvocationReplayResponse;
 import com.imt.api_invocations.controller.dto.output.SkillForMonsterWithoutRankDto;
 import com.imt.api_invocations.service.dto.GlobalMonsterDto;
+import com.imt.api_invocations.service.dto.InvocationReplayReport;
 import com.imt.api_invocations.service.dto.SkillForMonsterDto;
 
 import java.util.List;
@@ -22,8 +24,7 @@ public class DtoMapperInvocation {
                 skillForMonsterDto.getDamage(),
                 skillForMonsterDto.getRatio(),
                 skillForMonsterDto.getCooldown(),
-                skillForMonsterDto.getLvlMax()
-        );
+                skillForMonsterDto.getLvlMax());
     }
 
     private List<SkillForMonsterWithoutRankDto> mapSkills(GlobalMonsterDto globalMonsterDto) {
@@ -39,7 +40,14 @@ public class DtoMapperInvocation {
                 globalMonsterDto.getAtk(),
                 globalMonsterDto.getDef(),
                 globalMonsterDto.getVit(),
-                mapSkills(globalMonsterDto)
-        );
+                mapSkills(globalMonsterDto));
+    }
+
+    public InvocationReplayResponse toInvocationReplayResponse(InvocationReplayReport report) {
+        return new InvocationReplayResponse(
+                report.getRetried(),
+                report.getSucceeded(),
+                report.getFailed(),
+                report.getFailedInvocationIds());
     }
 }
