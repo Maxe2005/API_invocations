@@ -6,6 +6,8 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 
+import com.imt.api_invocations.client.dto.auth.AuthTokenRequest;
+import com.imt.api_invocations.client.dto.auth.AuthTokenResponse;
 import com.imt.api_invocations.config.ExternalApiProperties;
 
 import lombok.RequiredArgsConstructor;
@@ -36,13 +38,15 @@ public class AuthApiClient implements ExternalApiClient {
      */
     public boolean verifyToken(String token) {
         try {
-            String url = String.format("%s/user/verify-token/%s",
-                    externalApiProperties.getAuthBaseUrl(),
-                    token);
+            String url = String.format("%s/user/verify-token/",
+                    externalApiProperties.getAuthBaseUrl());
+
+            AuthTokenRequest request = new AuthTokenRequest(token);
 
             log.debug("Vérification du token auprès de {}: {}", getApiName(), url);
 
-            ResponseEntity<Void> response = restTemplate.getForEntity(url, Void.class);
+            ResponseEntity<AuthTokenResponse> response = restTemplate.postForEntity(url, request,
+                    AuthTokenResponse.class);
 
             boolean isValid = response.getStatusCode() == HttpStatus.OK;
             log.debug("Résultat de vérification du token: {}", isValid);

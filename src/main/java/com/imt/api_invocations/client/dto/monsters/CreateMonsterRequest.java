@@ -1,4 +1,4 @@
-package com.imt.api_invocations.client.dto;
+package com.imt.api_invocations.client.dto.monsters;
 
 import com.imt.api_invocations.enums.Elementary;
 import com.imt.api_invocations.enums.Rank;

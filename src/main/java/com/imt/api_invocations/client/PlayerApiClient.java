@@ -8,8 +8,8 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 
-import com.imt.api_invocations.client.dto.PlayerAddMonsterRequest;
-import com.imt.api_invocations.client.dto.PlayerResponse;
+import com.imt.api_invocations.client.dto.player.PlayerAddMonsterRequest;
+import com.imt.api_invocations.client.dto.player.PlayerResponse;
 import com.imt.api_invocations.config.ExternalApiProperties;
 import com.imt.api_invocations.exception.ExternalApiException;
 

@@ -8,8 +8,8 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 
-import com.imt.api_invocations.client.dto.CreateMonsterRequest;
-import com.imt.api_invocations.client.dto.CreateMonsterResponse;
+import com.imt.api_invocations.client.dto.monsters.CreateMonsterRequest;
+import com.imt.api_invocations.client.dto.monsters.CreateMonsterResponse;
 import com.imt.api_invocations.config.ExternalApiProperties;
 import com.imt.api_invocations.exception.ExternalApiException;
 import com.imt.api_invocations.service.dto.GlobalMonsterDto;
