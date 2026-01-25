@@ -24,67 +24,86 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class DatabaseSeeder implements CommandLineRunner {
 
-    private static final Logger logger = LoggerFactory.getLogger(DatabaseSeeder.class);
+        private static final Logger logger = LoggerFactory.getLogger(DatabaseSeeder.class);
 
-    private final MonsterMongoDao monsterRepository;
-    private final SkillsMongoDao skillsRepository;
+        private final MonsterMongoDao monsterRepository;
+        private final SkillsMongoDao skillsRepository;
 
-    @Override
-    public void run(String... args) throws Exception {
-        if (monsterRepository.count() == 0) {
-            logger.info("Seeding database...");
+        @Override
+        public void run(String... args) throws Exception {
+                if (monsterRepository.count() == 0) {
+                        logger.info("Seeding database...");
 
-            // Initialize Monsters
-            // Monster 1: Fire
-            MonsterMongoDto m1 = new MonsterMongoDto(Elementary.FIRE, 1200.0, 450.0, 300.0, 85.0, Rank.COMMON);
-            // Monster 2: Wind
-            MonsterMongoDto m2 = new MonsterMongoDto(Elementary.WIND, 1500.0, 200.0, 450.0, 80.0, Rank.COMMON);
-            // Monster 3: Water
-            MonsterMongoDto m3 = new MonsterMongoDto(Elementary.WATER, 2500.0, 150.0, 200.0, 70.0, Rank.COMMON);
-            // Monster 4: Water Dsp
-            MonsterMongoDto m4 = new MonsterMongoDto(Elementary.WATER, 1200.0, 550.0, 350.0, 80.0, Rank.LEGENDARY);
+                        // Initialize Monsters
+                        // Monster 1: Fire
+                        MonsterMongoDto m1 = new MonsterMongoDto("Fire Dragon", Elementary.FIRE, 1200.0, 450.0, 300.0,
+                                        85.0, Rank.COMMON, "A fierce fire dragon", "Unleash the power of fire");
+                        // Monster 2: Wind
+                        MonsterMongoDto m2 = new MonsterMongoDto("Wind Serpent", Elementary.WIND, 1500.0, 200.0, 450.0,
+                                        80.0, Rank.COMMON, "A swift wind serpent", "Control the winds");
+                        // Monster 3: Water
+                        MonsterMongoDto m3 = new MonsterMongoDto("Water Golem", Elementary.WATER, 2500.0, 150.0, 200.0,
+                                        70.0, Rank.COMMON, "A sturdy water golem", "Harness the ocean");
+                        // Monster 4: Water Dsp
+                        MonsterMongoDto m4 = new MonsterMongoDto("Aqua Leviathan", Elementary.WATER, 1200.0, 550.0,
+                                        350.0, 80.0, Rank.LEGENDARY, "A legendary aqua leviathan",
+                                        "The ultimate water beast");
 
-            monsterRepository.saveAll(Arrays.asList(m1, m2, m3, m4));
+                        monsterRepository.saveAll(Arrays.asList(m1, m2, m3, m4));
 
-            // Initialize Skills
-            List<SkillsMongoDto> skills = new ArrayList<>();
-            Rank defaultSkillLootRate = Rank.COMMON;
+                        // Initialize Skills
+                        List<SkillsMongoDto> skills = new ArrayList<>();
+                        Rank defaultSkillLootRate = Rank.COMMON;
 
-            // Monster 1 Skills
-            skills.add(new SkillsMongoDto(m1.getId(), 125.0, new RatioDto(Stat.ATK, 0.25), 0.0, 5.0,
-                    defaultSkillLootRate));
-            skills.add(new SkillsMongoDto(m1.getId(), 250.0, new RatioDto(Stat.ATK, 0.275), 2.0, 7.0,
-                    defaultSkillLootRate));
-            skills.add(new SkillsMongoDto(m1.getId(), 425.0, new RatioDto(Stat.ATK, 0.40), 5.0, 5.0,
-                    defaultSkillLootRate));
+                        // Monster 1 Skills
+                        skills.add(new SkillsMongoDto(m1.getId(), "Flame Burst", 125.0, new RatioDto(Stat.ATK, 0.25),
+                                        0.0, 5.0,
+                                        defaultSkillLootRate, "A basic fire skill"));
+                        skills.add(new SkillsMongoDto(m1.getId(), "Inferno Wave", 250.0, new RatioDto(Stat.ATK, 0.275),
+                                        2.0, 7.0,
+                                        defaultSkillLootRate, "A stronger fire skill"));
+                        skills.add(new SkillsMongoDto(m1.getId(), "Fire Storm", 425.0, new RatioDto(Stat.ATK, 0.40),
+                                        5.0, 5.0,
+                                        defaultSkillLootRate, "The ultimate fire skill"));
 
-            // Monster 2 Skills
-            skills.add(new SkillsMongoDto(m2.getId(), 200.0, new RatioDto(Stat.DEF, 0.10), 0.0, 4.0,
-                    defaultSkillLootRate));
-            skills.add(new SkillsMongoDto(m2.getId(), 315.0, new RatioDto(Stat.DEF, 0.175), 2.0, 5.0,
-                    defaultSkillLootRate));
-            skills.add(new SkillsMongoDto(m2.getId(), 525.0, new RatioDto(Stat.DEF, 0.20), 6.0, 7.0,
-                    defaultSkillLootRate));
+                        // Monster 2 Skills
+                        skills.add(new SkillsMongoDto(m2.getId(), "Wind Shield", 200.0, new RatioDto(Stat.DEF, 0.10),
+                                        0.0, 4.0,
+                                        defaultSkillLootRate, "A basic wind defensive skill"));
+                        skills.add(new SkillsMongoDto(m2.getId(), "Air Barrier", 315.0, new RatioDto(Stat.DEF, 0.175),
+                                        2.0, 5.0,
+                                        defaultSkillLootRate, "A stronger wind defensive skill"));
+                        skills.add(new SkillsMongoDto(m2.getId(), "Hurricane", 525.0, new RatioDto(Stat.DEF, 0.20), 6.0,
+                                        7.0,
+                                        defaultSkillLootRate, "The ultimate wind skill"));
 
-            // Monster 3 Skills
-            skills.add(
-                    new SkillsMongoDto(m3.getId(), 150.0, new RatioDto(Stat.HP, 0.05), 0.0, 7.0, defaultSkillLootRate));
-            skills.add(
-                    new SkillsMongoDto(m3.getId(), 350.0, new RatioDto(Stat.HP, 0.07), 2.0, 4.0, defaultSkillLootRate));
-            skills.add(new SkillsMongoDto(m3.getId(), 250.0, new RatioDto(Stat.ATK, 0.12), 5.0, 5.0,
-                    defaultSkillLootRate));
+                        // Monster 3 Skills
+                        skills.add(
+                                        new SkillsMongoDto(m3.getId(), "Aqua Shield", 150.0,
+                                                        new RatioDto(Stat.HP, 0.05), 0.0, 7.0, defaultSkillLootRate,
+                                                        "A basic water skill"));
+                        skills.add(
+                                        new SkillsMongoDto(m3.getId(), "Water Surge", 350.0,
+                                                        new RatioDto(Stat.HP, 0.07), 2.0, 4.0, defaultSkillLootRate,
+                                                        "A stronger water skill"));
+                        skills.add(new SkillsMongoDto(m3.getId(), "Tsunami", 250.0, new RatioDto(Stat.ATK, 0.12), 5.0,
+                                        5.0,
+                                        defaultSkillLootRate, "A powerful water attack"));
 
-            // Monster 4 Skills
-            skills.add(new SkillsMongoDto(m4.getId(), 150.0, new RatioDto(Stat.ATK, 0.275), 0.0, 6.0,
-                    defaultSkillLootRate));
-            skills.add(new SkillsMongoDto(m4.getId(), 285.0, new RatioDto(Stat.ATK, 0.275), 2.0, 9.0,
-                    defaultSkillLootRate));
-            skills.add(new SkillsMongoDto(m4.getId(), 550.0, new RatioDto(Stat.ATK, 0.60), 4.0, 4.0,
-                    defaultSkillLootRate));
+                        // Monster 4 Skills
+                        skills.add(new SkillsMongoDto(m4.getId(), "Deep Impact", 150.0, new RatioDto(Stat.ATK, 0.275),
+                                        0.0, 6.0,
+                                        defaultSkillLootRate, "A legendary water attack"));
+                        skills.add(new SkillsMongoDto(m4.getId(), "Abyss Call", 285.0, new RatioDto(Stat.ATK, 0.275),
+                                        2.0, 9.0,
+                                        defaultSkillLootRate, "A legendary summoning skill"));
+                        skills.add(new SkillsMongoDto(m4.getId(), "Leviathan's Wrath", 550.0,
+                                        new RatioDto(Stat.ATK, 0.60), 4.0, 4.0,
+                                        defaultSkillLootRate, "The ultimate legendary skill"));
 
-            skillsRepository.saveAll(skills);
+                        skillsRepository.saveAll(skills);
 
-            logger.info("Base data inserted into MongoDB via DatabaseSeeder!");
+                        logger.info("Base data inserted into MongoDB via DatabaseSeeder!");
+                }
         }
-    }
 }

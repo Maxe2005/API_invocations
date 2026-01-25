@@ -23,11 +23,13 @@ public class DtoMapperSkills {
         }
         return new SkillsMongoDto(
                 httpDto.getMonsterId(),
+                "Unknown Skill",
                 httpDto.getDamage(),
                 httpDto.getRatio(),
                 httpDto.getCooldown(),
                 httpDto.getLvlMax(),
-                httpDto.getRank());
+                httpDto.getRank(),
+                "No description");
     }
 
     /**
@@ -37,11 +39,13 @@ public class DtoMapperSkills {
         return new SkillsMongoDto(
                 existing.getId(),
                 partial.getMonsterId() != null ? partial.getMonsterId() : existing.getMonsterId(),
+                existing.getName(),
                 partial.getDamage() != null ? partial.getDamage() : existing.getDamage(),
                 partial.getRatio() != null ? partial.getRatio() : existing.getRatio(),
                 partial.getCooldown() != null ? partial.getCooldown() : existing.getCooldown(),
                 partial.getLvlMax() != null ? partial.getLvlMax() : existing.getLvlMax(),
-                partial.getRank() != null ? partial.getRank() : existing.getRank());
+                partial.getRank() != null ? partial.getRank() : existing.getRank(),
+                existing.getDescription());
     }
 
     /**

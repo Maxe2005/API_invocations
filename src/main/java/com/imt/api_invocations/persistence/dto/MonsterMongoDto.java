@@ -7,36 +7,29 @@ import org.springframework.data.mongodb.core.mapping.MongoId;
 
 import com.imt.api_invocations.enums.Elementary;
 import com.imt.api_invocations.enums.Rank;
+import com.imt.api_invocations.service.dto.MonsterBaseDto;
 
 import java.util.UUID;
 
 @Getter
 @Document(collection = "monsters")
-public class MonsterMongoDto {
+public class MonsterMongoDto extends MonsterBaseDto {
 
     @MongoId()
     private final String id;
-    private final Elementary element;
-    private final Double hp;
-    private final Double atk;
-    private final Double def;
-    private final Double vit;
-    private final Rank rank;
 
     @PersistenceCreator
-    public MonsterMongoDto(String id, Elementary element, Double hp, Double atk, Double def, Double vit,
-            Rank rank) {
+    @SuppressWarnings("java:S107")
+    public MonsterMongoDto(String id, String name, Elementary element, Double hp, Double atk, Double def, Double vit,
+            Rank rank, String visualDescription, String cardDescription) {
+        super(name, element, hp, atk, def, vit, rank, visualDescription, cardDescription);
         this.id = id;
-        this.element = element;
-        this.hp = hp;
-        this.atk = atk;
-        this.def = def;
-        this.vit = vit;
-        this.rank = rank;
     }
 
-    public MonsterMongoDto(Elementary element, Double hp, Double atk, Double def, Double vit, Rank rank) {
-        this(UUID.randomUUID().toString(), element, hp, atk, def, vit, rank);
+    public MonsterMongoDto(String name, Elementary element, Double hp, Double atk, Double def, Double vit, Rank rank,
+            String visualDescription, String cardDescription) {
+        this(UUID.randomUUID().toString(), name, element, hp, atk, def, vit, rank, visualDescription,
+                cardDescription);
     }
 
 }

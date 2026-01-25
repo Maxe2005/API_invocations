@@ -44,11 +44,13 @@ public class SkillsService implements DataServiceInterface {
         SkillsMongoDto skillToUpdate = new SkillsMongoDto(
                 skillId,
                 skillsMongoDto.getMonsterId(),
+                skillsMongoDto.getName(),
                 skillsMongoDto.getDamage(),
                 skillsMongoDto.getRatio(),
                 skillsMongoDto.getCooldown(),
                 skillsMongoDto.getLvlMax(),
-                skillsMongoDto.getRank());
+                skillsMongoDto.getRank(),
+                skillsMongoDto.getDescription());
         skillsRepository.update(skillToUpdate);
     }
 
@@ -70,12 +72,14 @@ public class SkillsService implements DataServiceInterface {
         for (SkillsMongoDto skill : skills) {
             skillDtos.add(
                     new SkillForMonsterDto(
-                            count++,
+                            skill.getName(),
                             skill.getDamage(),
                             skill.getRatio(),
                             skill.getCooldown(),
                             skill.getLvlMax(),
-                            skill.getRank()));
+                            skill.getRank(),
+                            skill.getDescription(),
+                            count++));
         }
         return skillDtos;
     }
@@ -86,7 +90,8 @@ public class SkillsService implements DataServiceInterface {
                 .toList();
     }
 
-    public List<SkillForMonsterDto> getRandomSkillsForMonster(String monsterId, int numberOfSkills) throws IllegalStateException {
+    public List<SkillForMonsterDto> getRandomSkillsForMonster(String monsterId, int numberOfSkills)
+            throws IllegalStateException {
         possibleSkills = skillsRepository.findByMonsterId(monsterId);
         int maxSkillsAvailable = possibleSkills.size();
         List<SkillsMongoDto> selectedSkills = new ArrayList<>();

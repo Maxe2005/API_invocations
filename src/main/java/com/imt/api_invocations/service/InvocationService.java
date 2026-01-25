@@ -50,13 +50,16 @@ public class InvocationService {
 
     private GlobalMonsterDto mapToGlobalMonsterDto(MonsterMongoDto monsterMongoDto, List<SkillForMonsterDto> skills) {
         return new GlobalMonsterDto(
+                monsterMongoDto.getName(),
                 monsterMongoDto.getElement(),
                 monsterMongoDto.getHp(),
                 monsterMongoDto.getAtk(),
                 monsterMongoDto.getDef(),
                 monsterMongoDto.getVit(),
-                skills,
-                monsterMongoDto.getRank());
+                monsterMongoDto.getRank(),
+                monsterMongoDto.getVisualDescription(),
+                monsterMongoDto.getCardDescription(),
+                skills);
     }
 
     public GlobalMonsterDto invoke() {
@@ -69,10 +72,10 @@ public class InvocationService {
     private CreateMonsterRequest toCreateMonsterRequest(GlobalMonsterDto monster) {
         return new CreateMonsterRequest(
                 monster.getElement(),
-                (int) monster.getHp(),
-                (int) monster.getAtk(),
-                (int) monster.getDef(),
-                (int) monster.getVit(),
+                monster.getHp().intValue(),
+                monster.getAtk().intValue(),
+                monster.getDef().intValue(),
+                monster.getVit().intValue(),
                 monster.getSkills(),
                 monster.getRank());
     }

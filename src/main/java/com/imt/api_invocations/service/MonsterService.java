@@ -37,12 +37,15 @@ public class MonsterService implements DataServiceInterface {
     public void updateMonster(String monsterId, MonsterMongoDto monsterMongoDto) {
         MonsterMongoDto monsterToUpdate = new MonsterMongoDto(
                 monsterId,
+                monsterMongoDto.getName(),
                 monsterMongoDto.getElement(),
                 monsterMongoDto.getHp(),
                 monsterMongoDto.getAtk(),
                 monsterMongoDto.getDef(),
                 monsterMongoDto.getVit(),
-                monsterMongoDto.getRank());
+                monsterMongoDto.getRank(),
+                monsterMongoDto.getVisualDescription(),
+                monsterMongoDto.getCardDescription());
         monsterRepository.update(monsterToUpdate);
     }
 

@@ -24,12 +24,15 @@ public class DtoMapperMonster {
             throw new IllegalArgumentException("All fields must be provided for creation");
         }
         return new MonsterMongoDto(
+                "Unknown",
                 httpDto.getElement(),
                 httpDto.getHp(),
                 httpDto.getAtk(),
                 httpDto.getDef(),
                 httpDto.getVit(),
-                httpDto.getRank());
+                httpDto.getRank(),
+                "No visual description",
+                "No card description");
     }
 
     /**
@@ -38,12 +41,15 @@ public class DtoMapperMonster {
     public MonsterMongoDto updateMonsterMongoDto(MonsterMongoDto existing, MonsterHttpDto partial) {
         return new MonsterMongoDto(
                 existing.getId(),
+                existing.getName(),
                 partial.getElement() != null ? partial.getElement() : existing.getElement(),
                 partial.getHp() != null ? partial.getHp() : existing.getHp(),
                 partial.getAtk() != null ? partial.getAtk() : existing.getAtk(),
                 partial.getDef() != null ? partial.getDef() : existing.getDef(),
                 partial.getVit() != null ? partial.getVit() : existing.getVit(),
-                partial.getRank() != null ? partial.getRank() : existing.getRank());
+                partial.getRank() != null ? partial.getRank() : existing.getRank(),
+                existing.getVisualDescription(),
+                existing.getCardDescription());
     }
 
     /**

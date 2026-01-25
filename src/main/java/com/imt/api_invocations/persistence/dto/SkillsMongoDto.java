@@ -6,37 +6,30 @@ import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.MongoId;
 
 import com.imt.api_invocations.enums.Rank;
+import com.imt.api_invocations.service.dto.SkillBaseDto;
 
 import java.util.UUID;
 
 @Getter
 @Document(collection = "skills")
-public class SkillsMongoDto {
+public class SkillsMongoDto extends SkillBaseDto {
 
     @MongoId()
     private final String id;
     private final String monsterId;
-    private final double damage;
-    private final RatioDto ratio;
-    private final double cooldown;
-    private final double lvlMax;
-    private final Rank rank;
 
     @PersistenceCreator
-    public SkillsMongoDto(String id, String monsterId, double damage, RatioDto ratio, double cooldown, double lvlMax,
-            Rank rank) {
+    public SkillsMongoDto(String id, String monsterId, String name, double damage, RatioDto ratio, double cooldown,
+            double lvlMax,
+            Rank rank, String description) {
+        super(name, damage, ratio, cooldown, lvlMax, rank, description);
         this.id = id;
         this.monsterId = monsterId;
-        this.damage = damage;
-        this.ratio = ratio;
-        this.cooldown = cooldown;
-        this.lvlMax = lvlMax;
-        this.rank = rank;
     }
 
-    public SkillsMongoDto(String monsterId, double damage, RatioDto ratio, double cooldown, double lvlMax,
-            Rank rank) {
-        this(UUID.randomUUID().toString(), monsterId, damage, ratio, cooldown, lvlMax, rank);
+    public SkillsMongoDto(String monsterId, String name, double damage, RatioDto ratio, double cooldown, double lvlMax,
+            Rank rank, String description) {
+        this(UUID.randomUUID().toString(), monsterId, name, damage, ratio, cooldown, lvlMax, rank, description);
     }
 
 }
