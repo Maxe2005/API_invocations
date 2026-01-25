@@ -1,0 +1,63 @@
+{
+    "nom": "Zéphirion",
+    "element": "WIND",
+    "rang": "RARE",
+    "stats": {
+        "hp": 550.0,
+        "atk": 85.0,
+        "def": 45.0,
+        "vit": 110.0
+    },
+    "description_carte": "Maître des cieux paré d'or, Zéphirion commande aux tempêtes. Sa vitesse est telle qu'il frappe avant même que le vent ne tourne.",
+    "description_visuelle": "Un faucon majestueux, ailes en nuages et courants d'air émeraude. Parures dorées au cou. Style fantasy épique, plumes dynamiques.",
+    "skills": [
+        {
+            "name": "Serre-Vent",
+            "description": "Frappe avec une rapidité fulgurante.",
+            "damage": 150.0,
+            "ratio": {
+                "stat": "VIT",
+                "percent": 0.50
+            },
+            "cooldown": 0.0,
+            "lvlMax": 5.0,
+            "rank": "RARE"
+        },
+        {
+            "name": "Mur de Nuages",
+            "description": "Crée une barrière vaporeuse pour esquiver les coups.",
+            "damage": 0.0,
+            "ratio": {
+                "stat": "DEF",
+                "percent": 0.80
+            },
+            "cooldown": 5.0,
+            "lvlMax": 5.0,
+            "rank": "RARE"
+        },
+        {
+            "name": "Bourrasque Dorée",
+            "description": "Une tempête de plumes qui aveugle la cible.",
+            "damage": 180.0,
+            "ratio": {
+                "stat": "ATK",
+                "percent": 1.25
+            },
+            "cooldown": 2.0,
+            "lvlMax": 5.0,
+            "rank": "EPIC"
+        },
+        {
+            "name": "Zénith Émeraude",
+            "description": "Attaque aérienne dévastatrice tombant du ciel.",
+            "damage": 320.0,
+            "ratio": {
+                "stat": "ATK",
+                "percent": 1.60
+            },
+            "cooldown": 4.0,
+            "lvlMax": 5.0,
+            "rank": "LEGENDARY"
+        }
+    ]
+}

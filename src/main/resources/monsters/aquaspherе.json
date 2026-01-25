@@ -1,0 +1,63 @@
+{
+    "nom": "Aquasphère",
+    "element": "WATER",
+    "rang": "COMMON",
+    "stats": {
+        "hp": 400.0,
+        "atk": 45.0,
+        "def": 55.0,
+        "vit": 50.0
+    },
+    "description_carte": "Une entité sereine abritant un écosystème fragile. Elle protège ses hôtes en enveloppant ses ennemis dans une prison d'eau pure.",
+    "description_visuelle": "Une méduse flottante faite d'eau translucide contenant des petits poissons à l'intérieur. Style magique, reflets bleus, bulles effervescentes.",
+    "skills": [
+        {
+            "name": "Jet de Bulle",
+            "description": "Projette une bulle d'eau sous pression.",
+            "damage": 100.0,
+            "ratio": {
+                "stat": "ATK",
+                "percent": 0.90
+            },
+            "cooldown": 0.0,
+            "lvlMax": 5.0,
+            "rank": "COMMON"
+        },
+        {
+            "name": "Prison Liquide",
+            "description": "Enveloppe la cible dans une sphère d'eau restrictive.",
+            "damage": 130.0,
+            "ratio": {
+                "stat": "ATK",
+                "percent": 0.75
+            },
+            "cooldown": 2.0,
+            "lvlMax": 5.0,
+            "rank": "COMMON"
+        },
+        {
+            "name": "Éclat d'Océan",
+            "description": "Libère une onde de choc aquatique puissante.",
+            "damage": 180.0,
+            "ratio": {
+                "stat": "ATK",
+                "percent": 1.10
+            },
+            "cooldown": 4.0,
+            "lvlMax": 5.0,
+            "rank": "RARE"
+        },
+        {
+            "name": "Siphon Curatif",
+            "description": "Les poissons internes soignent les alliés proches.",
+            "damage": 0.0,
+            "ratio": {
+                "stat": "HP",
+                "percent": 0.15
+            },
+            "cooldown": 3.0,
+            "lvlMax": 5.0,
+            "rank": "EPIC"
+        }
+    ]
+}

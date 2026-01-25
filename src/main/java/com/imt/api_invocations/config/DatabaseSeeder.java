@@ -1,7 +1,6 @@
 package com.imt.api_invocations.config;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 import org.slf4j.Logger;
@@ -9,6 +8,9 @@ import org.slf4j.LoggerFactory;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
 
+import com.imt.api_invocations.config.seeding.MonsterSeedDto;
+import com.imt.api_invocations.config.seeding.MonsterSeedingService;
+import com.imt.api_invocations.config.seeding.SkillSeedDto;
 import com.imt.api_invocations.enums.Elementary;
 import com.imt.api_invocations.enums.Rank;
 import com.imt.api_invocations.enums.Stat;
@@ -28,82 +30,89 @@ public class DatabaseSeeder implements CommandLineRunner {
 
         private final MonsterMongoDao monsterRepository;
         private final SkillsMongoDao skillsRepository;
+        private final MonsterSeedingService monsterSeedingService;
 
         @Override
         public void run(String... args) throws Exception {
                 if (monsterRepository.count() == 0) {
-                        logger.info("Seeding database...");
+                        logger.info("Seeding database from JSON configuration...");
 
-                        // Initialize Monsters
-                        // Monster 1: Fire
-                        MonsterMongoDto m1 = new MonsterMongoDto("Fire Dragon", Elementary.FIRE, 1200.0, 450.0, 300.0,
-                                        85.0, Rank.COMMON, "A fierce fire dragon", "Unleash the power of fire");
-                        // Monster 2: Wind
-                        MonsterMongoDto m2 = new MonsterMongoDto("Wind Serpent", Elementary.WIND, 1500.0, 200.0, 450.0,
-                                        80.0, Rank.COMMON, "A swift wind serpent", "Control the winds");
-                        // Monster 3: Water
-                        MonsterMongoDto m3 = new MonsterMongoDto("Water Golem", Elementary.WATER, 2500.0, 150.0, 200.0,
-                                        70.0, Rank.COMMON, "A sturdy water golem", "Harness the ocean");
-                        // Monster 4: Water Dsp
-                        MonsterMongoDto m4 = new MonsterMongoDto("Aqua Leviathan", Elementary.WATER, 1200.0, 550.0,
-                                        350.0, 80.0, Rank.LEGENDARY, "A legendary aqua leviathan",
-                                        "The ultimate water beast");
-
-                        monsterRepository.saveAll(Arrays.asList(m1, m2, m3, m4));
-
-                        // Initialize Skills
-                        List<SkillsMongoDto> skills = new ArrayList<>();
-                        Rank defaultSkillLootRate = Rank.COMMON;
-
-                        // Monster 1 Skills
-                        skills.add(new SkillsMongoDto(m1.getId(), "Flame Burst", 125.0, new RatioDto(Stat.ATK, 0.25),
-                                        0.0, 5.0,
-                                        defaultSkillLootRate, "A basic fire skill"));
-                        skills.add(new SkillsMongoDto(m1.getId(), "Inferno Wave", 250.0, new RatioDto(Stat.ATK, 0.275),
-                                        2.0, 7.0,
-                                        defaultSkillLootRate, "A stronger fire skill"));
-                        skills.add(new SkillsMongoDto(m1.getId(), "Fire Storm", 425.0, new RatioDto(Stat.ATK, 0.40),
-                                        5.0, 5.0,
-                                        defaultSkillLootRate, "The ultimate fire skill"));
-
-                        // Monster 2 Skills
-                        skills.add(new SkillsMongoDto(m2.getId(), "Wind Shield", 200.0, new RatioDto(Stat.DEF, 0.10),
-                                        0.0, 4.0,
-                                        defaultSkillLootRate, "A basic wind defensive skill"));
-                        skills.add(new SkillsMongoDto(m2.getId(), "Air Barrier", 315.0, new RatioDto(Stat.DEF, 0.175),
-                                        2.0, 5.0,
-                                        defaultSkillLootRate, "A stronger wind defensive skill"));
-                        skills.add(new SkillsMongoDto(m2.getId(), "Hurricane", 525.0, new RatioDto(Stat.DEF, 0.20), 6.0,
-                                        7.0,
-                                        defaultSkillLootRate, "The ultimate wind skill"));
-
-                        // Monster 3 Skills
-                        skills.add(
-                                        new SkillsMongoDto(m3.getId(), "Aqua Shield", 150.0,
-                                                        new RatioDto(Stat.HP, 0.05), 0.0, 7.0, defaultSkillLootRate,
-                                                        "A basic water skill"));
-                        skills.add(
-                                        new SkillsMongoDto(m3.getId(), "Water Surge", 350.0,
-                                                        new RatioDto(Stat.HP, 0.07), 2.0, 4.0, defaultSkillLootRate,
-                                                        "A stronger water skill"));
-                        skills.add(new SkillsMongoDto(m3.getId(), "Tsunami", 250.0, new RatioDto(Stat.ATK, 0.12), 5.0,
-                                        5.0,
-                                        defaultSkillLootRate, "A powerful water attack"));
-
-                        // Monster 4 Skills
-                        skills.add(new SkillsMongoDto(m4.getId(), "Deep Impact", 150.0, new RatioDto(Stat.ATK, 0.275),
-                                        0.0, 6.0,
-                                        defaultSkillLootRate, "A legendary water attack"));
-                        skills.add(new SkillsMongoDto(m4.getId(), "Abyss Call", 285.0, new RatioDto(Stat.ATK, 0.275),
-                                        2.0, 9.0,
-                                        defaultSkillLootRate, "A legendary summoning skill"));
-                        skills.add(new SkillsMongoDto(m4.getId(), "Leviathan's Wrath", 550.0,
-                                        new RatioDto(Stat.ATK, 0.60), 4.0, 4.0,
-                                        defaultSkillLootRate, "The ultimate legendary skill"));
-
-                        skillsRepository.saveAll(skills);
-
-                        logger.info("Base data inserted into MongoDB via DatabaseSeeder!");
+                        try {
+                                List<MonsterSeedDto> monsterSeeds = monsterSeedingService.loadAllMonsters();
+                                seedMonsters(monsterSeeds);
+                                logger.info("Database seeding completed successfully!");
+                        } catch (Exception e) {
+                                logger.error("Error during database seeding", e);
+                                throw e;
+                        }
                 }
+        }
+
+        /**
+         * Seed la base de données avec les monstres et compétences chargés depuis JSON
+         */
+        private void seedMonsters(List<MonsterSeedDto> monsterSeeds) {
+                List<MonsterMongoDto> monsters = new ArrayList<>();
+                List<SkillsMongoDto> allSkills = new ArrayList<>();
+
+                // Convertir les DTOs de seed en entités de base de données
+                for (MonsterSeedDto seedDto : monsterSeeds) {
+                        MonsterMongoDto monster = convertToMonsterEntity(seedDto);
+                        monsters.add(monster);
+                }
+
+                // Sauvegarder les monstres
+                monsterRepository.saveAll(monsters);
+
+                // Ajouter les compétences pour chaque monstre
+                for (int i = 0; i < monsterSeeds.size(); i++) {
+                        MonsterSeedDto seedDto = monsterSeeds.get(i);
+                        MonsterMongoDto monster = monsters.get(i);
+
+                        if (seedDto.getSkills() != null) {
+                                for (SkillSeedDto skillSeed : seedDto.getSkills()) {
+                                        SkillsMongoDto skill = convertToSkillEntity(monster.getId(), skillSeed);
+                                        allSkills.add(skill);
+                                }
+                        }
+                }
+
+                // Sauvegarder les compétences
+                if (!allSkills.isEmpty()) {
+                        skillsRepository.saveAll(allSkills);
+                }
+        }
+
+        /**
+         * Convertit un MonsterSeedDto en MonsterMongoDto
+         */
+        private MonsterMongoDto convertToMonsterEntity(MonsterSeedDto seedDto) {
+                return new MonsterMongoDto(
+                                seedDto.getNom(),
+                                Elementary.valueOf(seedDto.getElement()),
+                                seedDto.getStats().getHp(),
+                                seedDto.getStats().getAtk(),
+                                seedDto.getStats().getDef(),
+                                seedDto.getStats().getVit(),
+                                Rank.valueOf(seedDto.getRang()),
+                                seedDto.getDescriptionCarte(),
+                                seedDto.getDescriptionVisuelle());
+        }
+
+        /**
+         * Convertit un SkillSeedDto en SkillsMongoDto
+         */
+        private SkillsMongoDto convertToSkillEntity(String monsterId, SkillSeedDto seedDto) {
+                return new SkillsMongoDto(
+                                monsterId,
+                                seedDto.getName(),
+                                seedDto.getDamage(),
+                                new RatioDto(
+                                                Stat.valueOf(seedDto.getRatio().getStat()),
+                                                seedDto.getRatio().getPercent()),
+                                seedDto.getCooldown(),
+                                seedDto.getLvlMax(),
+                                Rank.valueOf(seedDto.getRank()),
+                                seedDto.getDescription());
         }
 }

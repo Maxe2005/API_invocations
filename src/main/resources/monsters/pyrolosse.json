@@ -1,0 +1,63 @@
+{
+    "nom": "Pyrolosse",
+    "element": "FIRE",
+    "rang": "COMMON",
+    "stats": {
+        "hp": 450,
+        "atk": 65,
+        "def": 40,
+        "vit": 35
+    },
+    "description_carte": "Un petit bouledogue de lave avec des charbons ardents en guise de fourrure. Ses yeux brillent d'un jaune vif. Style cartoon 2D, contours nets, fond volcanique flou.",
+    "description_visuelle": "Petit mais brûlant, Pyrolosse dégage une chaleur capable de fondre le plomb. Têtu et fidèle, il réchauffe le cœur de son maître... au risque de le brûler.",
+    "skills": [
+        {
+            "name": "Morsure Ardente",
+            "description": "Plante ses crocs chauffés à blanc dans sa cible.",
+            "damage": 120,
+            "ratio": {
+                "stat": "ATK",
+                "percent": 1.10
+            },
+            "cooldown": 0,
+            "lvlMax": 5,
+            "rank": "COMMON"
+        },
+        {
+            "name": "Bave de Magma",
+            "description": "Crache une substance visqueuse qui brûle et entrave l'ennemi.",
+            "damage": 80,
+            "ratio": {
+                "stat": "ATK",
+                "percent": 0.65
+            },
+            "cooldown": 2,
+            "lvlMax": 5,
+            "rank": "COMMON"
+        },
+        {
+            "name": "Écorce de Charbon",
+            "description": "Sa fourrure se durcit, créant un bouclier de braises protecteur.",
+            "damage": 0,
+            "ratio": {
+                "stat": "DEF",
+                "percent": 0.50
+            },
+            "cooldown": 3,
+            "lvlMax": 5,
+            "rank": "COMMON"
+        },
+        {
+            "name": "Explosion de Joie",
+            "description": "Un bond explosif qui libère toute sa chaleur interne à l'impact.",
+            "damage": 210,
+            "ratio": {
+                "stat": "ATK",
+                "percent": 1.45
+            },
+            "cooldown": 4,
+            "lvlMax": 5,
+            "rank": "RARE"
+        }
+    ]
+}
