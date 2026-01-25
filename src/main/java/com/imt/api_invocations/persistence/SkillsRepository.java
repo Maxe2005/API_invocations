@@ -46,4 +46,12 @@ public class SkillsRepository {
         return skillsMongoDao.findByRank(rank);
     }
 
+    public void deleteAll() {
+        skillsMongoDao.deleteAll();
+    }
+
+    public long count() {
+        return skillsMongoDao.count();
+    }
+
 }

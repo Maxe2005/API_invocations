@@ -1,0 +1,17 @@
+server:
+  port: 8080
+
+spring:
+  application:
+    name: Api_invocation
+  data:
+    mongodb:
+      auto-index-creation: true
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+
+logging:
+  level:
+    root: INFO
+    'com.imt.api_invocations': DEBUG

@@ -86,8 +86,11 @@ public class SkillsService implements DataServiceInterface {
                 .toList();
     }
 
-    public List<SkillForMonsterDto> getRandomSkillsForMonster(String monsterId, int numberOfSkills) throws IllegalStateException {
-        possibleSkills = skillsRepository.findByMonsterId(monsterId);
+    public List<SkillForMonsterDto> getRandomSkillsForMonster(String monsterId, int numberOfSkills)
+            throws IllegalStateException {
+        // Ensure we have a mutable list as we'll remove selected skills to avoid
+        // duplicates
+        possibleSkills = new ArrayList<>(skillsRepository.findByMonsterId(monsterId));
         int maxSkillsAvailable = possibleSkills.size();
         List<SkillsMongoDto> selectedSkills = new ArrayList<>();
         for (int i = 0; i < numberOfSkills && i < maxSkillsAvailable; i++) {

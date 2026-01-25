@@ -40,6 +40,14 @@ public class MonsterRepository {
                 .orElse(null);
     }
 
+    public void deleteAll() {
+        monsterMongoDao.deleteAll();
+    }
+
+    public long count() {
+        return monsterMongoDao.count();
+    }
+
     public void update(MonsterMongoDto monsterMongoDto) {
         monsterMongoDao.save(monsterMongoDto);
     }

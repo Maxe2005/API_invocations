@@ -28,4 +28,12 @@ public class InvocationBufferRepository {
         return invocationBufferMongoDao.findByStatusIn(
                 List.of(InvocationStatus.PENDING, InvocationStatus.MONSTER_CREATED, InvocationStatus.FAILED));
     }
+
+    public void deleteAll() {
+        invocationBufferMongoDao.deleteAll();
+    }
+
+    public long count() {
+        return invocationBufferMongoDao.count();
+    }
 }
