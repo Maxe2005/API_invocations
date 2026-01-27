@@ -96,7 +96,9 @@ public class DatabaseSeeder implements CommandLineRunner {
                                 seedDto.getStats().getVit(),
                                 Rank.valueOf(seedDto.getRang()),
                                 seedDto.getDescriptionVisuelle(),
-                                seedDto.getDescriptionCarte());
+                                seedDto.getDescriptionCarte(),
+                                "" //seedDto.getImageUrl()
+                        );
         }
 
         /**

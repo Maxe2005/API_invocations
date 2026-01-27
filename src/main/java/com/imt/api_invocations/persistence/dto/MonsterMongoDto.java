@@ -26,6 +26,7 @@ public class MonsterMongoDto extends MonsterBaseDto {
         this.id = id;
     }
 
+    @SuppressWarnings("java:S107")
     public MonsterMongoDto(String name, Elementary element, Double hp, Double atk, Double def, Double vit, Rank rank,
             String visualDescription, String cardDescription, String imageUrl) {
         this(UUID.randomUUID().toString(), name, element, hp, atk, def, vit, rank, visualDescription,
