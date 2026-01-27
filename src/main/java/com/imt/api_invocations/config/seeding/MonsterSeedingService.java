@@ -47,11 +47,16 @@ public class MonsterSeedingService {
             logger.info("Found {} monster files matching pattern: {}", resources.length, pattern);
 
             for (Resource resource : resources) {
+                // Skip files that start with a dot (like .TEMPLATE_monster.json)
+                if (resource.getFilename() != null && resource.getFilename().startsWith(".")) {
+                    logger.debug("Skipping template file: {}", resource.getFilename());
+                    continue;
+                }
+
                 try {
                     MonsterSeedDto monster = objectMapper.readValue(
                             resource.getInputStream(),
-                            MonsterSeedDto.class
-                    );
+                            MonsterSeedDto.class);
                     allMonsters.add(monster);
                     logger.debug("Loaded monster: {}", monster.getNom());
                 } catch (IOException e) {
@@ -78,8 +83,7 @@ public class MonsterSeedingService {
             ClassPathResource resource = new ClassPathResource("monsters/" + fileName);
             MonsterSeedDto monster = objectMapper.readValue(
                     resource.getInputStream(),
-                    MonsterSeedDto.class
-            );
+                    MonsterSeedDto.class);
             logger.info("Loaded monster from file: {}", fileName);
             return monster;
         } catch (IOException e) {
