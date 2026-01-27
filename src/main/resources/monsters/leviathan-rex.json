@@ -1,0 +1,63 @@
+{
+    "nom": "Leviathan-Rex",
+    "element": "WATER",
+    "rang": "LEGENDARY",
+    "stats": {
+        "hp": 3000.0,
+        "atk": 210.0,
+        "def": 250.0,
+        "vit": 90.0
+    },
+    "description_carte": "Souverain des océans originels, il transporte les vestiges d'une civilisation oubliée sur son dos impénétrable.",
+    "description_visuelle": "Baleine titanesque à la peau de cuir bleu-gris sombre. Une cité de corail blanc et de dômes de verre est édifiée sur son dos. Elle navigue au milieu de vagues géantes déferlantes. Rayons de lumière divine perçant la surface de l'eau, détails de vie marine microscopique autour, style majestueux et colossal.",
+    "skills": [
+        {
+            "name": "Geyser de Pression",
+            "description": "Expulse un jet d'eau destructeur depuis l'évent de la cité.",
+            "damage": 180.0,
+            "ratio": {
+                "stat": "ATK",
+                "percent": 1.2
+            },
+            "cooldown": 0.0,
+            "lvlMax": 5.0,
+            "rank": "RARE"
+        },
+        {
+            "name": "Rempart du Récif",
+            "description": "La cité de corail s'illumine, octroyant un bouclier massif à l'équipe.",
+            "damage": 0.0,
+            "ratio": {
+                "stat": "HP",
+                "percent": 0.25
+            },
+            "cooldown": 3.0,
+            "lvlMax": 5.0,
+            "rank": "EPIC"
+        },
+        {
+            "name": "Chant des Abysses",
+            "description": "Un chant mélancolique qui réduit drastiquement l'attaque des ennemis.",
+            "damage": 80.0,
+            "ratio": {
+                "stat": "DEF",
+                "percent": 0.8
+            },
+            "cooldown": 4.0,
+            "lvlMax": 5.0,
+            "rank": "EPIC"
+        },
+        {
+            "name": "Déluge du Monde Oublié",
+            "description": "Invoque une inondation planétaire submergeant toute résistance.",
+            "damage": 400.0,
+            "ratio": {
+                "stat": "HP",
+                "percent": 0.5
+            },
+            "cooldown": 7.0,
+            "lvlMax": 3.0,
+            "rank": "LEGENDARY"
+        }
+    ]
+}

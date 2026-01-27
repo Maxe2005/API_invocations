@@ -1,0 +1,63 @@
+{
+    "nom": "Ignis-Vult",
+    "element": "FIRE",
+    "rang": "RARE",
+    "stats": {
+        "hp": 600.0,
+        "atk": 105.0,
+        "def": 70.0,
+        "vit": 65.0
+    },
+    "description_carte": "Un chevalier spectral dont l'armure d'obsidienne brûle d'une fureur bleutée éternelle.",
+    "description_visuelle": "Un chevalier imposant en armure de plaques d'obsidienne noire mate. Des flammes bleu électrique jaillissent des jointures et de la visière. Il brandit une épée massive en cristal d'orange incandescent. Arrière-plan de forteresse volcanique sombre, style dark fantasy épique.",
+    "skills": [
+        {
+            "name": "Entaille de Cendre",
+            "description": "Frappe l'ennemi avec une lame chauffée à blanc.",
+            "damage": 80.0,
+            "ratio": {
+                "stat": "ATK",
+                "percent": 1.2
+            },
+            "cooldown": 0.0,
+            "lvlMax": 5.0,
+            "rank": "COMMON"
+        },
+        {
+            "name": "Armure de Soufre",
+            "description": "Renforce sa défense et inflige des dégâts de brûlure aux attaquants.",
+            "damage": 40.0,
+            "ratio": {
+                "stat": "DEF",
+                "percent": 0.8
+            },
+            "cooldown": 3.0,
+            "lvlMax": 5.0,
+            "rank": "RARE"
+        },
+        {
+            "name": "Éclat d'Obsidienne",
+            "description": "Projette des fragments de roche volcanique sur tous les ennemis.",
+            "damage": 110.0,
+            "ratio": {
+                "stat": "ATK",
+                "percent": 0.9
+            },
+            "cooldown": 4.0,
+            "lvlMax": 5.0,
+            "rank": "RARE"
+        },
+        {
+            "name": "Exécution de Nova Bleue",
+            "description": "Libère toute l'énergie thermique dans une explosion dévastatrice.",
+            "damage": 350.0,
+            "ratio": {
+                "stat": "ATK",
+                "percent": 2.5
+            },
+            "cooldown": 6.0,
+            "lvlMax": 3.0,
+            "rank": "EPIC"
+        }
+    ]
+}

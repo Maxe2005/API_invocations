@@ -1,0 +1,63 @@
+{
+    "nom": "Lithe-Ondine",
+    "element": "WATER",
+    "rang": "RARE",
+    "stats": {
+        "hp": 700.0,
+        "atk": 75.0,
+        "def": 90.0,
+        "vit": 80.0
+    },
+    "description_carte": "Gardienne des récifs de nacre, elle danse entre les courants avec une grâce mortelle.",
+    "description_visuelle": "Une créature serpentine élégante avec des écailles irisées changeant du rose pâle au bleu turquoise. Ses nageoires ressemblent à des voiles de soie translucides flottant dans l'eau. Arrière-plan de coraux luminescents et bulles d'air, style éthéré et gracieux.",
+    "skills": [
+        {
+            "name": "Jet de Perle",
+            "description": "Tire un projectile d'eau sous pression.",
+            "damage": 60.0,
+            "ratio": {
+                "stat": "ATK",
+                "percent": 1.0
+            },
+            "cooldown": 0.0,
+            "lvlMax": 5.0,
+            "rank": "COMMON"
+        },
+        {
+            "name": "Courant Régénérateur",
+            "description": "Soigne l'allié ayant le moins de PV.",
+            "damage": 0.0,
+            "ratio": {
+                "stat": "HP",
+                "percent": 0.2
+            },
+            "cooldown": 3.0,
+            "lvlMax": 5.0,
+            "rank": "RARE"
+        },
+        {
+            "name": "Miroir de Nacre",
+            "description": "Crée un bouclier reflétant une partie des dégâts reçus.",
+            "damage": 0.0,
+            "ratio": {
+                "stat": "DEF",
+                "percent": 1.5
+            },
+            "cooldown": 4.0,
+            "lvlMax": 5.0,
+            "rank": "RARE"
+        },
+        {
+            "name": "Danse des Marées Profondes",
+            "description": "Invoque un maelstrom qui étourdit et blesse tous les ennemis.",
+            "damage": 180.0,
+            "ratio": {
+                "stat": "VIT",
+                "percent": 2.0
+            },
+            "cooldown": 5.0,
+            "lvlMax": 3.0,
+            "rank": "EPIC"
+        }
+    ]
+}

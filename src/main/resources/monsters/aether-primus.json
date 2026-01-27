@@ -1,0 +1,63 @@
+{
+    "nom": "Aether-Primus",
+    "element": "WIND",
+    "rang": "LEGENDARY",
+    "stats": {
+        "hp": 2000.0,
+        "atk": 250.0,
+        "def": 180.0,
+        "vit": 200.0
+    },
+    "description_carte": "L'architecte céleste. Une entité géométrique pure dont la présence fait vibrer les cieux d'une harmonie absolue.",
+    "description_visuelle": "Un ange mécanique colossal composé d'anneaux d'or massifs imbriqués en rotation constante (astrolabe divin). Six ailes de lumière blanche éthérée jaillissent du centre. Absence de visage, remplacé par une orbe de singularité hyper-brillante. Particules dorées, nuages sacrés, style divin et transcendant.",
+    "skills": [
+        {
+            "name": "Rayon de Genèse",
+            "description": "Projette un faisceau de lumière pure focalisé par les anneaux.",
+            "damage": 220.0,
+            "ratio": {
+                "stat": "ATK",
+                "percent": 1.5
+            },
+            "cooldown": 0.0,
+            "lvlMax": 5.0,
+            "rank": "RARE"
+        },
+        {
+            "name": "Rotation Éternelle",
+            "description": "Accélère la rotation des anneaux pour augmenter la VIT de tous les alliés.",
+            "damage": 0.0,
+            "ratio": {
+                "stat": "VIT",
+                "percent": 0.4
+            },
+            "cooldown": 3.0,
+            "lvlMax": 5.0,
+            "rank": "EPIC"
+        },
+        {
+            "name": "Barrière d'Éther",
+            "description": "Crée une distorsion spatiale protégeant contre toute altération d'état.",
+            "damage": 0.0,
+            "ratio": {
+                "stat": "DEF",
+                "percent": 1.2
+            },
+            "cooldown": 4.0,
+            "lvlMax": 5.0,
+            "rank": "EPIC"
+        },
+        {
+            "name": "Harmonie du Zéro Absolu",
+            "description": "Libère une onde de choc qui réinitialise les bonus ennemis et inflige des dégâts massifs.",
+            "damage": 500.0,
+            "ratio": {
+                "stat": "ATK",
+                "percent": 3.0
+            },
+            "cooldown": 6.0,
+            "lvlMax": 3.0,
+            "rank": "LEGENDARY"
+        }
+    ]
+}

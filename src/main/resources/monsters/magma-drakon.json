@@ -1,0 +1,63 @@
+{
+    "nom": "Magma-Drakon",
+    "element": "FIRE",
+    "rang": "EPIC",
+    "stats": {
+        "hp": 1200.0,
+        "atk": 160.0,
+        "def": 110.0,
+        "vit": 70.0
+    },
+    "description_carte": "Un colosse de pierre et de feu. Chaque pas fait trembler la terre et jaillir la lave.",
+    "description_visuelle": "Dragon quadrupède massif, peau en basalte noir craquelé laissant voir du magma. Son dos porte un cratère fumant rejetant des cendres et des braises. Style imposant, lumières orangées intenses.",
+    "skills": [
+        {
+            "name": "Écrasement Sismique",
+            "description": "Frappe le sol pour briser la garde ennemie.",
+            "damage": 130.0,
+            "ratio": {
+                "stat": "ATK",
+                "percent": 1.2
+            },
+            "cooldown": 0.0,
+            "lvlMax": 5.0,
+            "rank": "COMMON"
+        },
+        {
+            "name": "Souffle de Pyroclaste",
+            "description": "Crache un nuage de gaz brûlant et de cendres.",
+            "damage": 150.0,
+            "ratio": {
+                "stat": "ATK",
+                "percent": 1.0
+            },
+            "cooldown": 2.0,
+            "lvlMax": 5.0,
+            "rank": "RARE"
+        },
+        {
+            "name": "Blindage de Magma",
+            "description": "La lave durcit, augmentant massivement la défense.",
+            "damage": 0.0,
+            "ratio": {
+                "stat": "DEF",
+                "percent": 2.0
+            },
+            "cooldown": 4.0,
+            "lvlMax": 5.0,
+            "rank": "EPIC"
+        },
+        {
+            "name": "Éruption Cataclysmique",
+            "description": "Le volcan sur son dos explose, dévastant tout le champ de bataille.",
+            "damage": 550.0,
+            "ratio": {
+                "stat": "HP",
+                "percent": 0.4
+            },
+            "cooldown": 7.0,
+            "lvlMax": 3.0,
+            "rank": "LEGENDARY"
+        }
+    ]
+}

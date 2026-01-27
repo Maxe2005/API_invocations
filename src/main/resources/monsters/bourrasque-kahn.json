@@ -1,0 +1,63 @@
+{
+    "nom": "Bourrasque-Kahn",
+    "element": "WIND",
+    "rang": "EPIC",
+    "stats": {
+        "hp": 950.0,
+        "atk": 140.0,
+        "def": 85.0,
+        "vit": 130.0
+    },
+    "description_carte": "Esprit tigre féroce maître des courants aériens, il frappe avec la vitesse de la foudre et la force d'un typhon.",
+    "description_visuelle": "Tigre anthropomorphe athlétique, pelage blanc strié de vert émeraude. Il est au centre d'une tornade tourbillonnante. Ses griffes sont de longues lames de vent translucide. Style anime dynamique avec effets de vitesse.",
+    "skills": [
+        {
+            "name": "Griffes de Zéphyr",
+            "description": "Lacère l'ennemi avec des lames de vent.",
+            "damage": 100.0,
+            "ratio": {
+                "stat": "ATK",
+                "percent": 1.1
+            },
+            "cooldown": 0.0,
+            "lvlMax": 5.0,
+            "rank": "COMMON"
+        },
+        {
+            "name": "Pas du Typhon",
+            "description": "Augmente sa propre vitesse et esquive la prochaine attaque.",
+            "damage": 0.0,
+            "ratio": {
+                "stat": "VIT",
+                "percent": 0.5
+            },
+            "cooldown": 3.0,
+            "lvlMax": 5.0,
+            "rank": "RARE"
+        },
+        {
+            "name": "Rugissement de Tempête",
+            "description": "Une onde de choc qui repousse les ennemis et réduit leur défense.",
+            "damage": 120.0,
+            "ratio": {
+                "stat": "ATK",
+                "percent": 0.8
+            },
+            "cooldown": 4.0,
+            "lvlMax": 5.0,
+            "rank": "EPIC"
+        },
+        {
+            "name": "Colère du Grand Khan",
+            "description": "Enchaînement de frappes invisibles à une vitesse suprême.",
+            "damage": 450.0,
+            "ratio": {
+                "stat": "VIT",
+                "percent": 3.5
+            },
+            "cooldown": 6.0,
+            "lvlMax": 3.0,
+            "rank": "LEGENDARY"
+        }
+    ]
+}

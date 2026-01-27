@@ -8,8 +8,8 @@
         "def": 50.0,
         "vit": 80.0
     },
-    "description_carte": "Description du monstre pour la carte (visible au joueur)",
-    "description_visuelle": "Description visuelle détaillée (style, couleurs, apparence)",
+    "description_carte": "Description du monstre pour la carte (visible au joueur). Moins de 200 caractères.",
+    "description_visuelle": "Description visuelle détaillée (style, couleurs, apparence, background). Utilisée pour générer l'image du monstre avec Nano Banana.",
     "skills": [
         {
             "name": "Compétence 1",
