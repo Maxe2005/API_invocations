@@ -32,7 +32,8 @@ public class DtoMapperMonster {
                 httpDto.getVit(),
                 httpDto.getRank(),
                 "No visual description",
-                "No card description");
+                "No card description",
+                "");
     }
 
     /**
@@ -49,7 +50,8 @@ public class DtoMapperMonster {
                 partial.getVit() != null ? partial.getVit() : existing.getVit(),
                 partial.getRank() != null ? partial.getRank() : existing.getRank(),
                 existing.getVisualDescription(),
-                existing.getCardDescription());
+                existing.getCardDescription(),
+                existing.getImageUrl());
     }
 
     /**

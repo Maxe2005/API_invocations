@@ -19,4 +19,5 @@ public class MonsterBaseDto {
     private final Rank rank;
     private final String visualDescription;
     private final String cardDescription;
+    private final String imageUrl;
 }

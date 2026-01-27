@@ -40,6 +40,7 @@ public class DtoMapperInvocation {
                 globalMonsterDto.getAtk(),
                 globalMonsterDto.getDef(),
                 globalMonsterDto.getVit(),
+                globalMonsterDto.getImageUrl(),
                 mapSkills(globalMonsterDto));
     }
 

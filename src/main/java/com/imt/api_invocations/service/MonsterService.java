@@ -45,7 +45,8 @@ public class MonsterService implements DataServiceInterface {
                 monsterMongoDto.getVit(),
                 monsterMongoDto.getRank(),
                 monsterMongoDto.getVisualDescription(),
-                monsterMongoDto.getCardDescription());
+                monsterMongoDto.getCardDescription(),
+                monsterMongoDto.getImageUrl());
         monsterRepository.update(monsterToUpdate);
     }
 

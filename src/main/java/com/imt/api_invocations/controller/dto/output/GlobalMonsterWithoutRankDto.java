@@ -16,5 +16,6 @@ public class GlobalMonsterWithoutRankDto {
     private final double atk;
     private final double def;
     private final double vit;
+    private final String imageUrl;
     private final List<SkillForMonsterWithoutRankDto> skills;
 }

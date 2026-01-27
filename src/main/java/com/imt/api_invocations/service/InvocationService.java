@@ -59,6 +59,7 @@ public class InvocationService {
                 monsterMongoDto.getRank(),
                 monsterMongoDto.getVisualDescription(),
                 monsterMongoDto.getCardDescription(),
+                monsterMongoDto.getImageUrl(),
                 skills);
     }
 

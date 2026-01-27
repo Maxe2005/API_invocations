@@ -21,15 +21,15 @@ public class MonsterMongoDto extends MonsterBaseDto {
     @PersistenceCreator
     @SuppressWarnings("java:S107")
     public MonsterMongoDto(String id, String name, Elementary element, Double hp, Double atk, Double def, Double vit,
-            Rank rank, String visualDescription, String cardDescription) {
-        super(name, element, hp, atk, def, vit, rank, visualDescription, cardDescription);
+            Rank rank, String visualDescription, String cardDescription, String imageUrl) {
+        super(name, element, hp, atk, def, vit, rank, visualDescription, cardDescription, imageUrl);
         this.id = id;
     }
 
     public MonsterMongoDto(String name, Elementary element, Double hp, Double atk, Double def, Double vit, Rank rank,
-            String visualDescription, String cardDescription) {
+            String visualDescription, String cardDescription, String imageUrl) {
         this(UUID.randomUUID().toString(), name, element, hp, atk, def, vit, rank, visualDescription,
-                cardDescription);
+                cardDescription, imageUrl);
     }
 
 }
