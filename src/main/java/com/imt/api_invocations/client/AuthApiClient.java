@@ -38,7 +38,7 @@ public class AuthApiClient implements ExternalApiClient {
      */
     public boolean verifyToken(String token) {
         try {
-            String url = String.format("%s/user/verify-token/",
+            String url = String.format("%s/user/verify-token",
                     externalApiProperties.getAuthBaseUrl());
 
             AuthTokenRequest request = new AuthTokenRequest(token);
