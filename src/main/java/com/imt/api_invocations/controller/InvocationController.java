@@ -26,7 +26,7 @@ public class InvocationController {
         return ResponseEntity.ok(result);
     }
 
-    @PostMapping("global-invoque/{playerId}")
+    @GetMapping("global-invoque/{playerId}")
     public ResponseEntity<GlobalMonsterWithoutRankDto> globalInvoque(@PathVariable String playerId) {
         GlobalMonsterDto result = invocationService.globalInvoke(playerId);
         return ResponseEntity.ok(dtoMapperInvocation.toGlobalMonsterWithoutRankDto(result));
