@@ -1,23 +1,33 @@
-package com.imt.api_invocations.service.dto;
+package com.imt.api_invocations.dto;
 
 import com.imt.api_invocations.enums.Elementary;
 import com.imt.api_invocations.enums.Rank;
 
-import lombok.AllArgsConstructor;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.Size;
 import lombok.Getter;
+import lombok.experimental.SuperBuilder;
 
 @Getter
-@AllArgsConstructor
+@SuperBuilder
 public class MonsterBaseDto {
 
     private final String name;
+
+    @Valid
     private final Elementary element;
-    private final Double hp;
-    private final Double atk;
-    private final Double def;
-    private final Double vit;
+
+    @Valid
+    private final StatsDto stats;
+
+    @Valid
     private final Rank rank;
+
     private final String visualDescription;
+
+    @Size(max = 255, message = "Card description must be at most 255 characters")
     private final String cardDescription;
+    
     private final String imageUrl;
+
 }

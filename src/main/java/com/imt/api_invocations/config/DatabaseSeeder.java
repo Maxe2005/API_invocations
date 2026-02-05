@@ -11,13 +11,13 @@ import org.springframework.stereotype.Component;
 import com.imt.api_invocations.config.seeding.MonsterSeedDto;
 import com.imt.api_invocations.config.seeding.MonsterSeedingService;
 import com.imt.api_invocations.config.seeding.SkillSeedDto;
+import com.imt.api_invocations.dto.RatioDto;
 import com.imt.api_invocations.enums.Elementary;
 import com.imt.api_invocations.enums.Rank;
 import com.imt.api_invocations.enums.Stat;
 import com.imt.api_invocations.persistence.dao.MonsterMongoDao;
 import com.imt.api_invocations.persistence.dao.SkillsMongoDao;
 import com.imt.api_invocations.persistence.dto.MonsterMongoDto;
-import com.imt.api_invocations.persistence.dto.RatioDto;
 import com.imt.api_invocations.persistence.dto.SkillsMongoDto;
 
 import lombok.RequiredArgsConstructor;

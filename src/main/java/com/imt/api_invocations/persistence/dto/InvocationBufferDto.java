@@ -9,8 +9,8 @@ import com.imt.api_invocations.client.dto.monsters.CreateMonsterRequest;
 import com.imt.api_invocations.client.dto.monsters.CreateMonsterResponse;
 import com.imt.api_invocations.client.dto.player.PlayerAddMonsterRequest;
 import com.imt.api_invocations.client.dto.player.PlayerResponse;
+import com.imt.api_invocations.dto.GlobalMonsterDto;
 import com.imt.api_invocations.enums.InvocationStatus;
-import com.imt.api_invocations.service.dto.GlobalMonsterDto;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

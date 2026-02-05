@@ -3,7 +3,7 @@ package com.imt.api_invocations.controller.mapper;
 import org.springframework.stereotype.Component;
 
 import com.imt.api_invocations.controller.dto.input.MonsterHttpDto;
-import com.imt.api_invocations.controller.dto.output.MonsterDto;
+import com.imt.api_invocations.controller.dto.output.GlobalMonsterWithIdDto;
 import com.imt.api_invocations.persistence.dto.MonsterMongoDto;
 
 import java.util.List;
@@ -57,8 +57,8 @@ public class DtoMapperMonster {
     /**
      * Convert MonsterMongoDto to MonsterDto
      */
-    public MonsterDto toMonsterDto(MonsterMongoDto mongoDto) {
-        return new MonsterDto(
+    public GlobalMonsterWithIdDto toGlobalMonsterWithIdDto(MonsterMongoDto mongoDto) {
+        return new GlobalMonsterWithIdDto(
                 mongoDto.getId(),
                 mongoDto.getElement(),
                 mongoDto.getHp(),

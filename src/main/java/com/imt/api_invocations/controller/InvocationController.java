@@ -5,11 +5,11 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import com.imt.api_invocations.controller.dto.output.GlobalMonsterWithoutRankDto;
+import com.imt.api_invocations.controller.dto.output.GlobalMonsterWithIdDto;
 import com.imt.api_invocations.controller.dto.output.InvocationReplayResponse;
 import com.imt.api_invocations.controller.mapper.DtoMapperInvocation;
+import com.imt.api_invocations.dto.GlobalMonsterDto;
 import com.imt.api_invocations.service.InvocationService;
-import com.imt.api_invocations.service.dto.GlobalMonsterDto;
 import com.imt.api_invocations.service.dto.InvocationReplayReport;
 
 @RestController
@@ -27,9 +27,9 @@ public class InvocationController {
     }
 
     @GetMapping("global-invoque/{playerId}")
-    public ResponseEntity<GlobalMonsterWithoutRankDto> globalInvoque(@PathVariable String playerId) {
-        GlobalMonsterDto result = invocationService.globalInvoke(playerId);
-        return ResponseEntity.ok(dtoMapperInvocation.toGlobalMonsterWithoutRankDto(result));
+    public ResponseEntity<GlobalMonsterWithIdDto> globalInvoque(@PathVariable String playerId) {
+        GlobalMonsterWithIdDto result = invocationService.globalInvoke(playerId);
+        return ResponseEntity.ok(result);
     }
 
     @PostMapping("recreate")

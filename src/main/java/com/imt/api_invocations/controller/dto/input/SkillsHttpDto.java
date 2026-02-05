@@ -1,33 +1,14 @@
 package com.imt.api_invocations.controller.dto.input;
 
-import jakarta.validation.Valid;
-import jakarta.validation.constraints.Positive;
-import lombok.AllArgsConstructor;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.experimental.SuperBuilder;
 
-import com.imt.api_invocations.enums.Rank;
-import com.imt.api_invocations.persistence.dto.RatioDto;
+import com.imt.api_invocations.dto.SkillBaseDto;
 
 @Getter
-@NoArgsConstructor
-@AllArgsConstructor
-public class SkillsHttpDto {
+@SuperBuilder
+public class SkillsHttpDto extends SkillBaseDto {
 
     private String monsterId;
-
-    @Positive(message = "Damage must be positive")
-    private Double damage;
-
-    @Valid
-    private RatioDto ratio;
-
-    @Positive(message = "Cooldown must be positive")
-    private Double cooldown;
-
-    @Positive(message = "Level max must be positive")
-    private Double lvlMax;
-
-    private Rank rank;
 
 }

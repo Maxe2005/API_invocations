@@ -7,12 +7,14 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import com.imt.api_invocations.controller.dto.input.MonsterHttpDto;
-import com.imt.api_invocations.controller.dto.output.MonsterDto;
+import com.imt.api_invocations.controller.dto.output.GlobalMonsterWithIdDto;
 import com.imt.api_invocations.controller.mapper.DtoMapperMonster;
 import com.imt.api_invocations.service.MonsterService;
 
 import java.util.List;
 import java.util.Map;
+
+import com.imt.api_invocations.exception.ResourceNotFoundException;
 
 @RestController
 @RequestMapping("/api/invocation/monsters")
@@ -41,12 +43,12 @@ public class MonsterController {
      * @return the monster details
      */
     @GetMapping("/{monsterId}")
-    public ResponseEntity<MonsterDto> getMonsterById(@PathVariable String monsterId) {
+    public ResponseEntity<GlobalMonsterWithIdDto> getMonsterById(@PathVariable String monsterId) {
         var monsterMongoDto = monsterService.getMonsterById(monsterId);
         if (monsterMongoDto == null) {
-            return ResponseEntity.notFound().build();
+            throw new ResourceNotFoundException("Monster", monsterId);
         }
-        return ResponseEntity.ok(dtoMapper.toMonsterDto(monsterMongoDto));
+        return ResponseEntity.ok(dtoMapper.toGlobalMonsterWithIdDto(monsterMongoDto));
     }
 
     /**
@@ -55,11 +57,11 @@ public class MonsterController {
      * @return list of all monsters
      */
     @GetMapping("/all")
-    public ResponseEntity<List<MonsterDto>> getAllMonsters() {
+    public ResponseEntity<List<GlobalMonsterWithIdDto>> getAllMonsters() {
         var monsters = monsterService.getAllMonsters();
-        List<MonsterDto> monsterDtos = monsters
+        List<GlobalMonsterWithIdDto> monsterDtos = monsters
                 .stream()
-                .map(dtoMapper::toMonsterDto)
+                .map(dtoMapper::toGlobalMonsterWithIdDto)
                 .toList();
         return ResponseEntity.ok(monsterDtos);
     }
@@ -77,7 +79,7 @@ public class MonsterController {
             @Valid @RequestBody MonsterHttpDto monsterHttpDto) {
         var existingMonster = monsterService.getMonsterById(monsterId);
         if (existingMonster == null) {
-            return ResponseEntity.notFound().build();
+            throw new ResourceNotFoundException("Monster", monsterId);
         }
         var updatedMonster = dtoMapper.updateMonsterMongoDto(existingMonster, monsterHttpDto);
         monsterService.updateMonster(monsterId, updatedMonster);

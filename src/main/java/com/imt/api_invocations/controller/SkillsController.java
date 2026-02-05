@@ -9,7 +9,8 @@ import java.util.List;
 import java.util.Map;
 
 import com.imt.api_invocations.controller.dto.input.SkillsHttpDto;
-import com.imt.api_invocations.controller.dto.output.SkillsDto;
+import com.imt.api_invocations.exception.ResourceNotFoundException;
+import com.imt.api_invocations.controller.dto.output.SkillsWithIdDto;
 import com.imt.api_invocations.controller.mapper.DtoMapperSkills;
 import com.imt.api_invocations.service.SkillsService;
 
@@ -40,10 +41,10 @@ public class SkillsController {
      * @return the skill details
      */
     @GetMapping("/{skillId}")
-    public ResponseEntity<SkillsDto> getSkillById(@PathVariable String skillId) {
+    public ResponseEntity<SkillsWithIdDto> getSkillById(@PathVariable String skillId) {
         var skillMongoDto = skillsService.getSkillById(skillId);
         if (skillMongoDto == null) {
-            return ResponseEntity.notFound().build();
+            throw new ResourceNotFoundException("Skill", skillId);
         }
         return ResponseEntity.ok(dtoMapper.toSkillsDto(skillMongoDto));
     }
@@ -55,10 +56,10 @@ public class SkillsController {
      * @return the skill details
      */
     @GetMapping("/monster/{monsterId}")
-    public ResponseEntity<List<SkillsDto>> getSkillByMonsterId(@PathVariable String monsterId) {
+    public ResponseEntity<List<SkillsWithIdDto>> getSkillByMonsterId(@PathVariable String monsterId) {
         var skills = skillsService.getSkillByMonsterId(monsterId);
         if (skills.isEmpty()) {
-            return ResponseEntity.notFound().build();
+            throw new ResourceNotFoundException("No skills found for monster with ID " + monsterId);
         }
         return ResponseEntity.ok(skills.stream().map(dtoMapper::toSkillsDto).toList());
     }
@@ -76,7 +77,7 @@ public class SkillsController {
             @Valid @RequestBody SkillsHttpDto skillsHttpDto) {
         var existingSkill = skillsService.getSkillById(skillId);
         if (existingSkill == null) {
-            return ResponseEntity.notFound().build();
+            throw new ResourceNotFoundException("Skill", skillId);
         }
         var updatedSkill = dtoMapper.updateSkillsMongoDto(existingSkill, skillsHttpDto);
         skillsService.updateSkill(skillId, updatedSkill);

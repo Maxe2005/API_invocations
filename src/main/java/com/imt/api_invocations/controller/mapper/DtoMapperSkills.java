@@ -3,7 +3,7 @@ package com.imt.api_invocations.controller.mapper;
 import org.springframework.stereotype.Component;
 
 import com.imt.api_invocations.controller.dto.input.SkillsHttpDto;
-import com.imt.api_invocations.controller.dto.output.SkillsDto;
+import com.imt.api_invocations.controller.dto.output.SkillsWithIdDto;
 import com.imt.api_invocations.persistence.dto.SkillsMongoDto;
 
 /**
@@ -51,8 +51,8 @@ public class DtoMapperSkills {
     /**
      * Convert SkillsMongoDto to SkillsDto
      */
-    public SkillsDto toSkillsDto(SkillsMongoDto mongoDto) {
-        return new SkillsDto(
+    public SkillsWithIdDto toSkillsDto(SkillsMongoDto mongoDto) {
+        return new SkillsWithIdDto(
                 mongoDto.getId(),
                 mongoDto.getMonsterId(),
                 mongoDto.getDamage(),

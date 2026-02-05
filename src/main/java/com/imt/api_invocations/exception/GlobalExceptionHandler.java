@@ -50,4 +50,15 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(status).body(errors);
     }
 
+    @ExceptionHandler(ResourceNotFoundException.class)
+    public ResponseEntity<Errors> handleResourceNotFoundException(ResourceNotFoundException ex) {
+        Errors errors = new Errors(new ArrayList<>());
+        CustomError customError = new CustomError(
+                404,
+                ex.getMessage());
+        errors.addError(customError);
+
+        return ResponseEntity.status(404).body(errors);
+    }
+
 }
