@@ -6,6 +6,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClientException;
+import org.springframework.web.client.RestClientResponseException;
 import org.springframework.web.client.RestTemplate;
 
 import com.imt.api_invocations.client.dto.player.PlayerAddMonsterRequest;
@@ -56,11 +57,28 @@ public class PlayerApiClient {
                 return response.getBody();
             }
 
-            throw new ExternalApiException("Échec de l'ajout du monstre au joueur");
+            throw new ExternalApiException(
+                    "Player API",
+                    response.getStatusCode().value(),
+                    null,
+                    "Échec de l'ajout du monstre au joueur");
 
+        } catch (RestClientResponseException e) {
+            logger.error("Erreur HTTP lors de l'ajout du monstre {} au joueur {}", monsterId, username, e);
+            throw new ExternalApiException(
+                    "Player API",
+                    e.getRawStatusCode(),
+                    e.getResponseBodyAsString(),
+                    "Échec de l'ajout du monstre au joueur dans l'API Player",
+                    e);
         } catch (RestClientException e) {
             logger.error("Erreur lors de l'ajout du monstre {} au joueur {}", monsterId, username, e);
-            throw new ExternalApiException("Échec de l'ajout du monstre au joueur dans l'API Player", e);
+            throw new ExternalApiException(
+                    "Player API",
+                    HttpStatus.BAD_GATEWAY.value(),
+                    null,
+                    "Échec de l'ajout du monstre au joueur dans l'API Player",
+                    e);
         }
     }
 }

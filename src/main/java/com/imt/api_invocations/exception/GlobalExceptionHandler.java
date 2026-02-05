@@ -35,12 +35,19 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(ExternalApiException.class)
     public ResponseEntity<Errors> handleExternalApiException(ExternalApiException ex) {
         Errors errors = new Errors(new ArrayList<>());
+        int status = ex.getStatusCode() != null ? ex.getStatusCode() : 502;
+        String apiName = ex.getApiName() != null ? ex.getApiName() : "API externe";
+        String responseBody = ex.getResponseBody();
+        String message = "Erreur de communication avec " + apiName + ": " + ex.getMessage();
+        if (responseBody != null && !responseBody.isBlank()) {
+            message += " | Détails: " + responseBody;
+        }
         CustomError customError = new CustomError(
-                502,
-                "Erreur de communication avec une API externe: " + ex.getMessage());
+                status,
+                message);
         errors.addError(customError);
 
-        return ResponseEntity.status(502).body(errors);
+        return ResponseEntity.status(status).body(errors);
     }
 
 }

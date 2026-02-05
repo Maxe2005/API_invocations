@@ -6,6 +6,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClientException;
+import org.springframework.web.client.RestClientResponseException;
 import org.springframework.web.client.RestTemplate;
 
 import com.imt.api_invocations.client.dto.monsters.CreateMonsterRequest;
@@ -58,11 +59,28 @@ public class MonstersApiClient {
                 }
             }
 
-            throw new ExternalApiException("Réponse invalide de l'API Monsters");
+            throw new ExternalApiException(
+                    "Monsters API",
+                    HttpStatus.BAD_GATEWAY.value(),
+                    null,
+                    "Réponse invalide de l'API Monsters");
 
+        } catch (RestClientResponseException e) {
+            logger.error("Erreur HTTP lors de la communication avec l'API Monsters", e);
+            throw new ExternalApiException(
+                    "Monsters API",
+                    e.getRawStatusCode(),
+                    e.getResponseBodyAsString(),
+                    "Échec de la création du monstre dans l'API Monsters",
+                    e);
         } catch (RestClientException e) {
             logger.error("Erreur lors de la communication avec l'API Monsters", e);
-            throw new ExternalApiException("Échec de la création du monstre dans l'API Monsters", e);
+            throw new ExternalApiException(
+                    "Monsters API",
+                    HttpStatus.BAD_GATEWAY.value(),
+                    null,
+                    "Échec de la création du monstre dans l'API Monsters",
+                    e);
         }
     }
 
