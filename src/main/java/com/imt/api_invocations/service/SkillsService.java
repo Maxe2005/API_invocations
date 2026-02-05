@@ -5,9 +5,10 @@ import java.util.ArrayList;
 
 import org.springframework.stereotype.Service;
 
+import com.imt.api_invocations.dto.SkillBaseDto;
 import com.imt.api_invocations.persistence.SkillsRepository;
 import com.imt.api_invocations.persistence.dto.SkillsMongoDto;
-import com.imt.api_invocations.service.dto.SkillForMonsterDto;
+import com.imt.api_invocations.service.mapper.SkillsServiceMapper;
 import com.imt.api_invocations.enums.Rank;
 import com.imt.api_invocations.utils.DataServiceInterface;
 import static com.imt.api_invocations.utils.Random.*;
@@ -17,11 +18,14 @@ public class SkillsService implements DataServiceInterface {
 
     private final SkillsRepository skillsRepository;
     private final MonsterService monsterService;
+    private final SkillsServiceMapper skillsServiceMapper;
     private List<SkillsMongoDto> possibleSkills;
 
-    public SkillsService(SkillsRepository skillsRepository, MonsterService monsterService) {
+    public SkillsService(SkillsRepository skillsRepository, MonsterService monsterService,
+            SkillsServiceMapper skillsServiceMapper) {
         this.skillsRepository = skillsRepository;
         this.monsterService = monsterService;
+        this.skillsServiceMapper = skillsServiceMapper;
     }
 
     public String createSkill(SkillsMongoDto skillsMongoDto) {
@@ -41,16 +45,7 @@ public class SkillsService implements DataServiceInterface {
         if (monsterId != null && monsterService.getMonsterById(monsterId) == null) {
             throw new IllegalArgumentException("Monster with ID " + monsterId + " does not exist.");
         }
-        SkillsMongoDto skillToUpdate = new SkillsMongoDto(
-                skillId,
-                skillsMongoDto.getMonsterId(),
-                skillsMongoDto.getName(),
-                skillsMongoDto.getDamage(),
-                skillsMongoDto.getRatio(),
-                skillsMongoDto.getCooldown(),
-                skillsMongoDto.getLvlMax(),
-                skillsMongoDto.getRank(),
-                skillsMongoDto.getDescription());
+        SkillsMongoDto skillToUpdate = skillsServiceMapper.toSkillsMongoDtoForUpdate(skillId, skillsMongoDto);
         skillsRepository.update(skillToUpdate);
     }
 
@@ -66,31 +61,13 @@ public class SkillsService implements DataServiceInterface {
         return skillsRepository.deleteById(id);
     }
 
-    private List<SkillForMonsterDto> mapToSkillForMonsterDto(List<SkillsMongoDto> skills) {
-        List<SkillForMonsterDto> skillDtos = new ArrayList<>();
-        int count = 1;
-        for (SkillsMongoDto skill : skills) {
-            skillDtos.add(
-                    new SkillForMonsterDto(
-                            skill.getName(),
-                            skill.getDamage(),
-                            skill.getRatio(),
-                            skill.getCooldown(),
-                            skill.getLvlMax(),
-                            skill.getRank(),
-                            skill.getDescription(),
-                            count++));
-        }
-        return skillDtos;
-    }
-
     private List<SkillsMongoDto> filterSkillsByRank(Rank rank) {
         return possibleSkills.stream()
                 .filter(skill -> skill.getRank() == rank)
                 .toList();
     }
 
-    public List<SkillForMonsterDto> getRandomSkillsForMonster(String monsterId, int numberOfSkills)
+    public List<SkillBaseDto> getRandomSkillsForMonster(String monsterId, int numberOfSkills)
             throws IllegalStateException {
         possibleSkills = skillsRepository.findByMonsterId(monsterId);
         int maxSkillsAvailable = possibleSkills.size();
@@ -108,7 +85,7 @@ public class SkillsService implements DataServiceInterface {
 
         }
 
-        return mapToSkillForMonsterDto(selectedSkills);
+        return skillsServiceMapper.toSkillBaseDtos(selectedSkills);
     }
 
     @Override

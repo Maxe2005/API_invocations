@@ -7,6 +7,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import com.imt.api_invocations.controller.dto.input.MonsterHttpDto;
+import com.imt.api_invocations.controller.dto.input.MonsterHttpUpdateDto;
 import com.imt.api_invocations.controller.dto.output.GlobalMonsterWithIdDto;
 import com.imt.api_invocations.controller.mapper.DtoMapperMonster;
 import com.imt.api_invocations.service.MonsterService;
@@ -69,19 +70,19 @@ public class MonsterController {
     /**
      * Update a monster
      * 
-     * @param monsterId      the monster ID
-     * @param monsterHttpDto the updated monster data
+     * @param monsterId        the monster ID
+     * @param monsterUpdateDto the updated monster data
      * @return no content response
      */
     @PutMapping("/{monsterId}")
     public ResponseEntity<Void> updateMonster(
             @PathVariable String monsterId,
-            @Valid @RequestBody MonsterHttpDto monsterHttpDto) {
+            @Valid @RequestBody MonsterHttpUpdateDto monsterUpdateDto) {
         var existingMonster = monsterService.getMonsterById(monsterId);
         if (existingMonster == null) {
             throw new ResourceNotFoundException("Monster", monsterId);
         }
-        var updatedMonster = dtoMapper.updateMonsterMongoDto(existingMonster, monsterHttpDto);
+        var updatedMonster = dtoMapper.updateMonsterMongoDto(existingMonster, monsterUpdateDto);
         monsterService.updateMonster(monsterId, updatedMonster);
         return ResponseEntity.ok().build();
     }

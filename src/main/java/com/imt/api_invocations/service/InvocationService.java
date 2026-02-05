@@ -12,7 +12,9 @@ import com.imt.api_invocations.client.dto.monsters.CreateMonsterRequest;
 import com.imt.api_invocations.client.dto.monsters.CreateMonsterResponse;
 import com.imt.api_invocations.client.dto.player.PlayerAddMonsterRequest;
 import com.imt.api_invocations.client.dto.player.PlayerResponse;
+import com.imt.api_invocations.controller.dto.output.GlobalMonsterWithIdDto;
 import com.imt.api_invocations.dto.GlobalMonsterDto;
+import com.imt.api_invocations.dto.SkillBaseDto;
 import com.imt.api_invocations.client.MonstersApiClient;
 import com.imt.api_invocations.client.PlayerApiClient;
 import com.imt.api_invocations.enums.InvocationStatus;
@@ -22,7 +24,7 @@ import com.imt.api_invocations.persistence.InvocationBufferRepository;
 import com.imt.api_invocations.persistence.dto.MonsterMongoDto;
 import com.imt.api_invocations.persistence.dto.InvocationBufferDto;
 import com.imt.api_invocations.service.dto.InvocationReplayReport;
-import com.imt.api_invocations.service.dto.SkillForMonsterDto;
+import com.imt.api_invocations.service.mapper.InvocationServiceMapper;
 import static com.imt.api_invocations.utils.Random.*;
 
 @Service
@@ -35,50 +37,27 @@ public class InvocationService {
     private final MonstersApiClient monstersApiClient;
     private final PlayerApiClient playerApiClient;
     private final InvocationBufferRepository invocationBufferRepository;
+    private final InvocationServiceMapper invocationServiceMapper;
 
     public InvocationService(MonsterService monsterService,
             SkillsService skillsService,
             MonstersApiClient monstersApiClient,
             PlayerApiClient playerApiClient,
-            InvocationBufferRepository invocationBufferRepository) {
+            InvocationBufferRepository invocationBufferRepository,
+            InvocationServiceMapper invocationServiceMapper) {
         this.monsterService = monsterService;
         this.skillsService = skillsService;
         this.monstersApiClient = monstersApiClient;
         this.playerApiClient = playerApiClient;
         this.invocationBufferRepository = invocationBufferRepository;
-    }
-
-    private GlobalMonsterDto mapToGlobalMonsterDto(MonsterMongoDto monsterMongoDto, List<SkillForMonsterDto> skills) {
-        return new GlobalMonsterDto(
-                monsterMongoDto.getName(),
-                monsterMongoDto.getElement(),
-                monsterMongoDto.getHp(),
-                monsterMongoDto.getAtk(),
-                monsterMongoDto.getDef(),
-                monsterMongoDto.getVit(),
-                monsterMongoDto.getRank(),
-                monsterMongoDto.getVisualDescription(),
-                monsterMongoDto.getCardDescription(),
-                monsterMongoDto.getImageUrl(),
-                skills);
+        this.invocationServiceMapper = invocationServiceMapper;
     }
 
     public GlobalMonsterDto invoke() {
         Rank rank = getRandomRankBasedOnAvailableData(monsterService);
         MonsterMongoDto monster = monsterService.getRandomMonsterByRank(rank);
-        List<SkillForMonsterDto> skills = skillsService.getRandomSkillsForMonster(monster.getId(), 3);
-        return mapToGlobalMonsterDto(monster, skills);
-    }
-
-    private CreateMonsterRequest toCreateMonsterRequest(GlobalMonsterDto monster) {
-        return new CreateMonsterRequest(
-                monster.getElement(),
-                monster.getHp().intValue(),
-                monster.getAtk().intValue(),
-                monster.getDef().intValue(),
-                monster.getVit().intValue(),
-                monster.getSkills(),
-                monster.getRank());
+        List<SkillBaseDto> skills = skillsService.getRandomSkillsForMonster(monster.getId(), 3);
+        return invocationServiceMapper.toGlobalMonsterDto(monster, skills);
     }
 
     private InvocationBufferDto createBufferEntry(String playerId, GlobalMonsterDto monster,
@@ -121,10 +100,10 @@ public class InvocationService {
         invocationBufferRepository.save(entry);
     }
 
-    private GlobalMonsterDto executeInvocation(GlobalMonsterDto monster, String playerId,
+    private String executeInvocation(GlobalMonsterDto monster, String playerId,
             InvocationBufferDto bufferEntry) {
         if (bufferEntry.getMonsterRequest() == null) {
-            bufferEntry.setMonsterRequest(toCreateMonsterRequest(monster));
+            bufferEntry.setMonsterRequest(invocationServiceMapper.toCreateMonsterRequest(monster));
             bufferEntry = invocationBufferRepository.save(bufferEntry);
         }
 
@@ -145,14 +124,12 @@ public class InvocationService {
             markCompleted(bufferEntry, playerRequest, playerResponse);
 
             logger.info("Invocation globale réussie. Monstre {} ajouté au joueur {}", createdMonsterId, playerId);
-            return monster;
+            return createdMonsterId;
 
         } catch (ExternalApiException e) {
             logger.error("Échec de l'invocation globale: {}", e.getMessage());
 
-            if (bufferEntry != null) {
-                markFailed(bufferEntry, e.getMessage());
-            }
+            markFailed(bufferEntry, e.getMessage());
 
             if (createdMonsterId != null) {
                 logger.warn("Déclenchement de la compensation: suppression du monstre {}", createdMonsterId);
@@ -176,15 +153,16 @@ public class InvocationService {
      * @throws ExternalApiException En cas d'erreur de communication avec les APIs
      *                              externes
      */
-    public GlobalMonsterDto globalInvoke(String playerId) {
+    public GlobalMonsterWithIdDto globalInvoke(String playerId) {
         logger.info("Début de l'invocation globale pour le joueur: {}", playerId);
 
         GlobalMonsterDto monster = invoke();
-        CreateMonsterRequest monsterRequest = toCreateMonsterRequest(monster);
+        CreateMonsterRequest monsterRequest = invocationServiceMapper.toCreateMonsterRequest(monster);
 
         InvocationBufferDto bufferEntry = createBufferEntry(playerId, monster, monsterRequest);
 
-        return executeInvocation(monster, playerId, bufferEntry);
+        String createdMonsterId = executeInvocation(monster, playerId, bufferEntry);
+        return invocationServiceMapper.toGlobalMonsterWithIdDto(monster, createdMonsterId);
     }
 
     public InvocationReplayReport replayBufferedInvocations() {

@@ -7,15 +7,18 @@ import com.imt.api_invocations.enums.Rank;
 import com.imt.api_invocations.persistence.MonsterRepository;
 import com.imt.api_invocations.persistence.dto.MonsterMongoDto;
 import static com.imt.api_invocations.utils.Random.random;
+import com.imt.api_invocations.service.mapper.MonsterServiceMapper;
 import com.imt.api_invocations.utils.DataServiceInterface;
 
 @Service
 public class MonsterService implements DataServiceInterface {
 
     private final MonsterRepository monsterRepository;
+    private final MonsterServiceMapper monsterServiceMapper;
 
-    public MonsterService(MonsterRepository monsterRepository) {
+    public MonsterService(MonsterRepository monsterRepository, MonsterServiceMapper monsterServiceMapper) {
         this.monsterRepository = monsterRepository;
+        this.monsterServiceMapper = monsterServiceMapper;
     }
 
     public String createMonster(MonsterMongoDto monsterMongoDto) {
@@ -35,18 +38,7 @@ public class MonsterService implements DataServiceInterface {
     }
 
     public void updateMonster(String monsterId, MonsterMongoDto monsterMongoDto) {
-        MonsterMongoDto monsterToUpdate = new MonsterMongoDto(
-                monsterId,
-                monsterMongoDto.getName(),
-                monsterMongoDto.getElement(),
-                monsterMongoDto.getHp(),
-                monsterMongoDto.getAtk(),
-                monsterMongoDto.getDef(),
-                monsterMongoDto.getVit(),
-                monsterMongoDto.getRank(),
-                monsterMongoDto.getVisualDescription(),
-                monsterMongoDto.getCardDescription(),
-                monsterMongoDto.getImageUrl());
+        MonsterMongoDto monsterToUpdate = monsterServiceMapper.toMonsterMongoDtoForUpdate(monsterId, monsterMongoDto);
         monsterRepository.update(monsterToUpdate);
     }
 

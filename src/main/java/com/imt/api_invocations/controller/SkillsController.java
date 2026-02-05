@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Map;
 
 import com.imt.api_invocations.controller.dto.input.SkillsHttpDto;
+import com.imt.api_invocations.controller.dto.input.SkillsHttpUpdateDto;
 import com.imt.api_invocations.exception.ResourceNotFoundException;
 import com.imt.api_invocations.controller.dto.output.SkillsWithIdDto;
 import com.imt.api_invocations.controller.mapper.DtoMapperSkills;
@@ -67,19 +68,19 @@ public class SkillsController {
     /**
      * Update a skill
      * 
-     * @param skillId       the skill ID
-     * @param skillsHttpDto the updated skill data
+     * @param skillId         the skill ID
+     * @param skillsUpdateDto the updated skill data
      * @return no content response
      */
     @PutMapping("/{skillId}")
     public ResponseEntity<Void> updateSkill(
             @PathVariable String skillId,
-            @Valid @RequestBody SkillsHttpDto skillsHttpDto) {
+            @Valid @RequestBody SkillsHttpUpdateDto skillsUpdateDto) {
         var existingSkill = skillsService.getSkillById(skillId);
         if (existingSkill == null) {
             throw new ResourceNotFoundException("Skill", skillId);
         }
-        var updatedSkill = dtoMapper.updateSkillsMongoDto(existingSkill, skillsHttpDto);
+        var updatedSkill = dtoMapper.updateSkillsMongoDto(existingSkill, skillsUpdateDto);
         skillsService.updateSkill(skillId, updatedSkill);
         return ResponseEntity.ok().build();
     }
