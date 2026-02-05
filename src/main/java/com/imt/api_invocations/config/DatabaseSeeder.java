@@ -12,6 +12,7 @@ import com.imt.api_invocations.config.seeding.MonsterSeedDto;
 import com.imt.api_invocations.config.seeding.MonsterSeedingService;
 import com.imt.api_invocations.config.seeding.SkillSeedDto;
 import com.imt.api_invocations.dto.RatioDto;
+import com.imt.api_invocations.dto.StatsDto;
 import com.imt.api_invocations.enums.Elementary;
 import com.imt.api_invocations.enums.Rank;
 import com.imt.api_invocations.enums.Stat;
@@ -87,34 +88,42 @@ public class DatabaseSeeder implements CommandLineRunner {
          * Convertit un MonsterSeedDto en MonsterMongoDto
          */
         private MonsterMongoDto convertToMonsterEntity(MonsterSeedDto seedDto) {
-                return new MonsterMongoDto(
-                                seedDto.getNom(),
-                                Elementary.valueOf(seedDto.getElement()),
-                                seedDto.getStats().getHp(),
-                                seedDto.getStats().getAtk(),
-                                seedDto.getStats().getDef(),
-                                seedDto.getStats().getVit(),
-                                Rank.valueOf(seedDto.getRang()),
-                                seedDto.getDescriptionVisuelle(),
-                                seedDto.getDescriptionCarte(),
-                                "" //seedDto.getImageUrl()
-                        );
+                StatsDto stats = StatsDto.builder()
+                                .hp(seedDto.getStats().getHp())
+                                .atk(seedDto.getStats().getAtk())
+                                .def(seedDto.getStats().getDef())
+                                .vit(seedDto.getStats().getVit())
+                                .build();
+
+                return MonsterMongoDto.builder()
+                                .name(seedDto.getNom())
+                                .element(Elementary.valueOf(seedDto.getElement()))
+                                .stats(stats)
+                                .rank(Rank.valueOf(seedDto.getRang()))
+                                .visualDescription(seedDto.getDescriptionVisuelle())
+                                .cardDescription(seedDto.getDescriptionCarte())
+                                .imageUrl("")
+                                .build();
         }
 
         /**
          * Convertit un SkillSeedDto en SkillsMongoDto
          */
         private SkillsMongoDto convertToSkillEntity(String monsterId, SkillSeedDto seedDto) {
-                return new SkillsMongoDto(
-                                monsterId,
-                                seedDto.getName(),
-                                seedDto.getDamage(),
-                                new RatioDto(
-                                                Stat.valueOf(seedDto.getRatio().getStat()),
-                                                seedDto.getRatio().getPercent()),
-                                seedDto.getCooldown(),
-                                seedDto.getLvlMax(),
-                                Rank.valueOf(seedDto.getRank()),
-                                seedDto.getDescription());
+                RatioDto ratio = RatioDto.builder()
+                                .stat(Stat.valueOf(seedDto.getRatio().getStat()))
+                                .percent(seedDto.getRatio().getPercent())
+                                .build();
+
+                return SkillsMongoDto.builder()
+                                .monsterId(monsterId)
+                                .name(seedDto.getName())
+                                .description(seedDto.getDescription())
+                                .damage(seedDto.getDamage())
+                                .ratio(ratio)
+                                .cooldown(seedDto.getCooldown())
+                                .lvlMax(seedDto.getLvlMax())
+                                .rank(Rank.valueOf(seedDto.getRank()))
+                                .build();
         }
 }
