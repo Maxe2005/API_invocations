@@ -117,6 +117,10 @@ public class DtoMapperMonster {
         return isBlank(candidate) ? existing : candidate;
     }
 
+    private Long valueOrExisting(Long existing, Long candidate) {
+        return candidate == null ? existing : candidate;
+    }
+
     private boolean isBlank(String value) {
         return value == null || value.isBlank();
     }
@@ -132,17 +136,17 @@ public class DtoMapperMonster {
         }
         if (existing == null) {
             return StatsDto.builder()
-                    .hp(partial.getHp() != null ? partial.getHp() : 0)
-                    .atk(partial.getAtk() != null ? partial.getAtk() : 0)
-                    .def(partial.getDef() != null ? partial.getDef() : 0)
-                    .vit(partial.getVit() != null ? partial.getVit() : 0)
+                    .hp(partial.getHp() != null ? partial.getHp() : 0L)
+                    .atk(partial.getAtk() != null ? partial.getAtk() : 0L)
+                    .def(partial.getDef() != null ? partial.getDef() : 0L)
+                    .vit(partial.getVit() != null ? partial.getVit() : 0L)
                     .build();
         }
         return StatsDto.builder()
-                .hp(partial.getHp() != null ? partial.getHp() : existing.getHp())
-                .atk(partial.getAtk() != null ? partial.getAtk() : existing.getAtk())
-                .def(partial.getDef() != null ? partial.getDef() : existing.getDef())
-                .vit(partial.getVit() != null ? partial.getVit() : existing.getVit())
+                .hp(valueOrExisting(existing.getHp(), partial.getHp()))
+                .atk(valueOrExisting(existing.getAtk(), partial.getAtk()))
+                .def(valueOrExisting(existing.getDef(), partial.getDef()))
+                .vit(valueOrExisting(existing.getVit(), partial.getVit()))
                 .build();
     }
 }

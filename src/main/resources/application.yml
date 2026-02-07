@@ -10,6 +10,22 @@ spring:
 app:
   auth:
     enabled: false
+  
+  # Numeric constraints for game entities
+  constraints:
+    stats:
+      min-value: 1
+      max-value: 999999999
+    skills:
+      min-damage: 1
+      max-damage: 999999999
+      min-cooldown: 1
+      max-cooldown: 999999999
+      min-lvl-max: 1
+      max-lvl-max: 9999
+    ratio:
+      min-percent: 0.0
+      max-percent: 100.0
 
 # Configuration des APIs externes
 external:

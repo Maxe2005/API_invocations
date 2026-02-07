@@ -89,10 +89,10 @@ public class DatabaseSeeder implements CommandLineRunner {
          */
         private MonsterMongoDto convertToMonsterEntity(MonsterSeedDto seedDto) {
                 StatsDto stats = StatsDto.builder()
-                                .hp(seedDto.getStats().getHp())
-                                .atk(seedDto.getStats().getAtk())
-                                .def(seedDto.getStats().getDef())
-                                .vit(seedDto.getStats().getVit())
+                                .hp(seedDto.getStats().getHp().longValue())
+                                .atk(seedDto.getStats().getAtk().longValue())
+                                .def(seedDto.getStats().getDef().longValue())
+                                .vit(seedDto.getStats().getVit().longValue())
                                 .build();
 
                 return MonsterMongoDto.builder()
@@ -119,10 +119,10 @@ public class DatabaseSeeder implements CommandLineRunner {
                                 .monsterId(monsterId)
                                 .name(seedDto.getName())
                                 .description(seedDto.getDescription())
-                                .damage(seedDto.getDamage())
+                                .damage(seedDto.getDamage().longValue())
                                 .ratio(ratio)
-                                .cooldown(seedDto.getCooldown())
-                                .lvlMax(seedDto.getLvlMax())
+                                .cooldown(seedDto.getCooldown().longValue())
+                                .lvlMax(seedDto.getLvlMax().longValue())
                                 .rank(Rank.valueOf(seedDto.getRank()))
                                 .build();
         }

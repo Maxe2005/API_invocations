@@ -7,15 +7,18 @@ import lombok.NoArgsConstructor;
 
 import com.imt.api_invocations.dto.RatioUpdateDto;
 import com.imt.api_invocations.enums.Rank;
+import com.imt.api_invocations.validation.IntRange;
+import com.imt.api_invocations.validation.IntRange.ConstraintType;
 
 import jakarta.validation.Valid;
 
 /**
  * DTO for partial updates of skills.
- * Uses nullable primitives to distinguish between null (not provided) and
- * values (provided).
+ * Uses nullable Long to distinguish between null (not provided) and values
+ * (provided).
  * Supports fine-grained updates of nested objects (e.g., only update damage
  * ratio without touching damage value).
+ * Numeric constraints are validated against NumericConstraintsConfig.
  */
 @Getter
 @Builder
@@ -29,14 +32,17 @@ public class SkillsHttpUpdateDto {
 
     private String description;
 
-    private Double damage;
+    @IntRange(constraintType = ConstraintType.DAMAGE, fieldName = "Damage")
+    private Long damage;
 
     @Valid
     private RatioUpdateDto ratio;
 
-    private Double cooldown;
+    @IntRange(constraintType = ConstraintType.COOLDOWN, fieldName = "Cooldown")
+    private Long cooldown;
 
-    private Double lvlMax;
+    @IntRange(constraintType = ConstraintType.LVL_MAX, fieldName = "Level max")
+    private Long lvlMax;
 
     private Rank rank;
 }

@@ -1,22 +1,28 @@
 package com.imt.api_invocations.dto;
 
-import jakarta.validation.constraints.Positive;
+import com.imt.api_invocations.validation.IntRange;
+import com.imt.api_invocations.validation.IntRange.ConstraintType;
 import lombok.Getter;
 import lombok.experimental.SuperBuilder;
 
+/**
+ * DTO for game entity stats (HP, ATK, DEF, VIT).
+ * Uses long instead of double for precise integer values.
+ * Numeric constraints are validated against NumericConstraintsConfig.
+ */
 @Getter
 @SuperBuilder
 public class StatsDto {
 
-    @Positive(message = "HP must be positive")
-    private final double hp;
+    @IntRange(constraintType = ConstraintType.STAT, fieldName = "HP")
+    private final long hp;
 
-    @Positive(message = "ATK must be positive")
-    private final double atk;
+    @IntRange(constraintType = ConstraintType.STAT, fieldName = "ATK")
+    private final long atk;
 
-    @Positive(message = "DEF must be positive")
-    private final double def;
+    @IntRange(constraintType = ConstraintType.STAT, fieldName = "DEF")
+    private final long def;
 
-    @Positive(message = "VIT must be positive")
-    private final double vit;
+    @IntRange(constraintType = ConstraintType.STAT, fieldName = "VIT")
+    private final long vit;
 }

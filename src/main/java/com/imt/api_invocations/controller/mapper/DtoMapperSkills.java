@@ -18,6 +18,8 @@ public class DtoMapperSkills {
 
     /**
      * Convert SkillsHttpDto to SkillsMongoDto
+     * Note: Numeric validations (@IntRange) are already applied by Jakarta
+     * validation framework
      */
     public SkillsMongoDto toSkillsMongoDto(SkillsHttpDto httpDto) {
         if (httpDto.getMonsterId() == null || httpDto.getRatio() == null || httpDto.getRank() == null ||
@@ -25,9 +27,6 @@ public class DtoMapperSkills {
             throw new IllegalArgumentException("All fields must be provided for creation");
         }
         validateRatio(httpDto.getRatio());
-        validatePositive(httpDto.getDamage());
-        validatePositive(httpDto.getCooldown());
-        validatePositive(httpDto.getLvlMax());
         return SkillsMongoDto.builder()
                 .monsterId(httpDto.getMonsterId())
                 .name(httpDto.getName())
@@ -93,7 +92,7 @@ public class DtoMapperSkills {
                 .build();
     }
 
-    private double mergePositive(double existing, double candidate) {
+    private long mergePositive(long existing, long candidate) {
         return candidate > 0 ? candidate : existing;
     }
 
@@ -112,12 +111,6 @@ public class DtoMapperSkills {
 
     private void validateRatio(RatioDto ratio) {
         if (ratio.getStat() == null || ratio.getPercent() <= 0) {
-            throw new IllegalArgumentException("All fields must be provided for creation");
-        }
-    }
-
-    private void validatePositive(double value) {
-        if (value <= 0) {
             throw new IllegalArgumentException("All fields must be provided for creation");
         }
     }

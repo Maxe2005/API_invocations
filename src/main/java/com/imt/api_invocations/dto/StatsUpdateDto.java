@@ -1,6 +1,7 @@
 package com.imt.api_invocations.dto;
 
-import jakarta.validation.constraints.Positive;
+import com.imt.api_invocations.validation.IntRange;
+import com.imt.api_invocations.validation.IntRange.ConstraintType;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -8,8 +9,9 @@ import lombok.NoArgsConstructor;
 
 /**
  * DTO for partial updates of stats.
- * Uses nullable Double to distinguish between null (not provided) and values
+ * Uses nullable Long to distinguish between null (not provided) and values
  * (provided).
+ * Numeric constraints are validated against NumericConstraintsConfig.
  */
 @Getter
 @Builder
@@ -17,15 +19,15 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class StatsUpdateDto {
 
-    @Positive(message = "HP must be positive")
-    private Double hp;
+    @IntRange(constraintType = ConstraintType.STAT, fieldName = "HP")
+    private Long hp;
 
-    @Positive(message = "ATK must be positive")
-    private Double atk;
+    @IntRange(constraintType = ConstraintType.STAT, fieldName = "ATK")
+    private Long atk;
 
-    @Positive(message = "DEF must be positive")
-    private Double def;
+    @IntRange(constraintType = ConstraintType.STAT, fieldName = "DEF")
+    private Long def;
 
-    @Positive(message = "VIT must be positive")
-    private Double vit;
+    @IntRange(constraintType = ConstraintType.STAT, fieldName = "VIT")
+    private Long vit;
 }
