@@ -3,6 +3,7 @@ package com.imt.api_invocations.config;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.bson.types.ObjectId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.CommandLineRunner;
@@ -42,9 +43,11 @@ public class DatabaseSeeder implements CommandLineRunner {
                                 List<MonsterSeedDto> monsterSeeds = monsterSeedingService.loadAllMonsters();
                                 seedMonsters(monsterSeeds);
                                 logger.info("Database seeding completed successfully!");
-                        } catch (Exception e) {
-                                logger.error("Error during database seeding", e);
-                                throw e;
+                        } catch (Exception e) { // NOSONAR - Logging with context before rethrowing with wrapper
+                                                // exception
+                                String errorMsg = "Failed to seed database with initial data: " + e.getMessage();
+                                logger.error(errorMsg, e);
+                                throw new IllegalStateException(errorMsg, e);
                         }
                 }
         }
@@ -96,6 +99,7 @@ public class DatabaseSeeder implements CommandLineRunner {
                                 .build();
 
                 return MonsterMongoDto.builder()
+                                .id(ObjectId.get().toHexString())
                                 .name(seedDto.getNom())
                                 .element(Elementary.valueOf(seedDto.getElement()))
                                 .stats(stats)
@@ -116,6 +120,7 @@ public class DatabaseSeeder implements CommandLineRunner {
                                 .build();
 
                 return SkillsMongoDto.builder()
+                                .id(ObjectId.get().toHexString())
                                 .monsterId(monsterId)
                                 .name(seedDto.getName())
                                 .description(seedDto.getDescription())

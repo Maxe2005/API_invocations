@@ -65,21 +65,24 @@ public class MonstersApiClient {
                     null,
                     "Réponse invalide de l'API Monsters");
 
-        } catch (RestClientResponseException e) {
-            logger.error("Erreur HTTP lors de la communication avec l'API Monsters", e);
+        } catch (RestClientResponseException e) { // NOSONAR - Logging with context before rethrowing
+            String errorMsg = String.format("Erreur HTTP %d lors de la création du monstre dans l'API Monsters",
+                    e.getStatusCode().value());
+            logger.error(errorMsg, e);
             throw new ExternalApiException(
                     "Monsters API",
-                    e.getRawStatusCode(),
+                    e.getStatusCode().value(),
                     e.getResponseBodyAsString(),
-                    "Échec de la création du monstre dans l'API Monsters",
+                    errorMsg,
                     e);
-        } catch (RestClientException e) {
-            logger.error("Erreur lors de la communication avec l'API Monsters", e);
+        } catch (RestClientException e) { // NOSONAR - Logging with context before rethrowing
+            String errorMsg = "Échec de connexion à l'API Monsters: " + e.getMessage();
+            logger.error(errorMsg, e);
             throw new ExternalApiException(
                     "Monsters API",
                     HttpStatus.BAD_GATEWAY.value(),
                     null,
-                    "Échec de la création du monstre dans l'API Monsters",
+                    errorMsg,
                     e);
         }
     }
@@ -97,8 +100,10 @@ public class MonstersApiClient {
             restTemplate.delete(url);
             logger.info("Monstre supprimé avec succès: {}", monsterId);
         } catch (RestClientException e) {
-            logger.error("Échec de la compensation: impossible de supprimer le monstre {}", monsterId, e);
-            // On ne relance pas l'exception pour éviter de masquer l'erreur originale
+            // Logged but not rethrown to avoid masking the original error during
+            // compensation
+            logger.error("Échec de la compensation: impossible de supprimer le monstre {} - {}",
+                    monsterId, e.getMessage(), e);
         }
     }
 }

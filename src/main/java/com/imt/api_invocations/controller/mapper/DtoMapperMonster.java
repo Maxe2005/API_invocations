@@ -1,5 +1,6 @@
 package com.imt.api_invocations.controller.mapper;
 
+import org.bson.types.ObjectId;
 import org.springframework.stereotype.Component;
 
 import com.imt.api_invocations.controller.dto.input.MonsterHttpDto;
@@ -29,6 +30,7 @@ public class DtoMapperMonster {
         }
         validateStats(httpDto.getStats());
         return MonsterMongoDto.builder()
+                .id(ObjectId.get().toHexString())
                 .name(httpDto.getName())
                 .element(httpDto.getElement())
                 .stats(httpDto.getStats())

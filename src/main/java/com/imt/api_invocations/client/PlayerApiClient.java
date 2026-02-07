@@ -63,21 +63,26 @@ public class PlayerApiClient {
                     null,
                     "Échec de l'ajout du monstre au joueur");
 
-        } catch (RestClientResponseException e) {
-            logger.error("Erreur HTTP lors de l'ajout du monstre {} au joueur {}", monsterId, username, e);
+        } catch (RestClientResponseException e) { // NOSONAR - Logging with context before rethrowing
+            String errorMsg = String.format("Erreur HTTP %d lors de l'ajout du monstre %s au joueur %s",
+                    e.getStatusCode().value(), monsterId, username);
+            logger.error(errorMsg, e);
             throw new ExternalApiException(
                     "Player API",
-                    e.getRawStatusCode(),
+                    e.getStatusCode().value(),
                     e.getResponseBodyAsString(),
-                    "Échec de l'ajout du monstre au joueur dans l'API Player",
+                    errorMsg,
                     e);
-        } catch (RestClientException e) {
-            logger.error("Erreur lors de l'ajout du monstre {} au joueur {}", monsterId, username, e);
+        } catch (RestClientException e) { // NOSONAR - Logging with context before rethrowing
+            String errorMsg = String.format(
+                    "Échec de connexion à l'API Player pour l'ajout du monstre %s au joueur %s: %s",
+                    monsterId, username, e.getMessage());
+            logger.error(errorMsg, e);
             throw new ExternalApiException(
                     "Player API",
                     HttpStatus.BAD_GATEWAY.value(),
                     null,
-                    "Échec de l'ajout du monstre au joueur dans l'API Player",
+                    errorMsg,
                     e);
         }
     }

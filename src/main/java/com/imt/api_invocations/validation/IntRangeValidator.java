@@ -3,7 +3,6 @@ package com.imt.api_invocations.validation;
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
 import com.imt.api_invocations.config.NumericConstraintsConfig;
-import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * Validator for @IntRange annotation.
@@ -12,12 +11,14 @@ import org.springframework.beans.factory.annotation.Autowired;
  */
 public class IntRangeValidator implements ConstraintValidator<IntRange, Long> {
 
-    @Autowired
-    private NumericConstraintsConfig config;
-
+    private final NumericConstraintsConfig config;
     private long minValue;
     private long maxValue;
     private String fieldName;
+
+    public IntRangeValidator(NumericConstraintsConfig config) {
+        this.config = config;
+    }
 
     @Override
     public void initialize(IntRange constraintAnnotation) {

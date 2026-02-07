@@ -1,6 +1,7 @@
 package com.imt.api_invocations.config;
 
 import lombok.Getter;
+import lombok.Setter;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;
 
@@ -12,6 +13,7 @@ import org.springframework.stereotype.Component;
 @Component
 @ConfigurationProperties(prefix = "app.constraints")
 @Getter
+@Setter
 public class NumericConstraintsConfig {
 
     /**
@@ -30,12 +32,14 @@ public class NumericConstraintsConfig {
     private RatioConstraints ratio = new RatioConstraints();
 
     @Getter
+    @Setter
     public static class StatConstraints {
         private long minValue = 1;
         private long maxValue = 999_999_999;
     }
 
     @Getter
+    @Setter
     public static class SkillConstraints {
         private long minDamage = 1;
         private long maxDamage = 999_999_999;
@@ -46,6 +50,7 @@ public class NumericConstraintsConfig {
     }
 
     @Getter
+    @Setter
     public static class RatioConstraints {
         private double minPercent = 0.0;
         private double maxPercent = 100.0;
