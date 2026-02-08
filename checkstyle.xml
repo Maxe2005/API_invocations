@@ -1,0 +1,109 @@
+<?xml version="1.0"?>
+<!DOCTYPE module PUBLIC "-//Checkstyle//DTD Checkstyle Configuration 1.3//EN" "https://checkstyle.org/dtds/configuration_1_3.dtd">
+
+<module name="Checker">
+    <property name="charset" value="UTF-8" />
+    <property name="severity" value="warning" />
+
+    <!-- Fichiers -->
+    <module name="FileLength">
+        <property name="max" value="2000" />
+    </module>
+
+    <module name="TreeWalker">
+        <property name="tabWidth" value="4" />
+
+        <!-- Nommage -->
+        <module name="ConstantName" />
+        <module name="LocalFinalVariableName" />
+        <module name="LocalVariableName" />
+        <module name="MemberName">
+            <property name="format" value="^[a-z][a-zA-Z0-9]*$" />
+        </module>
+        <module name="MethodName">
+            <property name="format" value="^[a-z][a-zA-Z0-9]*$" />
+        </module>
+        <module name="PackageName">
+            <property name="format" value="^[a-z]+(\.[a-z][a-z0-9]*)*$" />
+        </module>
+        <module name="ParameterName" />
+        <module name="StaticVariableName" />
+        <module name="TypeName" />
+
+        <!-- Imports -->
+        <module name="AvoidStarImport" />
+        <module name="ImportOrder">
+            <property name="groups" value="java,javax,org,com" />
+            <property name="ordered" value="true" />
+            <property name="separated" value="true" />
+        </module>
+        <module name="UnusedImports" />
+
+        <!-- Taille -->
+        <module name="LineLength">
+            <property name="max" value="120" />
+            <property name="ignorePattern" value="^package.*|^import.*|a href|href|http://|https://" />
+        </module>
+        <module name="MethodLength">
+            <property name="max" value="200" />
+        </module>
+        <module name="ParameterNumber">
+            <property name="max" value="8" />
+        </module>
+
+        <!-- Whitespace -->
+        <module name="EmptyForInitializerPad" />
+        <module name="EmptyForIteratorPad" />
+        <module name="GenericWhitespace" />
+        <module name="MethodParamPad" />
+        <module name="NoWhitespaceAfter">
+            <property name="tokens" value="BNOT,DEC,DOT,INC,LNOT,UNARY_MINUS,UNARY_PLUS" />
+        </module>
+        <module name="NoWhitespaceBefore" />
+        <module name="OperatorWrap" />
+        <module name="ParenPad" />
+        <module name="TypecastParenPad" />
+        <module name="WhitespaceAfter" />
+        <module name="WhitespaceAround" />
+
+        <!-- Modificateurs -->
+        <module name="ModifierOrder" />
+        <module name="RedundantModifier" />
+
+        <!-- Blocs -->
+        <module name="AvoidNestedBlocks" />
+        <module name="EmptyBlock" />
+        <module name="LeftCurly" />
+        <module name="NeedBraces" />
+        <module name="RightCurly" />
+
+        <!-- Coding -->
+        <module name="CovariantEquals" />
+        <module name="EmptyStatement" />
+        <module name="EqualsAvoidNull" />
+        <module name="EqualsHashCode" />
+        <module name="HiddenField">
+            <property name="ignoreConstructorParameter" value="true" />
+            <property name="ignoreSetter" value="true" />
+        </module>
+        <module name="InnerAssignment" />
+        <module name="MagicNumber">
+            <property name="ignoreNumbers" value="-1,0,1,2" />
+        </module>
+        <module name="MissingSwitchDefault" />
+        <module name="MultipleVariableDeclarations" />
+        <module name="SimplifyBooleanExpression" />
+        <module name="SimplifyBooleanReturn" />
+        <module name="StringLiteralEquality" />
+
+        <!-- Classe Design -->
+        <module name="FinalClass" />
+        <module name="HideUtilityClassConstructor" />
+        <module name="InterfaceIsType" />
+
+        <!-- Annotations -->
+        <module name="AnnotationUseStyle" />
+        <module name="MissingDeprecated" />
+        <module name="MissingOverride" />
+    </module>
+</module>
