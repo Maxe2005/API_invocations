@@ -9,18 +9,20 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 @RequiredArgsConstructor
 public class WebConfig implements WebMvcConfigurer {
 
-    private final AuthInterceptor authInterceptor;
-    private final AppProperties appProperties;
+  private final AuthInterceptor authInterceptor;
+  private final AppProperties appProperties;
 
-    @Override
-    public void addInterceptors(InterceptorRegistry registry) {
-        if (!appProperties.getAuth().isEnabled()) {
-            return;
-        }
-        registry.addInterceptor(authInterceptor)
-                .addPathPatterns("/**") // Applique l'intercepteur à toutes les URL
-                .excludePathPatterns("/actuator/**") // Exclut les endpoints actuator
-                .excludePathPatterns("/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html"); // Exclut les endpoints
-                                                                                               // Swagger
+  @Override
+  public void addInterceptors(InterceptorRegistry registry) {
+    if (!appProperties.getAuth().isEnabled()) {
+      return;
     }
+    registry
+        .addInterceptor(authInterceptor)
+        .addPathPatterns("/**") // Applique l'intercepteur à toutes les URL
+        .excludePathPatterns("/actuator/**") // Exclut les endpoints actuator
+        .excludePathPatterns(
+            "/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html"); // Exclut les endpoints
+    // Swagger
+  }
 }

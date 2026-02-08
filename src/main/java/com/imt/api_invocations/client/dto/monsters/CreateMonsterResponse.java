@@ -7,6 +7,6 @@ import lombok.Getter;
 @AllArgsConstructor
 public class CreateMonsterResponse {
 
-    private String monsterId;
-    private String message;
+  private String monsterId;
+  private String message;
 }

@@ -8,8 +8,7 @@ import org.springframework.boot.context.properties.ConfigurationPropertiesScan;
 @SpringBootApplication
 public class ApiInvocationsApplication {
 
-    public static void main(String[] args) {
-        SpringApplication.run(ApiInvocationsApplication.class, args);
-    }
-
+  public static void main(String[] args) {
+    SpringApplication.run(ApiInvocationsApplication.class, args);
+  }
 }

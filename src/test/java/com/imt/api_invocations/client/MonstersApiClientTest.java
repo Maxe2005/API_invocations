@@ -57,13 +57,15 @@
 //                 Collections.emptyList(),
 //                 Rank.COMMON);
 
-//         successResponse = new CreateMonsterResponse("monster-123", "Monster created successfully");
+//         successResponse = new CreateMonsterResponse("monster-123", "Monster created
+// successfully");
 //     }
 
 //     @Test
 //     void createMonster_shouldReturnMonsterId_whenApiCallSucceeds() {
 //         // Given
-//         ResponseEntity<CreateMonsterResponse> responseEntity = new ResponseEntity<>(successResponse,
+//         ResponseEntity<CreateMonsterResponse> responseEntity = new
+// ResponseEntity<>(successResponse,
 //                 HttpStatus.CREATED);
 
 //         when(restTemplate.postForEntity(
@@ -89,7 +91,8 @@
 //         when(restTemplate.postForEntity(
 //                 anyString(),
 //                 any(CreateMonsterRequest.class),
-//                 eq(CreateMonsterResponse.class))).thenThrow(new RestClientException("Connection refused"));
+//                 eq(CreateMonsterResponse.class))).thenThrow(new RestClientException("Connection
+// refused"));
 
 //         // When & Then
 //         assertThrows(ExternalApiException.class, () -> {
@@ -100,7 +103,8 @@
 //     @Test
 //     void createMonster_shouldThrowException_whenResponseBodyIsNull() {
 //         // Given
-//         ResponseEntity<CreateMonsterResponse> responseEntity = new ResponseEntity<>(null, HttpStatus.OK);
+//         ResponseEntity<CreateMonsterResponse> responseEntity = new ResponseEntity<>(null,
+// HttpStatus.OK);
 
 //         when(restTemplate.postForEntity(
 //                 anyString(),
@@ -123,7 +127,8 @@
 //         monstersApiClient.deleteMonster(monsterId);
 
 //         // Then
-//         verify(restTemplate, times(1)).delete("http://api_monsters:8080/api/monsters/monster-123");
+//         verify(restTemplate,
+// times(1)).delete("http://api_monsters:8080/api/monsters/monster-123");
 //     }
 
 //     @Test

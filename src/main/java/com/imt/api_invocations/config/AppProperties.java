@@ -5,23 +5,19 @@ import lombok.Setter;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;
 
-/**
- * Centralized application-level properties.
- */
+/** Centralized application-level properties. */
 @Component
 @ConfigurationProperties(prefix = "app")
 @Getter
 @Setter
 public class AppProperties {
 
-    /**
-     * Authentication configuration
-     */
-    private AuthConfig auth = new AuthConfig();
+  /** Authentication configuration */
+  private AuthConfig auth = new AuthConfig();
 
-    @Getter
-    @Setter
-    public static class AuthConfig {
-        private boolean enabled = true;
-    }
+  @Getter
+  @Setter
+  public static class AuthConfig {
+    private boolean enabled = true;
+  }
 }

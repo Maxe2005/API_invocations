@@ -1,35 +1,34 @@
 package com.imt.api_invocations.config.seeding;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-
-import java.util.List;
 
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 public class MonsterSeedDto {
 
-    @JsonProperty("nom")
-    private String nom;
+  @JsonProperty("nom")
+  private String nom;
 
-    @JsonProperty("element")
-    private String element;
+  @JsonProperty("element")
+  private String element;
 
-    @JsonProperty("rang")
-    private String rang;
+  @JsonProperty("rang")
+  private String rang;
 
-    @JsonProperty("stats")
-    private StatsSeedDto stats;
+  @JsonProperty("stats")
+  private StatsSeedDto stats;
 
-    @JsonProperty("description_carte")
-    private String descriptionCarte;
+  @JsonProperty("description_carte")
+  private String descriptionCarte;
 
-    @JsonProperty("description_visuelle")
-    private String descriptionVisuelle;
+  @JsonProperty("description_visuelle")
+  private String descriptionVisuelle;
 
-    @JsonProperty("skills")
-    private List<SkillSeedDto> skills;
+  @JsonProperty("skills")
+  private List<SkillSeedDto> skills;
 }

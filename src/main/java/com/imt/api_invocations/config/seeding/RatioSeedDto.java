@@ -10,9 +10,9 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class RatioSeedDto {
 
-    @JsonProperty("stat")
-    private String stat;
+  @JsonProperty("stat")
+  private String stat;
 
-    @JsonProperty("percent")
-    private Double percent;
+  @JsonProperty("percent")
+  private Double percent;
 }

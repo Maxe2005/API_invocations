@@ -1,18 +1,16 @@
 package com.imt.api_invocations.exception;
 
+import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
-
-import java.util.List;
 
 @Getter
 @AllArgsConstructor
 public class Errors {
 
-    private List<CustomError> theErrorsYOUMade;
+  private List<CustomError> theErrorsYOUMade;
 
-    public void addError(CustomError error) {
-        this.theErrorsYOUMade.add(error);
-    }
-
+  public void addError(CustomError error) {
+    this.theErrorsYOUMade.add(error);
+  }
 }

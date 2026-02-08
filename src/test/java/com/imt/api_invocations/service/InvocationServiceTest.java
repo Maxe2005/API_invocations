@@ -65,7 +65,8 @@
 //         String monsterId = "created-monster-789";
 
 //         when(monsterService.getRandomMonsterByRank(any(Rank.class))).thenReturn(sampleMonster);
-//         when(skillsService.getRandomSkillsForMonster(anyString(), anyInt())).thenReturn(Collections.emptyList());
+//         when(skillsService.getRandomSkillsForMonster(anyString(),
+// anyInt())).thenReturn(Collections.emptyList());
 //         when(monstersApiClient.createMonster(any(GlobalMonsterDto.class))).thenReturn(monsterId);
 //         doNothing().when(playerApiClient).addMonsterToPlayer(playerId, monsterId);
 
@@ -87,7 +88,8 @@
 //         String monsterId = "created-monster-789";
 
 //         when(monsterService.getRandomMonsterByRank(any(Rank.class))).thenReturn(sampleMonster);
-//         when(skillsService.getRandomSkillsForMonster(anyString(), anyInt())).thenReturn(Collections.emptyList());
+//         when(skillsService.getRandomSkillsForMonster(anyString(),
+// anyInt())).thenReturn(Collections.emptyList());
 //         when(monstersApiClient.createMonster(any(GlobalMonsterDto.class))).thenReturn(monsterId);
 //         doThrow(new ExternalApiException("Player API error"))
 //                 .when(playerApiClient).addMonsterToPlayer(playerId, monsterId);
@@ -107,7 +109,8 @@
 //         String playerId = "player-456";
 
 //         when(monsterService.getRandomMonsterByRank(any(Rank.class))).thenReturn(sampleMonster);
-//         when(skillsService.getRandomSkillsForMonster(anyString(), anyInt())).thenReturn(Collections.emptyList());
+//         when(skillsService.getRandomSkillsForMonster(anyString(),
+// anyInt())).thenReturn(Collections.emptyList());
 //         when(monstersApiClient.createMonster(any(GlobalMonsterDto.class)))
 //                 .thenThrow(new ExternalApiException("Monster API error"));
 

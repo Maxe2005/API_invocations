@@ -6,5 +6,5 @@ import lombok.Getter;
 @Getter
 @AllArgsConstructor
 public class PlayerAddMonsterRequest {
-    private String monsterId;
+  private String monsterId;
 }

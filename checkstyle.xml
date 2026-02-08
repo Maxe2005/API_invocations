@@ -10,6 +10,11 @@
         <property name="max" value="2000" />
     </module>
 
+    <module name="LineLength">
+        <property name="max" value="120" />
+        <property name="ignorePattern" value="^package.*|^import.*|a href|href|http://|https://" />
+    </module>
+
     <module name="TreeWalker">
         <property name="tabWidth" value="4" />
 
@@ -40,10 +45,6 @@
         <module name="UnusedImports" />
 
         <!-- Taille -->
-        <module name="LineLength">
-            <property name="max" value="120" />
-            <property name="ignorePattern" value="^package.*|^import.*|a href|href|http://|https://" />
-        </module>
         <module name="MethodLength">
             <property name="max" value="200" />
         </module>

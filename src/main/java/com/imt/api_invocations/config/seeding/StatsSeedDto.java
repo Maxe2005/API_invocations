@@ -10,15 +10,15 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class StatsSeedDto {
 
-    @JsonProperty("hp")
-    private Double hp;
+  @JsonProperty("hp")
+  private Double hp;
 
-    @JsonProperty("atk")
-    private Double atk;
+  @JsonProperty("atk")
+  private Double atk;
 
-    @JsonProperty("def")
-    private Double def;
+  @JsonProperty("def")
+  private Double def;
 
-    @JsonProperty("vit")
-    private Double vit;
+  @JsonProperty("vit")
+  private Double vit;
 }

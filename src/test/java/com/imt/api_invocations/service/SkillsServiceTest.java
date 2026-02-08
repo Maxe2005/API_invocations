@@ -38,10 +38,12 @@
 //     @Test
 //     void createSkill_WhenMonsterExists() {
 //         String monsterId = "monster-id";
-//         SkillsMongoDto skill = new SkillsMongoDto(monsterId, 10.0, new RatioDto(Stat.ATK, 0.5), 10.0, 5.0, Rank.COMMON);
+//         SkillsMongoDto skill = new SkillsMongoDto(monsterId, 10.0, new RatioDto(Stat.ATK, 0.5),
+// 10.0, 5.0, Rank.COMMON);
 
 //         when(monsterService.getMonsterById(monsterId))
-//                 .thenReturn(new MonsterMongoDto("id", Elementary.FIRE, 100.0, 10.0, 5.0, 50.0, Rank.COMMON));
+//                 .thenReturn(new MonsterMongoDto("id", Elementary.FIRE, 100.0, 10.0, 5.0, 50.0,
+// Rank.COMMON));
 //         when(skillsRepository.save(any(SkillsMongoDto.class))).thenReturn("skill-id");
 
 //         String result = skillsService.createSkill(skill);
@@ -53,7 +55,8 @@
 //     @Test
 //     void createSkill_WhenMonsterDoesNotExist() {
 //         String monsterId = "monster-id";
-//         SkillsMongoDto skill = new SkillsMongoDto(monsterId, 10.0, new RatioDto(Stat.ATK, 0.5), 10.0, 5.0, Rank.COMMON);
+//         SkillsMongoDto skill = new SkillsMongoDto(monsterId, 10.0, new RatioDto(Stat.ATK, 0.5),
+// 10.0, 5.0, Rank.COMMON);
 //         assertThrows(IllegalArgumentException.class, () -> skillsService.createSkill(skill));
 //         verify(skillsRepository, never()).save(any(SkillsMongoDto.class));
 //     }
@@ -61,7 +64,8 @@
 //     @Test
 //     void getSkillById() {
 //         String id = "skill-id";
-//         SkillsMongoDto skill = new SkillsMongoDto(id, "monster-id", 10.0, new RatioDto(Stat.ATK, 0.5), 10.0, 5.0,
+//         SkillsMongoDto skill = new SkillsMongoDto(id, "monster-id", 10.0, new RatioDto(Stat.ATK,
+// 0.5), 10.0, 5.0,
 //                 Rank.COMMON);
 
 //         when(skillsRepository.findByID(id)).thenReturn(skill);
@@ -75,10 +79,12 @@
 //     void updateSkill_WhenMonsterExists() {
 //         String skillId = "skill-id";
 //         String monsterId = "monster-id";
-//         SkillsMongoDto skill = new SkillsMongoDto(monsterId, 10.0, new RatioDto(Stat.ATK, 0.5), 10.0, 5.0, Rank.COMMON);
+//         SkillsMongoDto skill = new SkillsMongoDto(monsterId, 10.0, new RatioDto(Stat.ATK, 0.5),
+// 10.0, 5.0, Rank.COMMON);
 
 //         when(monsterService.getMonsterById(monsterId))
-//                 .thenReturn(new MonsterMongoDto("id", Elementary.FIRE, 100.0, 10.0, 5.0, 50.0, Rank.COMMON));
+//                 .thenReturn(new MonsterMongoDto("id", Elementary.FIRE, 100.0, 10.0, 5.0, 50.0,
+// Rank.COMMON));
 
 //         skillsService.updateSkill(skillId, skill);
 
@@ -89,15 +95,18 @@
 //     void updateSkill_WhenMonsterDoesNotExist() {
 //         String skillId = "skill-id";
 //         String monsterId = "monster-id";
-//         SkillsMongoDto skill = new SkillsMongoDto(monsterId, 10.0, new RatioDto(Stat.ATK, 0.5), 10.0, 5.0, Rank.COMMON);
-//         assertThrows(IllegalArgumentException.class, () -> skillsService.updateSkill(skillId, skill));
+//         SkillsMongoDto skill = new SkillsMongoDto(monsterId, 10.0, new RatioDto(Stat.ATK, 0.5),
+// 10.0, 5.0, Rank.COMMON);
+//         assertThrows(IllegalArgumentException.class, () -> skillsService.updateSkill(skillId,
+// skill));
 //         verify(skillsRepository, never()).update(any(SkillsMongoDto.class));
 //     }
 
 //     @Test
 //     void getSkillByMonsterId() {
 //         String monsterId = "monster-id";
-//         SkillsMongoDto skill = new SkillsMongoDto("skill-id", monsterId, 10.0, new RatioDto(Stat.ATK, 0.5), 10.0, 5.0,
+//         SkillsMongoDto skill = new SkillsMongoDto("skill-id", monsterId, 10.0, new
+// RatioDto(Stat.ATK, 0.5), 10.0, 5.0,
 //                 Rank.COMMON);
 
 //         when(skillsRepository.findByMonsterId(monsterId)).thenReturn(List.of(skill));

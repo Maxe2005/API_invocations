@@ -10,24 +10,24 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class SkillSeedDto {
 
-    @JsonProperty("name")
-    private String name;
+  @JsonProperty("name")
+  private String name;
 
-    @JsonProperty("description")
-    private String description;
+  @JsonProperty("description")
+  private String description;
 
-    @JsonProperty("damage")
-    private Double damage;
+  @JsonProperty("damage")
+  private Double damage;
 
-    @JsonProperty("ratio")
-    private RatioSeedDto ratio;
+  @JsonProperty("ratio")
+  private RatioSeedDto ratio;
 
-    @JsonProperty("cooldown")
-    private Double cooldown;
+  @JsonProperty("cooldown")
+  private Double cooldown;
 
-    @JsonProperty("lvlMax")
-    private Double lvlMax;
+  @JsonProperty("lvlMax")
+  private Double lvlMax;
 
-    @JsonProperty("rank")
-    private String rank;
+  @JsonProperty("rank")
+  private String rank;
 }

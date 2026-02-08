@@ -8,18 +8,19 @@ import org.springframework.validation.beanvalidation.LocalValidatorFactoryBean;
 import org.springframework.validation.beanvalidation.SpringConstraintValidatorFactory;
 
 /**
- * Configuration pour intégrer Spring avec la validation Jakarta.
- * Permet aux ConstraintValidators d'utiliser l'injection de dépendances Spring.
+ * Configuration pour intégrer Spring avec la validation Jakarta. Permet aux ConstraintValidators
+ * d'utiliser l'injection de dépendances Spring.
  */
 @Configuration
 public class ValidationConfig {
 
-    @Bean
-    @Primary
-    public LocalValidatorFactoryBean validator(AutowireCapableBeanFactory autowireCapableBeanFactory) {
-        LocalValidatorFactoryBean validatorFactoryBean = new LocalValidatorFactoryBean();
-        validatorFactoryBean.setConstraintValidatorFactory(
-                new SpringConstraintValidatorFactory(autowireCapableBeanFactory));
-        return validatorFactoryBean;
-    }
+  @Bean
+  @Primary
+  public LocalValidatorFactoryBean validator(
+      AutowireCapableBeanFactory autowireCapableBeanFactory) {
+    LocalValidatorFactoryBean validatorFactoryBean = new LocalValidatorFactoryBean();
+    validatorFactoryBean.setConstraintValidatorFactory(
+        new SpringConstraintValidatorFactory(autowireCapableBeanFactory));
+    return validatorFactoryBean;
+  }
 }

@@ -31,7 +31,8 @@
 
 //     @Test
 //     void createMonster() {
-//         MonsterMongoDto monster = new MonsterMongoDto(Elementary.FIRE, 100.0, 10.0, 5.0, 50.0, Rank.COMMON);
+//         MonsterMongoDto monster = new MonsterMongoDto(Elementary.FIRE, 100.0, 10.0, 5.0, 50.0,
+// Rank.COMMON);
 //         when(monsterRepository.save(any(MonsterMongoDto.class))).thenReturn("some-id");
 
 //         String result = monsterService.createMonster(monster);
@@ -43,7 +44,8 @@
 //     @Test
 //     void getMonsterById() {
 //         String id = "some-id";
-//         MonsterMongoDto monster = new MonsterMongoDto(id, Elementary.FIRE, 100.0, 10.0, 5.0, 50.0, Rank.COMMON);
+//         MonsterMongoDto monster = new MonsterMongoDto(id, Elementary.FIRE, 100.0, 10.0, 5.0,
+// 50.0, Rank.COMMON);
 //         when(monsterRepository.findByID(id)).thenReturn(monster);
 
 //         MonsterMongoDto result = monsterService.getMonsterById(id);
@@ -53,8 +55,10 @@
 
 //     @Test
 //     void getAllMonsters() {
-//         MonsterMongoDto monster1 = new MonsterMongoDto(Elementary.FIRE, 100.0, 10.0, 5.0, 50.0, Rank.COMMON);
-//         MonsterMongoDto monster2 = new MonsterMongoDto(Elementary.WATER, 120.0, 12.0, 6.0, 60.0, Rank.RARE);
+//         MonsterMongoDto monster1 = new MonsterMongoDto(Elementary.FIRE, 100.0, 10.0, 5.0, 50.0,
+// Rank.COMMON);
+//         MonsterMongoDto monster2 = new MonsterMongoDto(Elementary.WATER, 120.0, 12.0, 6.0, 60.0,
+// Rank.RARE);
 //         when(monsterRepository.findAll()).thenReturn(List.of(monster1, monster2));
 
 //         List<MonsterMongoDto> result = monsterService.getAllMonsters();
@@ -64,8 +68,10 @@
 
 //     @Test
 //     void getAllMonsterIds() {
-//         MonsterMongoDto monster1 = new MonsterMongoDto("id1", Elementary.FIRE, 100.0, 10.0, 5.0, 50.0, Rank.COMMON);
-//         MonsterMongoDto monster2 = new MonsterMongoDto("id2", Elementary.WATER, 100.0, 10.0, 5.0, 50.0, Rank.COMMON);
+//         MonsterMongoDto monster1 = new MonsterMongoDto("id1", Elementary.FIRE, 100.0, 10.0, 5.0,
+// 50.0, Rank.COMMON);
+//         MonsterMongoDto monster2 = new MonsterMongoDto("id2", Elementary.WATER, 100.0, 10.0, 5.0,
+// 50.0, Rank.COMMON);
 //         when(monsterRepository.findAllIds()).thenReturn(List.of(monster1, monster2));
 
 //         List<String> result = monsterService.getAllMonsterIds();
@@ -78,7 +84,8 @@
 //     @Test
 //     void updateMonster() {
 //         String id = "some-id";
-//         MonsterMongoDto monster = new MonsterMongoDto(Elementary.FIRE, 100.0, 10.0, 5.0, 50.0, Rank.COMMON);
+//         MonsterMongoDto monster = new MonsterMongoDto(Elementary.FIRE, 100.0, 10.0, 5.0, 50.0,
+// Rank.COMMON);
 //         monsterService.updateMonster(id, monster);
 //         verify(monsterRepository).update(any(MonsterMongoDto.class));
 //     }
