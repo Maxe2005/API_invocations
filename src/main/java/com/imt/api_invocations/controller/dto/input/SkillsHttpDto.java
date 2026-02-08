@@ -11,8 +11,7 @@ import com.imt.api_invocations.dto.SkillBaseDto;
 @Schema(description = "Données pour créer une compétence")
 public class SkillsHttpDto extends SkillBaseDto {
 
-    @Schema(description = "Identifiant du monstre auquel associer cette compétence", 
-            example = "507f1f77bcf86cd799439011", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+    @Schema(description = "Identifiant du monstre auquel associer cette compétence", example = "4b1f2e8d-7d5f-4d7a-9c2a-8e0b4e0f2a11", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
     private String monsterId;
 
 }

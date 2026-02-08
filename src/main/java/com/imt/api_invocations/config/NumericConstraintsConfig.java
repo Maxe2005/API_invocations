@@ -41,9 +41,9 @@ public class NumericConstraintsConfig {
     @Getter
     @Setter
     public static class SkillConstraints {
-        private long minDamage = 1;
+        private long minDamage = 0;
         private long maxDamage = 999_999_999;
-        private long minCooldown = 1;
+        private long minCooldown = 0;
         private long maxCooldown = 999_999_999;
         private long minLvlMax = 1;
         private long maxLvlMax = 9_999;

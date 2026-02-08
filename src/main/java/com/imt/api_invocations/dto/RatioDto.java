@@ -7,7 +7,12 @@ import jakarta.validation.Valid;
 import jakarta.validation.constraints.DecimalMax;
 import jakarta.validation.constraints.DecimalMin;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.AllArgsConstructor;
 import lombok.experimental.SuperBuilder;
+import jakarta.persistence.Embeddable;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.EnumType;
 
 /**
  * DTO for skill ratio configuration.
@@ -15,17 +20,19 @@ import lombok.experimental.SuperBuilder;
  */
 @Getter
 @SuperBuilder
+@NoArgsConstructor
+@AllArgsConstructor
+@Embeddable
 @Schema(description = "Configuration du ratio de scaling d'une compétence sur une statistique")
 public class RatioDto {
 
-    @Valid
-    @Schema(description = "Statistique sur laquelle scale la compétence", implementation = Stat.class, 
-            example = "ATK", requiredMode = Schema.RequiredMode.REQUIRED)
-    private final Stat stat;
+        @Valid
+        @Enumerated(EnumType.STRING)
+        @Schema(description = "Statistique sur laquelle scale la compétence", implementation = Stat.class, example = "ATK", requiredMode = Schema.RequiredMode.REQUIRED)
+        private Stat stat;
 
-    @DecimalMin(value = "0.0", message = "Percent must be at least 0")
-    @DecimalMax(value = "100.0", message = "Percent must not exceed 100")
-    @Schema(description = "Pourcentage de la statistique ajouté aux dégâts (0-100)", 
-            example = "75.5", minimum = "0", maximum = "100", requiredMode = Schema.RequiredMode.REQUIRED)
-    private final double percent;
+        @DecimalMin(value = "0.0", message = "Percent must be at least 0")
+        @DecimalMax(value = "100.0", message = "Percent must not exceed 100")
+        @Schema(description = "Pourcentage de la statistique ajouté aux dégâts (0-100)", example = "75.5", minimum = "0", maximum = "100", requiredMode = Schema.RequiredMode.REQUIRED)
+        private double percent;
 }

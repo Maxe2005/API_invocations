@@ -1,12 +1,34 @@
 services:
-  mongo:
-    image: mongo
-    container_name: api_invocations_mongo
+  postgres:
+    image: postgres:16
+    container_name: api_invocations_postgres
+    environment:
+      POSTGRES_DB: api_invocationsdb
+      POSTGRES_USER: api_invocations
+      POSTGRES_PASSWORD: api_invocations
     ports:
-      - "27017:27017"
+      - "5432:5432"
+    volumes:
+      - api_invocations_pg_data:/var/lib/postgresql/data
+
+  pgadmin:
+    image: dpage/pgadmin4:latest
+    container_name: api_invocations_pgadmin
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@admin.com
+      PGADMIN_DEFAULT_PASSWORD: admin
+    ports:
+      - "5050:80"
+    depends_on:
+      - postgres
 
   api_invocations:
     build: ./
     container_name: api_invocations
     ports:
       - "8085:8080"
+    depends_on:
+      - postgres
+
+volumes:
+  api_invocations_pg_data:

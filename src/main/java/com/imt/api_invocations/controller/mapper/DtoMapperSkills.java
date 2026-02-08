@@ -1,6 +1,5 @@
 package com.imt.api_invocations.controller.mapper;
 
-import org.bson.types.ObjectId;
 import org.springframework.stereotype.Component;
 
 import com.imt.api_invocations.controller.dto.input.SkillsHttpDto;
@@ -29,7 +28,6 @@ public class DtoMapperSkills {
         }
         validateRatio(httpDto.getRatio());
         return SkillsMongoDto.builder()
-                .id(ObjectId.get().toHexString())
                 .monsterId(httpDto.getMonsterId())
                 .name(httpDto.getName())
                 .description(httpDto.getDescription())

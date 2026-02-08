@@ -7,10 +7,17 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Size;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
+import jakarta.persistence.Embedded;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.MappedSuperclass;
 
 @Getter
 @SuperBuilder
+@NoArgsConstructor
+@MappedSuperclass
 @Schema(description = "Informations de base d'un monstre")
 public class MonsterBaseDto {
 
@@ -18,14 +25,17 @@ public class MonsterBaseDto {
     private String name;
 
     @Valid
+    @Enumerated(EnumType.STRING)
     @Schema(description = "Élément du monstre", implementation = Elementary.class, requiredMode = Schema.RequiredMode.REQUIRED)
     private Elementary element;
 
     @Valid
+    @Embedded
     @Schema(description = "Statistiques du monstre (HP, ATK, DEF, VIT)", requiredMode = Schema.RequiredMode.REQUIRED)
     private StatsDto stats;
 
     @Valid
+    @Enumerated(EnumType.STRING)
     @Schema(description = "Rang du monstre déterminant sa rareté", implementation = Rank.class, requiredMode = Schema.RequiredMode.REQUIRED)
     private Rank rank;
 

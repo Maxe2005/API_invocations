@@ -1,13 +1,17 @@
 package com.imt.api_invocations.config;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
-import org.bson.types.ObjectId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
+
+import jakarta.validation.ConstraintViolation;
+import jakarta.validation.ConstraintViolationException;
 
 import com.imt.api_invocations.config.seeding.MonsterSeedDto;
 import com.imt.api_invocations.config.seeding.MonsterSeedingService;
@@ -36,7 +40,10 @@ public class DatabaseSeeder implements CommandLineRunner {
 
         @Override
         public void run(String... args) throws Exception {
-                if (monsterRepository.count() == 0) {
+                long monsterCount = monsterRepository.count();
+                long skillCount = skillsRepository.count();
+
+                if (monsterCount == 0) {
                         logger.info("Seeding database from JSON configuration...");
 
                         try {
@@ -45,7 +52,25 @@ public class DatabaseSeeder implements CommandLineRunner {
                                 logger.info("Database seeding completed successfully!");
                         } catch (Exception e) { // NOSONAR - Logging with context before rethrowing with wrapper
                                                 // exception
+                                logConstraintViolations(e);
                                 String errorMsg = "Failed to seed database with initial data: " + e.getMessage();
+                                logger.error(errorMsg, e);
+                                throw new IllegalStateException(errorMsg, e);
+                        }
+                        return;
+                }
+
+                if (skillCount == 0) {
+                        logger.info("Monsters already present; seeding skills from JSON configuration...");
+
+                        try {
+                                List<MonsterSeedDto> monsterSeeds = monsterSeedingService.loadAllMonsters();
+                                seedSkillsOnly(monsterSeeds);
+                                logger.info("Skill seeding completed successfully!");
+                        } catch (Exception e) { // NOSONAR - Logging with context before rethrowing with wrapper
+                                                // exception
+                                logConstraintViolations(e);
+                                String errorMsg = "Failed to seed skills with initial data: " + e.getMessage();
                                 logger.error(errorMsg, e);
                                 throw new IllegalStateException(errorMsg, e);
                         }
@@ -87,6 +112,39 @@ public class DatabaseSeeder implements CommandLineRunner {
                 }
         }
 
+        private void seedSkillsOnly(List<MonsterSeedDto> monsterSeeds) {
+                List<MonsterMongoDto> monsters = monsterRepository.findAll();
+                Map<String, String> monsterIdByName = new HashMap<>();
+
+                for (MonsterMongoDto monster : monsters) {
+                        if (monster.getName() != null) {
+                                monsterIdByName.put(monster.getName(), monster.getId());
+                        }
+                }
+
+                List<SkillsMongoDto> allSkills = new ArrayList<>();
+
+                for (MonsterSeedDto seedDto : monsterSeeds) {
+                        String monsterId = monsterIdByName.get(seedDto.getNom());
+
+                        if (monsterId == null) {
+                                logger.warn("No monster found for seed name: {}", seedDto.getNom());
+                                continue;
+                        }
+
+                        if (seedDto.getSkills() != null) {
+                                for (SkillSeedDto skillSeed : seedDto.getSkills()) {
+                                        SkillsMongoDto skill = convertToSkillEntity(monsterId, skillSeed);
+                                        allSkills.add(skill);
+                                }
+                        }
+                }
+
+                if (!allSkills.isEmpty()) {
+                        skillsRepository.saveAll(allSkills);
+                }
+        }
+
         /**
          * Convertit un MonsterSeedDto en MonsterMongoDto
          */
@@ -99,7 +157,6 @@ public class DatabaseSeeder implements CommandLineRunner {
                                 .build();
 
                 return MonsterMongoDto.builder()
-                                .id(ObjectId.get().toHexString())
                                 .name(seedDto.getNom())
                                 .element(Elementary.valueOf(seedDto.getElement()))
                                 .stats(stats)
@@ -120,7 +177,6 @@ public class DatabaseSeeder implements CommandLineRunner {
                                 .build();
 
                 return SkillsMongoDto.builder()
-                                .id(ObjectId.get().toHexString())
                                 .monsterId(monsterId)
                                 .name(seedDto.getName())
                                 .description(seedDto.getDescription())
@@ -130,5 +186,39 @@ public class DatabaseSeeder implements CommandLineRunner {
                                 .lvlMax(seedDto.getLvlMax().longValue())
                                 .rank(Rank.valueOf(seedDto.getRank()))
                                 .build();
+        }
+
+        private void logConstraintViolations(Throwable error) {
+                ConstraintViolationException violationException = findConstraintViolationException(error);
+
+                if (violationException == null) {
+                        return;
+                }
+
+                logger.error("Validation errors detected during seeding:");
+
+                for (ConstraintViolation<?> violation : violationException.getConstraintViolations()) {
+                        String bean = violation.getRootBeanClass() != null
+                                        ? violation.getRootBeanClass().getSimpleName()
+                                        : "Unknown";
+                        logger.error("- {}.{}: {} (invalid value: {})",
+                                        bean,
+                                        violation.getPropertyPath(),
+                                        violation.getMessage(),
+                                        violation.getInvalidValue());
+                }
+        }
+
+        private ConstraintViolationException findConstraintViolationException(Throwable error) {
+                Throwable current = error;
+
+                while (current != null) {
+                        if (current instanceof ConstraintViolationException violationException) {
+                                return violationException;
+                        }
+                        current = current.getCause();
+                }
+
+                return null;
         }
 }

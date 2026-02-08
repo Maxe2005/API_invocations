@@ -11,13 +11,23 @@ import com.imt.api_invocations.config.NumericConstraintsConfig;
  */
 public class IntRangeValidator implements ConstraintValidator<IntRange, Long> {
 
-    private final NumericConstraintsConfig config;
+    private NumericConstraintsConfig config;
     private long minValue;
     private long maxValue;
     private String fieldName;
 
+    /**
+     * Constructor with dependency injection (used by Spring when available)
+     */
     public IntRangeValidator(NumericConstraintsConfig config) {
         this.config = config;
+    }
+
+    /**
+     * Default constructor (required by Hibernate Validator)
+     */
+    public IntRangeValidator() {
+        this.config = null;
     }
 
     @Override
@@ -30,11 +40,11 @@ public class IntRangeValidator implements ConstraintValidator<IntRange, Long> {
                 this.maxValue = config != null ? config.getStats().getMaxValue() : 999_999_999;
             }
             case DAMAGE -> {
-                this.minValue = config != null ? config.getSkills().getMinDamage() : 1;
+                this.minValue = config != null ? config.getSkills().getMinDamage() : 0;
                 this.maxValue = config != null ? config.getSkills().getMaxDamage() : 999_999_999;
             }
             case COOLDOWN -> {
-                this.minValue = config != null ? config.getSkills().getMinCooldown() : 1;
+                this.minValue = config != null ? config.getSkills().getMinCooldown() : 0;
                 this.maxValue = config != null ? config.getSkills().getMaxCooldown() : 999_999_999;
             }
             case LVL_MAX -> {

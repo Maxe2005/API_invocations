@@ -28,7 +28,7 @@ public class MonsterRepository {
         return monsterMongoDao.findAll();
     }
 
-    public List<MonsterMongoDto> findAllMonsterIdByRank(Rank rank) {
+    public List<String> findAllMonsterIdByRank(Rank rank) {
         return monsterMongoDao.findAllMonsterIdByRank(rank);
     }
 

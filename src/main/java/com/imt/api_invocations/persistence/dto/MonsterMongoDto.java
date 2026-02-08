@@ -1,19 +1,35 @@
 package com.imt.api_invocations.persistence.dto;
 
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
 
-import org.springframework.data.mongodb.core.mapping.Document;
-import org.springframework.data.mongodb.core.mapping.MongoId;
+import jakarta.persistence.AttributeOverride;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
+
+import org.hibernate.annotations.UuidGenerator;
 
 import com.imt.api_invocations.dto.MonsterBaseDto;
 
 @Getter
 @SuperBuilder
-@Document(collection = "monsters")
+@NoArgsConstructor
+@Entity
+@Table(name = "monsters")
+@AttributeOverride(name = "stats.hp", column = @Column(name = "stats_hp"))
+@AttributeOverride(name = "stats.atk", column = @Column(name = "stats_atk"))
+@AttributeOverride(name = "stats.def", column = @Column(name = "stats_def"))
+@AttributeOverride(name = "stats.vit", column = @Column(name = "stats_vit"))
 public class MonsterMongoDto extends MonsterBaseDto {
 
-    @MongoId()
-    private final String id;
+    @Id
+    @GeneratedValue
+    @UuidGenerator
+    @Column(name = "id", nullable = false, updatable = false, length = 36)
+    private String id;
 
 }

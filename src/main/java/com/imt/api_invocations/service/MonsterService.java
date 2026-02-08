@@ -34,7 +34,7 @@ public class MonsterService implements DataServiceInterface {
     }
 
     public List<String> getAllMonsterIdByRank(Rank rank) {
-        return monsterRepository.findAllMonsterIdByRank(rank).stream().map(MonsterMongoDto::getId).toList();
+        return monsterRepository.findAllMonsterIdByRank(rank);
     }
 
     public void updateMonster(String monsterId, MonsterMongoDto monsterMongoDto) {

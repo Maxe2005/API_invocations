@@ -1,11 +1,24 @@
 spring.application.name: api_invocations
 
 spring:
-  data:
-    mongodb:
-      uuid-representation: standard
-      database: api_invocationsdb
-      port: 27017
+  datasource:
+    url: jdbc:postgresql://localhost:5432/api_invocationsdb
+    username: api_invocations
+    password: api_invocations
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    open-in-view: false
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+        format_sql: true
+        jdbc:
+          time_zone: UTC
+    show-sql: false
+  flyway:
+    enabled: true
+    baseline-on-migrate: true
   
 app:
   auth:
@@ -17,9 +30,9 @@ app:
       min-value: 1
       max-value: 999999999
     skills:
-      min-damage: 1
+      min-damage: 0
       max-damage: 999999999
-      min-cooldown: 1
+      min-cooldown: 0
       max-cooldown: 999999999
       min-lvl-max: 1
       max-lvl-max: 9999
