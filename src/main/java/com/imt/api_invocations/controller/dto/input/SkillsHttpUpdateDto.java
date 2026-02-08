@@ -1,5 +1,6 @@
 package com.imt.api_invocations.controller.dto.input;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -24,25 +25,34 @@ import jakarta.validation.Valid;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
+@Schema(description = "Données pour mettre à jour partiellement une compétence (tous les champs sont optionnels)")
 public class SkillsHttpUpdateDto {
 
+    @Schema(description = "Nouvel identifiant du monstre associé", example = "507f1f77bcf86cd799439011")
     private String monsterId;
 
+    @Schema(description = "Nouveau nom de la compétence", example = "Méga Boule de feu")
     private String name;
 
+    @Schema(description = "Nouvelle description de la compétence")
     private String description;
 
     @IntRange(constraintType = ConstraintType.DAMAGE, fieldName = "Damage")
+    @Schema(description = "Nouveaux dégâts de base", example = "450")
     private Long damage;
 
     @Valid
+    @Schema(description = "Nouveau ratio de scaling (mise à jour partielle possible)")
     private RatioUpdateDto ratio;
 
     @IntRange(constraintType = ConstraintType.COOLDOWN, fieldName = "Cooldown")
+    @Schema(description = "Nouveau temps de recharge", example = "4")
     private Long cooldown;
 
     @IntRange(constraintType = ConstraintType.LVL_MAX, fieldName = "Level max")
+    @Schema(description = "Nouveau niveau maximum", example = "15")
     private Long lvlMax;
 
+    @Schema(description = "Nouveau rang de la compétence", implementation = Rank.class)
     private Rank rank;
 }

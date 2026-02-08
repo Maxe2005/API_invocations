@@ -1,5 +1,6 @@
 package com.imt.api_invocations.controller.dto.input;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -23,21 +24,29 @@ import jakarta.validation.constraints.Size;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
+@Schema(description = "Données pour mettre à jour partiellement un monstre (tous les champs sont optionnels)")
 public class MonsterHttpUpdateDto {
 
+    @Schema(description = "Nouveau nom du monstre", example = "Pyrolosse Évolué")
     private String name;
 
+    @Schema(description = "Nouvel élément du monstre", implementation = Elementary.class)
     private Elementary element;
 
     @Valid
+    @Schema(description = "Nouvelles statistiques du monstre (mise à jour partielle possible)")
     private StatsUpdateDto stats;
 
+    @Schema(description = "Nouveau rang du monstre", implementation = Rank.class)
     private Rank rank;
 
+    @Schema(description = "Nouvelle description visuelle du monstre")
     private String visualDescription;
 
     @Size(max = 255, message = "Card description must be at most 255 characters")
+    @Schema(description = "Nouvelle description de carte du monstre (max 255 caractères)", maxLength = 255)
     private String cardDescription;
 
+    @Schema(description = "Nouvelle URL de l'image du monstre")
     private String imageUrl;
 }
