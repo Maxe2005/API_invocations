@@ -1,5 +1,4 @@
 package com.imt.api_invocations.service;
-
 import static com.imt.api_invocations.utils.Random.random;
 
 import com.imt.api_invocations.enums.Rank;
@@ -34,12 +33,20 @@ public class MonsterService implements DataServiceInterface {
     return monsterRepository.findByIDWithSkills(id);
   }
 
+  public MonsterMongoDto getMonsterById(String id, boolean includeSkills) {
+    return monsterRepository.findByID(id, includeSkills);
+  }
+
   public List<MonsterMongoDto> getAllMonsters() {
     return monsterRepository.findAll();
   }
 
   public List<MonsterMongoDto> getAllMonstersWithSkills() {
     return monsterRepository.findAllWithSkills();
+  }
+
+  public List<MonsterMongoDto> getAllMonsters(boolean includeSkills) {
+    return monsterRepository.findAll(includeSkills);
   }
 
   public List<String> getAllMonsterIdByRank(Rank rank) {

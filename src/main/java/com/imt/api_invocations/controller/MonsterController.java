@@ -3,9 +3,7 @@ package com.imt.api_invocations.controller;
 import com.imt.api_invocations.controller.dto.input.MonsterHttpDto;
 import com.imt.api_invocations.controller.dto.input.MonsterHttpUpdateDto;
 import com.imt.api_invocations.controller.dto.output.GlobalMonsterWithIdDto;
-import com.imt.api_invocations.controller.dto.output.SkillsWithIdDto;
 import com.imt.api_invocations.controller.mapper.DtoMapperMonster;
-import com.imt.api_invocations.controller.mapper.DtoMapperSkills;
 import com.imt.api_invocations.exception.ResourceNotFoundException;
 import com.imt.api_invocations.service.MonsterService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -31,7 +29,6 @@ public class MonsterController {
 
   private final MonsterService monsterService;
   private final DtoMapperMonster dtoMapper;
-  private final DtoMapperSkills dtoMapperSkills;
 
   @Operation(
       summary = "Créer un nouveau monstre",
@@ -86,22 +83,12 @@ public class MonsterController {
       @Parameter(description = "Inclure les relations (ex: skills)", example = "skills")
           @RequestParam(required = false)
           String include) {
-
-    var monsterMongoDto =
-        (include != null && include.contains("skills"))
-            ? monsterService.getMonsterByIdWithSkills(monsterId)
-            : monsterService.getMonsterById(monsterId);
-
-    if (monsterMongoDto == null) {
-      throw new ResourceNotFoundException("Monster", monsterId);
-    }
-
-    List<SkillsWithIdDto> skillDtos =
-        (monsterMongoDto.getSkills() != null)
-            ? monsterMongoDto.getSkills().stream().map(dtoMapperSkills::toSkillsDto).toList()
-            : List.of();
-
-    return ResponseEntity.ok(dtoMapper.toGlobalMonsterWithIdDto(monsterMongoDto, skillDtos));
+        boolean includeSkills = include != null && include.contains("skills");
+        var monsterMongoDto = monsterService.getMonsterById(monsterId, includeSkills);
+        if (monsterMongoDto == null) {
+            throw new ResourceNotFoundException("Monster", monsterId);
+        }
+        return ResponseEntity.ok(dtoMapper.toGlobalMonsterWithIdDto(monsterMongoDto, includeSkills));
   }
 
   @Operation(
@@ -124,21 +111,14 @@ public class MonsterController {
       @Parameter(description = "Inclure les relations (ex: skills)", example = "skills")
           @RequestParam(required = false)
           String include) {
-
-    var monsters =
-        (include != null && include.contains("skills"))
-            ? monsterService.getAllMonstersWithSkills()
-            : monsterService.getAllMonsters();
+    boolean includeSkills = include != null && include.contains("skills");
+    var monsters = monsterService.getAllMonsters(includeSkills);
 
     List<GlobalMonsterWithIdDto> monsterDtos =
         monsters.stream()
             .map(
                 monster -> {
-                  List<SkillsWithIdDto> skillDtos =
-                      (monster.getSkills() != null)
-                          ? monster.getSkills().stream().map(dtoMapperSkills::toSkillsDto).toList()
-                          : List.of();
-                  return dtoMapper.toGlobalMonsterWithIdDto(monster, skillDtos);
+                                    return dtoMapper.toGlobalMonsterWithIdDto(monster, includeSkills);
                 })
             .toList();
     return ResponseEntity.ok(monsterDtos);

@@ -13,9 +13,17 @@ public interface MonsterMongoDao extends JpaRepository<MonsterMongoDto, String> 
   @Query("select m.id from MonsterMongoDto m where m.rank = :rank")
   List<String> findAllMonsterIdByRank(@Param("rank") Rank rank);
 
-  @EntityGraph(attributePaths = "skills")
-  List<MonsterMongoDto> findAllWithSkills();
+  @Query("select m from MonsterMongoDto m")
+  List<MonsterMongoDto> findAllNoSkills();
 
   @EntityGraph(attributePaths = "skills")
+  @Query("select m from MonsterMongoDto m")
+  List<MonsterMongoDto> findAllWithSkills();
+
+  @Query("select m from MonsterMongoDto m where m.id = :id")
+  Optional<MonsterMongoDto> findByIdNoSkills(@Param("id") String id);
+
+  @EntityGraph(attributePaths = "skills")
+  @Query("select m from MonsterMongoDto m where m.id = :id")
   Optional<MonsterMongoDto> findByIdWithSkills(@Param("id") String id);
 }

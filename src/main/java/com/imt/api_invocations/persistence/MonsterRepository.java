@@ -19,19 +19,31 @@ public class MonsterRepository {
   }
 
   public MonsterMongoDto findByID(String id) {
-    return monsterMongoDao.findById(id).orElse(null);
+    return monsterMongoDao.findByIdNoSkills(id).orElse(null);
   }
 
   public MonsterMongoDto findByIDWithSkills(String id) {
     return monsterMongoDao.findByIdWithSkills(id).orElse(null);
   }
 
+  public MonsterMongoDto findByID(String id, boolean includeSkills) {
+    return includeSkills
+        ? monsterMongoDao.findByIdWithSkills(id).orElse(null)
+        : monsterMongoDao.findByIdNoSkills(id).orElse(null);
+  }
+
   public List<MonsterMongoDto> findAll() {
-    return monsterMongoDao.findAll();
+    return monsterMongoDao.findAllNoSkills();
   }
 
   public List<MonsterMongoDto> findAllWithSkills() {
     return monsterMongoDao.findAllWithSkills();
+  }
+
+  public List<MonsterMongoDto> findAll(boolean includeSkills) {
+    return includeSkills
+        ? monsterMongoDao.findAllWithSkills()
+        : monsterMongoDao.findAllNoSkills();
   }
 
   public List<String> findAllMonsterIdByRank(Rank rank) {
@@ -39,7 +51,7 @@ public class MonsterRepository {
   }
 
   public MonsterMongoDto findByElement(String element) {
-    return monsterMongoDao.findAll().stream()
+    return monsterMongoDao.findAllNoSkills().stream()
         .filter(monster -> monster.getElement().toString().equalsIgnoreCase(element))
         .findFirst()
         .orElse(null);
