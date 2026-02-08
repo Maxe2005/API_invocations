@@ -29,8 +29,16 @@ public class MonsterService implements DataServiceInterface {
         return monsterRepository.findByID(id);
     }
 
+    public MonsterMongoDto getMonsterByIdWithSkills(String id) {
+        return monsterRepository.findByIDWithSkills(id);
+    }
+
     public List<MonsterMongoDto> getAllMonsters() {
         return monsterRepository.findAll();
+    }
+
+    public List<MonsterMongoDto> getAllMonstersWithSkills() {
+        return monsterRepository.findAllWithSkills();
     }
 
     public List<String> getAllMonsterIdByRank(Rank rank) {

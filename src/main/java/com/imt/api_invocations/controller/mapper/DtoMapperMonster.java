@@ -5,6 +5,7 @@ import org.springframework.stereotype.Component;
 import com.imt.api_invocations.controller.dto.input.MonsterHttpDto;
 import com.imt.api_invocations.controller.dto.input.MonsterHttpUpdateDto;
 import com.imt.api_invocations.controller.dto.output.GlobalMonsterWithIdDto;
+import com.imt.api_invocations.controller.dto.output.SkillsWithIdDto;
 import com.imt.api_invocations.dto.StatsDto;
 import com.imt.api_invocations.dto.StatsUpdateDto;
 import com.imt.api_invocations.persistence.dto.MonsterMongoDto;
@@ -76,9 +77,9 @@ public class DtoMapperMonster {
     }
 
     /**
-     * Convert MonsterMongoDto to MonsterDto
+     * Convert MonsterMongoDto to GlobalMonsterWithIdDto with skills
      */
-    public GlobalMonsterWithIdDto toGlobalMonsterWithIdDto(MonsterMongoDto mongoDto) {
+    public GlobalMonsterWithIdDto toGlobalMonsterWithIdDto(MonsterMongoDto mongoDto, List<SkillsWithIdDto> skills) {
         return GlobalMonsterWithIdDto.builder()
                 .id(mongoDto.getId())
                 .name(mongoDto.getName())
@@ -88,8 +89,16 @@ public class DtoMapperMonster {
                 .visualDescription(mongoDto.getVisualDescription())
                 .cardDescription(mongoDto.getCardDescription())
                 .imageUrl(mongoDto.getImageUrl())
-                .skills(List.of())
+                .skills(skills)
                 .build();
+    }
+
+    /**
+     * Convert MonsterMongoDto to GlobalMonsterWithIdDto without skills (backward
+     * compatibility)
+     */
+    public GlobalMonsterWithIdDto toGlobalMonsterWithIdDto(MonsterMongoDto mongoDto) {
+        return toGlobalMonsterWithIdDto(mongoDto, List.of());
     }
 
     private StatsDto mergeStats(StatsDto existing, StatsDto partial) {

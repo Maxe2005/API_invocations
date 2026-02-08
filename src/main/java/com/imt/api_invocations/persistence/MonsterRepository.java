@@ -24,8 +24,16 @@ public class MonsterRepository {
         return monsterMongoDao.findById(id).orElse(null);
     }
 
+    public MonsterMongoDto findByIDWithSkills(String id) {
+        return monsterMongoDao.findByIdWithSkills(id).orElse(null);
+    }
+
     public List<MonsterMongoDto> findAll() {
         return monsterMongoDao.findAll();
+    }
+
+    public List<MonsterMongoDto> findAllWithSkills() {
+        return monsterMongoDao.findAllWithSkills();
     }
 
     public List<String> findAllMonsterIdByRank(Rank rank) {
