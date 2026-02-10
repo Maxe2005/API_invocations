@@ -1,38 +1,39 @@
 {
     "nom": "TEMPLATE - Remplacer par le nom du monstre",
-    "element": "FIRE|WATER|WIND|EARTH",
+    "element": "FIRE|WATER|WIND|EARTH|LIGHT|DARKNESS",
     "rang": "COMMON|RARE|EPIC|LEGENDARY",
     "stats": {
-        "hp": 500.0,
-        "atk": 75.0,
-        "def": 50.0,
-        "vit": 80.0
+        "hp": 500,
+        "atk": 75,
+        "def": 50,
+        "vit": 80
     },
     "description_carte": "Description du monstre pour la carte (visible au joueur). Moins de 200 caractères.",
     "description_visuelle": "Description visuelle détaillée (style, couleurs, apparence, background). Utilisée pour générer l'image du monstre avec Nano Banana.",
+    "imageUrl": "URL de l'image du monstre (générée par Nano Banana ou une image personnalisée).",
     "skills": [
         {
             "name": "Compétence 1",
             "description": "Description de la compétence",
-            "damage": 100.0,
+            "damage": 100,
             "ratio": {
                 "stat": "ATK|DEF|HP|VIT",
                 "percent": 0.75
             },
-            "cooldown": 0.0,
-            "lvlMax": 5.0,
+            "cooldown": 0,
+            "lvlMax": 5,
             "rank": "COMMON|RARE|EPIC|LEGENDARY"
         },
         {
             "name": "Compétence 2",
             "description": "Description de la compétence",
-            "damage": 150.0,
+            "damage": 150,
             "ratio": {
                 "stat": "ATK",
                 "percent": 1.0
             },
-            "cooldown": 2.0,
-            "lvlMax": 5.0,
+            "cooldown": 2,
+            "lvlMax": 5,
             "rank": "RARE"
         }
     ]

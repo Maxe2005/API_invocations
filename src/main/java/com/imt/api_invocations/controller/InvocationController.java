@@ -76,7 +76,7 @@ public class InvocationController {
             description = "Erreur lors de l'invocation",
             content = @Content)
       })
-  @GetMapping("global-invoque/{playerId}")
+  @PostMapping("global-invoque/{playerId}")
   public ResponseEntity<GlobalMonsterWithIdDto> globalInvoque(
       @Parameter(
               description = "Identifiant unique du joueur",

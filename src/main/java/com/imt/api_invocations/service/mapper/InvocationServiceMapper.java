@@ -31,7 +31,6 @@ public class InvocationServiceMapper {
         .element(monster.getElement())
         .stats(monster.getStats())
         .rank(monster.getRank())
-        .visualDescription(monster.getVisualDescription())
         .cardDescription(monster.getCardDescription())
         .imageUrl(monster.getImageUrl())
         .skills(monster.getSkills())
