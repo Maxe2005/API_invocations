@@ -1,4 +1,4 @@
-package com.imt.api_invocations.persistence.dto;
+package com.imt.api_invocations.persistence.entity;
 
 import com.imt.api_invocations.dto.MonsterBaseDto;
 import jakarta.persistence.AttributeOverride;
@@ -24,14 +24,14 @@ import org.hibernate.annotations.UuidGenerator;
 @AttributeOverride(name = "stats.atk", column = @Column(name = "stats_atk"))
 @AttributeOverride(name = "stats.def", column = @Column(name = "stats_def"))
 @AttributeOverride(name = "stats.vit", column = @Column(name = "stats_vit"))
-public class MonsterMongoDto extends MonsterBaseDto {
+public class MonsterEntity extends MonsterBaseDto {
 
-  @Id
-  @GeneratedValue
-  @UuidGenerator
-  @Column(name = "id", nullable = false, updatable = false, length = 36)
-  private String id;
+    @Id
+    @GeneratedValue
+    @UuidGenerator
+    @Column(name = "id", nullable = false, updatable = false, length = 36)
+    private String id;
 
-  @OneToMany(mappedBy = "monster", fetch = FetchType.LAZY)
-  private List<SkillsMongoDto> skills;
+    @OneToMany(mappedBy = "monster", fetch = FetchType.LAZY)
+    private List<SkillEntity> skills;
 }

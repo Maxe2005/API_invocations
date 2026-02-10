@@ -5,7 +5,7 @@ import static com.imt.api_invocations.utils.Random.*;
 import com.imt.api_invocations.dto.SkillBaseDto;
 import com.imt.api_invocations.enums.Rank;
 import com.imt.api_invocations.persistence.SkillsRepository;
-import com.imt.api_invocations.persistence.dto.SkillsMongoDto;
+import com.imt.api_invocations.persistence.entity.SkillEntity;
 import com.imt.api_invocations.service.mapper.SkillsServiceMapper;
 import com.imt.api_invocations.utils.DataServiceInterface;
 import java.util.ArrayList;
@@ -18,40 +18,37 @@ public class SkillsService implements DataServiceInterface {
   private final SkillsRepository skillsRepository;
   private final MonsterService monsterService;
   private final SkillsServiceMapper skillsServiceMapper;
-  private List<SkillsMongoDto> possibleSkills;
+  private List<SkillEntity> possibleSkills;
 
-  public SkillsService(
-      SkillsRepository skillsRepository,
-      MonsterService monsterService,
+  public SkillsService(SkillsRepository skillsRepository, MonsterService monsterService,
       SkillsServiceMapper skillsServiceMapper) {
     this.skillsRepository = skillsRepository;
     this.monsterService = monsterService;
     this.skillsServiceMapper = skillsServiceMapper;
   }
 
-  public String createSkill(SkillsMongoDto skillsMongoDto) {
-    final String monsterId = skillsMongoDto.getMonsterId();
+  public String createSkill(SkillEntity skillEntity) {
+    final String monsterId = skillEntity.getMonsterId();
     if (monsterService.getMonsterById(monsterId) == null) {
       throw new IllegalArgumentException("Monster with ID " + monsterId + " does not exist.");
     }
-    return skillsRepository.save(skillsMongoDto);
+    return skillsRepository.save(skillEntity);
   }
 
-  public SkillsMongoDto getSkillById(String id) {
+  public SkillEntity getSkillById(String id) {
     return skillsRepository.findByID(id);
   }
 
-  public void updateSkill(String skillId, SkillsMongoDto skillsMongoDto) {
-    final String monsterId = skillsMongoDto.getMonsterId();
+  public void updateSkill(String skillId, SkillEntity skillEntity) {
+    final String monsterId = skillEntity.getMonsterId();
     if (monsterId != null && monsterService.getMonsterById(monsterId) == null) {
       throw new IllegalArgumentException("Monster with ID " + monsterId + " does not exist.");
     }
-    SkillsMongoDto skillToUpdate =
-        skillsServiceMapper.toSkillsMongoDtoForUpdate(skillId, skillsMongoDto);
+    SkillEntity skillToUpdate = skillsServiceMapper.toSkillEntityForUpdate(skillId, skillEntity);
     skillsRepository.update(skillToUpdate);
   }
 
-  public List<SkillsMongoDto> getSkillByMonsterId(String monsterId) {
+  public List<SkillEntity> getSkillByMonsterId(String monsterId) {
     return skillsRepository.findByMonsterId(monsterId);
   }
 
@@ -63,7 +60,7 @@ public class SkillsService implements DataServiceInterface {
     return skillsRepository.deleteById(id);
   }
 
-  private List<SkillsMongoDto> filterSkillsByRank(Rank rank) {
+  private List<SkillEntity> filterSkillsByRank(Rank rank) {
     return possibleSkills.stream().filter(skill -> skill.getRank() == rank).toList();
   }
 
@@ -71,12 +68,12 @@ public class SkillsService implements DataServiceInterface {
       throws IllegalStateException {
     possibleSkills = skillsRepository.findByMonsterId(monsterId);
     int maxSkillsAvailable = possibleSkills.size();
-    List<SkillsMongoDto> selectedSkills = new ArrayList<>();
+    List<SkillEntity> selectedSkills = new ArrayList<>();
     for (int i = 0; i < numberOfSkills && i < maxSkillsAvailable; i++) {
       Rank rank = getRandomRankBasedOnAvailableData(this);
-      List<SkillsMongoDto> skillsOfRank = filterSkillsByRank(rank);
+      List<SkillEntity> skillsOfRank = filterSkillsByRank(rank);
       if (!skillsOfRank.isEmpty()) {
-        SkillsMongoDto selectedSkill = skillsOfRank.get(random(0, skillsOfRank.size() - 1));
+        SkillEntity selectedSkill = skillsOfRank.get(random(0, skillsOfRank.size() - 1));
         possibleSkills.remove(selectedSkill);
         selectedSkills.add(selectedSkill);
       } else {
@@ -93,7 +90,7 @@ public class SkillsService implements DataServiceInterface {
     if (possibleSkills == null) {
       return false;
     }
-    List<SkillsMongoDto> skills = filterSkillsByRank(rank);
+    List<SkillEntity> skills = filterSkillsByRank(rank);
     return !skills.isEmpty();
   }
 }

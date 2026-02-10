@@ -16,7 +16,7 @@ import com.imt.api_invocations.enums.Rank;
 import com.imt.api_invocations.exception.ExternalApiException;
 import com.imt.api_invocations.persistence.InvocationBufferRepository;
 import com.imt.api_invocations.persistence.dto.InvocationBufferDto;
-import com.imt.api_invocations.persistence.dto.MonsterMongoDto;
+import com.imt.api_invocations.persistence.entity.MonsterEntity;
 import com.imt.api_invocations.service.dto.InvocationReplayReport;
 import com.imt.api_invocations.service.mapper.InvocationServiceMapper;
 import java.time.LocalDateTime;
@@ -38,11 +38,8 @@ public class InvocationService {
   private final InvocationBufferRepository invocationBufferRepository;
   private final InvocationServiceMapper invocationServiceMapper;
 
-  public InvocationService(
-      MonsterService monsterService,
-      SkillsService skillsService,
-      MonstersApiClient monstersApiClient,
-      PlayerApiClient playerApiClient,
+  public InvocationService(MonsterService monsterService, SkillsService skillsService,
+      MonstersApiClient monstersApiClient, PlayerApiClient playerApiClient,
       InvocationBufferRepository invocationBufferRepository,
       InvocationServiceMapper invocationServiceMapper) {
     this.monsterService = monsterService;
@@ -55,22 +52,16 @@ public class InvocationService {
 
   public GlobalMonsterDto invoke() {
     Rank rank = getRandomRankBasedOnAvailableData(monsterService);
-    MonsterMongoDto monster = monsterService.getRandomMonsterByRank(rank);
+    MonsterEntity monster = monsterService.getRandomMonsterByRank(rank);
     List<SkillBaseDto> skills = skillsService.getRandomSkillsForMonster(monster.getId(), 3);
     return invocationServiceMapper.toGlobalMonsterDto(monster, skills);
   }
 
-  private InvocationBufferDto createBufferEntry(
-      String playerId, GlobalMonsterDto monster, CreateMonsterRequest monsterRequest) {
-    InvocationBufferDto bufferEntry =
-        InvocationBufferDto.builder()
-            .playerId(playerId)
-            .monsterSnapshot(monster)
-            .monsterRequest(monsterRequest)
-            .status(InvocationStatus.PENDING)
-            .attemptCount(0)
-            .createdAt(LocalDateTime.now())
-            .build();
+  private InvocationBufferDto createBufferEntry(String playerId, GlobalMonsterDto monster,
+      CreateMonsterRequest monsterRequest) {
+    InvocationBufferDto bufferEntry = InvocationBufferDto.builder().playerId(playerId)
+        .monsterSnapshot(monster).monsterRequest(monsterRequest).status(InvocationStatus.PENDING)
+        .attemptCount(0).createdAt(LocalDateTime.now()).build();
     return invocationBufferRepository.save(bufferEntry);
   }
 
@@ -87,8 +78,8 @@ public class InvocationService {
     invocationBufferRepository.save(entry);
   }
 
-  private void markCompleted(
-      InvocationBufferDto entry, PlayerAddMonsterRequest request, PlayerResponse response) {
+  private void markCompleted(InvocationBufferDto entry, PlayerAddMonsterRequest request,
+      PlayerResponse response) {
     entry.setPlayerRequest(request);
     entry.setPlayerResponse(response);
     entry.setStatus(InvocationStatus.COMPLETED);
@@ -102,8 +93,8 @@ public class InvocationService {
     invocationBufferRepository.save(entry);
   }
 
-  private String executeInvocation(
-      GlobalMonsterDto monster, String playerId, InvocationBufferDto bufferEntry) {
+  private String executeInvocation(GlobalMonsterDto monster, String playerId,
+      InvocationBufferDto bufferEntry) {
     if (bufferEntry.getMonsterRequest() == null) {
       bufferEntry.setMonsterRequest(invocationServiceMapper.toCreateMonsterRequest(monster));
       bufferEntry = invocationBufferRepository.save(bufferEntry);
@@ -127,8 +118,8 @@ public class InvocationService {
 
       markCompleted(bufferEntry, playerRequest, playerResponse);
 
-      logger.info(
-          "Invocation globale réussie. Monstre {} ajouté au joueur {}", createdMonsterId, playerId);
+      logger.info("Invocation globale réussie. Monstre {} ajouté au joueur {}", createdMonsterId,
+          playerId);
       return createdMonsterId;
 
     } catch (ExternalApiException e) {
@@ -137,13 +128,13 @@ public class InvocationService {
       markFailed(bufferEntry, e.getMessage());
 
       if (createdMonsterId != null) {
-        logger.warn(
-            "Déclenchement de la compensation: suppression du monstre {}", createdMonsterId);
+        logger.warn("Déclenchement de la compensation: suppression du monstre {}",
+            createdMonsterId);
         try {
           monstersApiClient.deleteMonster(createdMonsterId);
         } catch (Exception compensationError) {
-          logger.error(
-              "Échec de la compensation pour le monstre {}", createdMonsterId, compensationError);
+          logger.error("Échec de la compensation pour le monstre {}", createdMonsterId,
+              compensationError);
         }
       }
 

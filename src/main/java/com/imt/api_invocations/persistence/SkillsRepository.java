@@ -1,7 +1,7 @@
 package com.imt.api_invocations.persistence;
 
-import com.imt.api_invocations.persistence.dao.SkillsMongoDao;
-import com.imt.api_invocations.persistence.dto.SkillsMongoDto;
+import com.imt.api_invocations.persistence.entity.SkillEntity;
+import com.imt.api_invocations.persistence.repository.SkillJpaRepository;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
@@ -10,38 +10,38 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class SkillsRepository {
 
-  private final SkillsMongoDao skillsMongoDao;
+  private final SkillJpaRepository skillJpaRepository;
 
-  public String save(SkillsMongoDto skillsMongoDto) {
-    SkillsMongoDto savedSkillsDto = skillsMongoDao.save(skillsMongoDto);
-    return savedSkillsDto.getId();
+  public String save(SkillEntity skillEntity) {
+    SkillEntity savedSkillEntity = skillJpaRepository.save(skillEntity);
+    return savedSkillEntity.getId();
   }
 
-  public SkillsMongoDto findByID(String id) {
-    return skillsMongoDao.findById(id).orElse(null);
+  public SkillEntity findByID(String id) {
+    return skillJpaRepository.findById(id).orElse(null);
   }
 
-  public void update(SkillsMongoDto skillsMongoDto) {
-    skillsMongoDao.save(skillsMongoDto);
+  public void update(SkillEntity skillEntity) {
+    skillJpaRepository.save(skillEntity);
   }
 
-  public List<SkillsMongoDto> findByMonsterId(String id) {
-    return skillsMongoDao.findByMonsterId(id);
+  public List<SkillEntity> findByMonsterId(String id) {
+    return skillJpaRepository.findByMonsterId(id);
   }
 
   public Long deleteByMonsterId(String monsterId) {
-    return skillsMongoDao.deleteByMonsterId(monsterId);
+    return skillJpaRepository.deleteByMonsterId(monsterId);
   }
 
   public boolean deleteById(String id) {
-    if (skillsMongoDao.existsById(id)) {
-      skillsMongoDao.deleteById(id);
+    if (skillJpaRepository.existsById(id)) {
+      skillJpaRepository.deleteById(id);
       return true;
     }
     return false;
   }
 
-  public List<SkillsMongoDto> findByRank(com.imt.api_invocations.enums.Rank rank) {
-    return skillsMongoDao.findByRank(rank);
+  public List<SkillEntity> findByRank(com.imt.api_invocations.enums.Rank rank) {
+    return skillJpaRepository.findByRank(rank);
   }
 }

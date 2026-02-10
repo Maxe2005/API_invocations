@@ -1,8 +1,8 @@
 package com.imt.api_invocations.persistence;
 
 import com.imt.api_invocations.enums.Rank;
-import com.imt.api_invocations.persistence.dao.MonsterMongoDao;
-import com.imt.api_invocations.persistence.dto.MonsterMongoDto;
+import com.imt.api_invocations.persistence.entity.MonsterEntity;
+import com.imt.api_invocations.persistence.repository.MonsterJpaRepository;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
@@ -11,59 +11,56 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class MonsterRepository {
 
-  private final MonsterMongoDao monsterMongoDao;
+  private final MonsterJpaRepository monsterJpaRepository;
 
-  public String save(MonsterMongoDto monsterMongoDto) {
-    MonsterMongoDto savedMonsterDto = monsterMongoDao.save(monsterMongoDto);
-    return savedMonsterDto.getId();
+  public String save(MonsterEntity monsterEntity) {
+    MonsterEntity savedMonsterEntity = monsterJpaRepository.save(monsterEntity);
+    return savedMonsterEntity.getId();
   }
 
-  public MonsterMongoDto findByID(String id) {
-    return monsterMongoDao.findByIdNoSkills(id).orElse(null);
+  public MonsterEntity findByID(String id) {
+    return monsterJpaRepository.findByIdNoSkills(id).orElse(null);
   }
 
-  public MonsterMongoDto findByIDWithSkills(String id) {
-    return monsterMongoDao.findByIdWithSkills(id).orElse(null);
+  public MonsterEntity findByIDWithSkills(String id) {
+    return monsterJpaRepository.findByIdWithSkills(id).orElse(null);
   }
 
-  public MonsterMongoDto findByID(String id, boolean includeSkills) {
-    return includeSkills
-        ? monsterMongoDao.findByIdWithSkills(id).orElse(null)
-        : monsterMongoDao.findByIdNoSkills(id).orElse(null);
+  public MonsterEntity findByID(String id, boolean includeSkills) {
+    return includeSkills ? monsterJpaRepository.findByIdWithSkills(id).orElse(null)
+        : monsterJpaRepository.findByIdNoSkills(id).orElse(null);
   }
 
-  public List<MonsterMongoDto> findAll() {
-    return monsterMongoDao.findAllNoSkills();
+  public List<MonsterEntity> findAll() {
+    return monsterJpaRepository.findAllNoSkills();
   }
 
-  public List<MonsterMongoDto> findAllWithSkills() {
-    return monsterMongoDao.findAllWithSkills();
+  public List<MonsterEntity> findAllWithSkills() {
+    return monsterJpaRepository.findAllWithSkills();
   }
 
-  public List<MonsterMongoDto> findAll(boolean includeSkills) {
-    return includeSkills
-        ? monsterMongoDao.findAllWithSkills()
-        : monsterMongoDao.findAllNoSkills();
+  public List<MonsterEntity> findAll(boolean includeSkills) {
+    return includeSkills ? monsterJpaRepository.findAllWithSkills()
+        : monsterJpaRepository.findAllNoSkills();
   }
 
   public List<String> findAllMonsterIdByRank(Rank rank) {
-    return monsterMongoDao.findAllMonsterIdByRank(rank);
+    return monsterJpaRepository.findAllMonsterIdByRank(rank);
   }
 
-  public MonsterMongoDto findByElement(String element) {
-    return monsterMongoDao.findAllNoSkills().stream()
-        .filter(monster -> monster.getElement().toString().equalsIgnoreCase(element))
-        .findFirst()
+  public MonsterEntity findByElement(String element) {
+    return monsterJpaRepository.findAllNoSkills().stream()
+        .filter(monster -> monster.getElement().toString().equalsIgnoreCase(element)).findFirst()
         .orElse(null);
   }
 
-  public void update(MonsterMongoDto monsterMongoDto) {
-    monsterMongoDao.save(monsterMongoDto);
+  public void update(MonsterEntity monsterEntity) {
+    monsterJpaRepository.save(monsterEntity);
   }
 
   public boolean deleteByID(String id) {
-    if (monsterMongoDao.existsById(id)) {
-      monsterMongoDao.deleteById(id);
+    if (monsterJpaRepository.existsById(id)) {
+      monsterJpaRepository.deleteById(id);
       return true;
     }
     return false;

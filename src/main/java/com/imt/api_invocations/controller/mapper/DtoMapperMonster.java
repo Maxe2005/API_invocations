@@ -6,7 +6,7 @@ import com.imt.api_invocations.controller.dto.output.GlobalMonsterWithIdDto;
 import com.imt.api_invocations.controller.dto.output.SkillsWithIdDto;
 import com.imt.api_invocations.dto.StatsDto;
 import com.imt.api_invocations.dto.StatsUpdateDto;
-import com.imt.api_invocations.persistence.dto.MonsterMongoDto;
+import com.imt.api_invocations.persistence.entity.MonsterEntity;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
@@ -21,24 +21,24 @@ public class DtoMapperMonster {
 
     private final DtoMapperSkills dtoMapperSkills;
 
-    /** Convert MonsterHttpDto to MonsterMongoDto */
-    public MonsterMongoDto toMonsterMongoDto(MonsterHttpDto httpDto) {
+    /** Convert MonsterHttpDto to MonsterEntity */
+    public MonsterEntity toMonsterEntity(MonsterHttpDto httpDto) {
         if (httpDto.getElement() == null || httpDto.getStats() == null || httpDto.getRank() == null
                 || isBlank(httpDto.getName()) || isBlank(httpDto.getVisualDescription())
                 || isBlank(httpDto.getCardDescription()) || isBlank(httpDto.getImageUrl())) {
             throw new IllegalArgumentException("All fields must be provided for creation");
         }
         validateStats(httpDto.getStats());
-        return MonsterMongoDto.builder().name(httpDto.getName()).element(httpDto.getElement())
+        return MonsterEntity.builder().name(httpDto.getName()).element(httpDto.getElement())
                 .stats(httpDto.getStats()).rank(httpDto.getRank())
                 .visualDescription(httpDto.getVisualDescription())
                 .cardDescription(httpDto.getCardDescription()).imageUrl(httpDto.getImageUrl())
                 .build();
     }
 
-    /** Merge partial MonsterHttpDto into existing MonsterMongoDto */
-    public MonsterMongoDto updateMonsterMongoDto(MonsterMongoDto existing, MonsterHttpDto partial) {
-        return MonsterMongoDto.builder().id(existing.getId())
+    /** Merge partial MonsterHttpDto into existing MonsterEntity */
+    public MonsterEntity updateMonsterEntity(MonsterEntity existing, MonsterHttpDto partial) {
+        return MonsterEntity.builder().id(existing.getId())
                 .name(valueOrExisting(existing.getName(), partial.getName()))
                 .element(
                         partial.getElement() != null ? partial.getElement() : existing.getElement())
@@ -52,13 +52,12 @@ public class DtoMapperMonster {
     }
 
     /**
-     * Merge partial MonsterHttpUpdateDto into existing MonsterMongoDto Uses nullable types to
+     * Merge partial MonsterHttpUpdateDto into existing MonsterEntity Uses nullable types to
      * distinguish between missing and null values Supports fine-grained updates of nested stats
      * (e.g., only update HP)
      */
-    public MonsterMongoDto updateMonsterMongoDto(MonsterMongoDto existing,
-            MonsterHttpUpdateDto partial) {
-        return MonsterMongoDto.builder().id(existing.getId())
+    public MonsterEntity updateMonsterEntity(MonsterEntity existing, MonsterHttpUpdateDto partial) {
+        return MonsterEntity.builder().id(existing.getId())
                 .name(partial.getName() != null ? partial.getName() : existing.getName())
                 .element(
                         partial.getElement() != null ? partial.getElement() : existing.getElement())
@@ -74,27 +73,28 @@ public class DtoMapperMonster {
                 .build();
     }
 
-    /** Convert MonsterMongoDto to GlobalMonsterWithIdDto with skills */
-    public GlobalMonsterWithIdDto toGlobalMonsterWithIdDto(MonsterMongoDto mongoDto,
+    /** Convert MonsterEntity to GlobalMonsterWithIdDto with skills */
+    public GlobalMonsterWithIdDto toGlobalMonsterWithIdDto(MonsterEntity monsterEntity,
             List<SkillsWithIdDto> skills) {
-        return GlobalMonsterWithIdDto.builder().id(mongoDto.getId()).name(mongoDto.getName())
-                .element(mongoDto.getElement()).stats(mongoDto.getStats()).rank(mongoDto.getRank())
-                .visualDescription(mongoDto.getVisualDescription())
-                .cardDescription(mongoDto.getCardDescription()).imageUrl(mongoDto.getImageUrl())
-                .skills(skills).build();
+        return GlobalMonsterWithIdDto.builder().id(monsterEntity.getId())
+                .name(monsterEntity.getName()).element(monsterEntity.getElement())
+                .stats(monsterEntity.getStats()).rank(monsterEntity.getRank())
+                .visualDescription(monsterEntity.getVisualDescription())
+                .cardDescription(monsterEntity.getCardDescription())
+                .imageUrl(monsterEntity.getImageUrl()).skills(skills).build();
     }
 
-    /** Convert MonsterMongoDto to GlobalMonsterWithIdDto without skills (backward compatibility) */
-    public GlobalMonsterWithIdDto toGlobalMonsterWithIdDto(MonsterMongoDto mongoDto) {
-        return toGlobalMonsterWithIdDto(mongoDto, List.of());
+    /** Convert MonsterEntity to GlobalMonsterWithIdDto without skills (backward compatibility) */
+    public GlobalMonsterWithIdDto toGlobalMonsterWithIdDto(MonsterEntity monsterEntity) {
+        return toGlobalMonsterWithIdDto(monsterEntity, List.of());
     }
 
-    public GlobalMonsterWithIdDto toGlobalMonsterWithIdDto(MonsterMongoDto mongoDto,
+    public GlobalMonsterWithIdDto toGlobalMonsterWithIdDto(MonsterEntity monsterEntity,
             boolean includeSkills) {
-        List<SkillsWithIdDto> skills = includeSkills && mongoDto.getSkills() != null
-                ? mongoDto.getSkills().stream().map(dtoMapperSkills::toSkillsDto).toList()
+        List<SkillsWithIdDto> skills = includeSkills && monsterEntity.getSkills() != null
+                ? monsterEntity.getSkills().stream().map(dtoMapperSkills::toSkillsDto).toList()
                 : List.of();
-        return toGlobalMonsterWithIdDto(mongoDto, skills);
+        return toGlobalMonsterWithIdDto(monsterEntity, skills);
     }
 
     private StatsDto mergeStats(StatsDto existing, StatsDto partial) {

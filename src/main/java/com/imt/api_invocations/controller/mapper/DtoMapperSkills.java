@@ -5,7 +5,7 @@ import com.imt.api_invocations.controller.dto.input.SkillsHttpUpdateDto;
 import com.imt.api_invocations.controller.dto.output.SkillsWithIdDto;
 import com.imt.api_invocations.dto.RatioDto;
 import com.imt.api_invocations.dto.RatioUpdateDto;
-import com.imt.api_invocations.persistence.dto.SkillsMongoDto;
+import com.imt.api_invocations.persistence.entity.SkillEntity;
 import org.springframework.stereotype.Component;
 
 /**
@@ -16,34 +16,24 @@ import org.springframework.stereotype.Component;
 public class DtoMapperSkills {
 
   /**
-   * Convert SkillsHttpDto to SkillsMongoDto Note: Numeric validations (@IntRange) are already
-   * applied by Jakarta validation framework
+   * Convert SkillsHttpDto to SkillEntity Note: Numeric validations (@IntRange) are already applied
+   * by Jakarta validation framework
    */
-  public SkillsMongoDto toSkillsMongoDto(SkillsHttpDto httpDto) {
-    if (httpDto.getMonsterId() == null
-        || httpDto.getRatio() == null
-        || httpDto.getRank() == null
-        || isBlank(httpDto.getName())
-        || isBlank(httpDto.getDescription())) {
+  public SkillEntity toSkillEntity(SkillsHttpDto httpDto) {
+    if (httpDto.getMonsterId() == null || httpDto.getRatio() == null || httpDto.getRank() == null
+        || isBlank(httpDto.getName()) || isBlank(httpDto.getDescription())) {
       throw new IllegalArgumentException("All fields must be provided for creation");
     }
     validateRatio(httpDto.getRatio());
-    return SkillsMongoDto.builder()
-        .monsterId(httpDto.getMonsterId())
-        .name(httpDto.getName())
-        .description(httpDto.getDescription())
-        .damage(httpDto.getDamage())
-        .ratio(httpDto.getRatio())
-        .cooldown(httpDto.getCooldown())
-        .lvlMax(httpDto.getLvlMax())
-        .rank(httpDto.getRank())
+    return SkillEntity.builder().monsterId(httpDto.getMonsterId()).name(httpDto.getName())
+        .description(httpDto.getDescription()).damage(httpDto.getDamage()).ratio(httpDto.getRatio())
+        .cooldown(httpDto.getCooldown()).lvlMax(httpDto.getLvlMax()).rank(httpDto.getRank())
         .build();
   }
 
-  /** Merge partial SkillsHttpDto into existing SkillsMongoDto */
-  public SkillsMongoDto updateSkillsMongoDto(SkillsMongoDto existing, SkillsHttpDto partial) {
-    return SkillsMongoDto.builder()
-        .id(existing.getId())
+  /** Merge partial SkillsHttpDto into existing SkillEntity */
+  public SkillEntity updateSkillEntity(SkillEntity existing, SkillsHttpDto partial) {
+    return SkillEntity.builder().id(existing.getId())
         .monsterId(
             partial.getMonsterId() != null ? partial.getMonsterId() : existing.getMonsterId())
         .name(valueOrExisting(existing.getName(), partial.getName()))
@@ -52,18 +42,16 @@ public class DtoMapperSkills {
         .ratio(mergeRatio(existing.getRatio(), partial.getRatio()))
         .cooldown(mergePositive(existing.getCooldown(), partial.getCooldown()))
         .lvlMax(mergePositive(existing.getLvlMax(), partial.getLvlMax()))
-        .rank(partial.getRank() != null ? partial.getRank() : existing.getRank())
-        .build();
+        .rank(partial.getRank() != null ? partial.getRank() : existing.getRank()).build();
   }
 
   /**
-   * Merge partial SkillsHttpUpdateDto into existing SkillsMongoDto Uses nullable types to
-   * distinguish between missing and null values Supports fine-grained updates of nested ratio
-   * (e.g., only update ratio percent)\n
+   * Merge partial SkillsHttpUpdateDto into existing SkillEntity Uses nullable types to distinguish
+   * between missing and null values Supports fine-grained updates of nested ratio (e.g., only
+   * update ratio percent)\n
    */
-  public SkillsMongoDto updateSkillsMongoDto(SkillsMongoDto existing, SkillsHttpUpdateDto partial) {
-    return SkillsMongoDto.builder()
-        .id(existing.getId())
+  public SkillEntity updateSkillEntity(SkillEntity existing, SkillsHttpUpdateDto partial) {
+    return SkillEntity.builder().id(existing.getId())
         .monsterId(
             partial.getMonsterId() != null ? partial.getMonsterId() : existing.getMonsterId())
         .name(partial.getName() != null ? partial.getName() : existing.getName())
@@ -73,22 +61,15 @@ public class DtoMapperSkills {
         .ratio(mergeRatioWithUpdate(existing.getRatio(), partial.getRatio()))
         .cooldown(partial.getCooldown() != null ? partial.getCooldown() : existing.getCooldown())
         .lvlMax(partial.getLvlMax() != null ? partial.getLvlMax() : existing.getLvlMax())
-        .rank(partial.getRank() != null ? partial.getRank() : existing.getRank())
-        .build();
+        .rank(partial.getRank() != null ? partial.getRank() : existing.getRank()).build();
   }
 
-  /** Convert SkillsMongoDto to SkillsDto */
-  public SkillsWithIdDto toSkillsDto(SkillsMongoDto mongoDto) {
-    return SkillsWithIdDto.builder()
-        .id(mongoDto.getId())
-        .name(mongoDto.getName())
-        .description(mongoDto.getDescription())
-        .damage(mongoDto.getDamage())
-        .ratio(mongoDto.getRatio())
-        .cooldown(mongoDto.getCooldown())
-        .lvlMax(mongoDto.getLvlMax())
-        .rank(mongoDto.getRank())
-        .build();
+  /** Convert SkillEntity to SkillsDto */
+  public SkillsWithIdDto toSkillsDto(SkillEntity skillEntity) {
+    return SkillsWithIdDto.builder().id(skillEntity.getId()).name(skillEntity.getName())
+        .description(skillEntity.getDescription()).damage(skillEntity.getDamage())
+        .ratio(skillEntity.getRatio()).cooldown(skillEntity.getCooldown())
+        .lvlMax(skillEntity.getLvlMax()).rank(skillEntity.getRank()).build();
   }
 
   private long mergePositive(long existing, long candidate) {
@@ -104,8 +85,7 @@ public class DtoMapperSkills {
     }
     return RatioDto.builder()
         .stat(partial.getStat() != null ? partial.getStat() : existing.getStat())
-        .percent(partial.getPercent() > 0 ? partial.getPercent() : existing.getPercent())
-        .build();
+        .percent(partial.getPercent() > 0 ? partial.getPercent() : existing.getPercent()).build();
   }
 
   private void validateRatio(RatioDto ratio) {
@@ -132,10 +112,8 @@ public class DtoMapperSkills {
       return existing;
     }
     if (existing == null) {
-      return RatioDto.builder()
-          .stat(partial.getStat())
-          .percent(partial.getPercent() != null ? partial.getPercent() : 0)
-          .build();
+      return RatioDto.builder().stat(partial.getStat())
+          .percent(partial.getPercent() != null ? partial.getPercent() : 0).build();
     }
     return RatioDto.builder()
         .stat(partial.getStat() != null ? partial.getStat() : existing.getStat())
