@@ -34,9 +34,9 @@ public class OpenApiConfig {
         .servers(
             List.of(
                 new Server()
-                    .url("http://localhost:8085")
+                    .url("http://localhost:8080")
                     .description("Serveur de développement local"),
-                new Server().url("http://localhost:8085").description("Serveur Docker local")))
+                new Server().url("http://localhost:8080").description("Serveur Docker local")))
         .addSecurityItem(new SecurityRequirement().addList(securitySchemeName))
         .components(
             new Components()

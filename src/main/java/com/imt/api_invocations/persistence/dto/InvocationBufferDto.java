@@ -61,6 +61,7 @@ public class InvocationBufferDto {
   @Enumerated(EnumType.STRING)
   private InvocationStatus status;
 
+  @Column(length = 2000)
   private String failureReason;
   private int attemptCount;
   private LocalDateTime createdAt;

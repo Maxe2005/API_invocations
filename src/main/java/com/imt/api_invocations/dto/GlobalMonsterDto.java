@@ -3,12 +3,14 @@ package com.imt.api_invocations.dto;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.util.List;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.SuperBuilder;
 
 @Getter
 @Setter
 @SuperBuilder
+@NoArgsConstructor
 @Schema(description = "Monstre avec ses compétences (sans identifiant)")
 public class GlobalMonsterDto extends MonsterBaseDto {
 
