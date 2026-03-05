@@ -39,7 +39,7 @@ public class PlayerApiClient {
      * @throws ExternalApiException En cas d'erreur de communication
      */
     public PlayerResponse addMonsterToPlayer(String username, String monsterId) {
-        String url = apiProperties.getPlayerBaseUrl() + "/api/players/" + username + "/add_monster";
+        String url = apiProperties.getPlayerBaseUrl() + "/api/players/" + username + "/monsters";
 
         PlayerAddMonsterRequest request = new PlayerAddMonsterRequest(monsterId);
 
