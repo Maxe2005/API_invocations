@@ -22,7 +22,7 @@ public class MonstersApiClient {
 
     private static final Logger logger = LoggerFactory.getLogger(MonstersApiClient.class);
     private static final String CREATE_MONSTER_ENDPOINT = "/api/monsters/create";
-    private static final String DELETE_MONSTER_ENDPOINT = "/api/monsters/";
+    private static final String DELETE_MONSTER_ENDPOINT = "/api/monsters/delete/";
 
     private final RestTemplate restTemplate;
     private final ExternalApiProperties apiProperties;
