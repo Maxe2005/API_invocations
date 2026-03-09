@@ -20,7 +20,7 @@ public class Random {
         // 1. Calculer la somme des taux des rangs encore DISPONIBLES
         float totalAvailableRate = 0f;
         for (Rank rank : Rank.values()) {
-            if (dataService.hasAvailableData(rank)) { // Votre méthode de vérification de stock
+            if (dataService.hasAvailableData(rank)) { // La méthode de vérification de stock de monstres
                 totalAvailableRate += rank.getDropRate();
             }
         }
