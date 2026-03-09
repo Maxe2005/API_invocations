@@ -1,8 +1,31 @@
-spring.application.name: Api_invocations
+spring.application.name: api_invocations
 
 spring:
   data:
     mongodb:
       uuid-representation: standard
-      database: Api_invocationsdb
+      database: api_invocationsdb
       port: 27017
+  
+app:
+  auth:
+    enabled: false
+
+# Configuration des APIs externes
+external:
+  api:
+    monsters-base-url: http://api_monsters:8080
+    player-base-url: http://api_joueur:8080
+    auth-base-url: http://api_auth:8080
+    connection-timeout: 5000
+    read-timeout: 5000
+
+# Actuator configuration
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health
+  endpoint:
+    health:
+      show-details: always

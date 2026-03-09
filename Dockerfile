@@ -1,4 +1,4 @@
-FROM maven:3.9.6-amazoncorretto-21 as build
+FROM maven:3.9.6-amazoncorretto-21 AS build
 RUN mkdir -p /Api_invocations
 COPY src /Api_invocations/src
 COPY pom.xml /Api_invocations
