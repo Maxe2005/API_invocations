@@ -49,11 +49,8 @@ public class AuthApiClient implements ExternalApiClient {
 
       return isValid;
     } catch (RestClientException e) {
-      log.error(
-          "Erreur lors de la vérification du token auprès de {}: {}",
-          getApiName(),
-          e.getMessage(),
-          e);
+      log.error("Erreur lors de la vérification du token auprès de {}: {}", getApiName(),
+          e.getMessage(), e);
       return false;
     }
   }

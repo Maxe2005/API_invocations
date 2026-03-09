@@ -30,16 +30,16 @@ public class PlayerApiClient {
     this.apiProperties = apiProperties;
   }
 
-  /**
-   * Ajoute un monstre à un joueur dans l'API externe.
-   *
-   * @param username Le nom d'utilisateur du joueur
-   * @param monsterId L'ID du monstre à ajouter
-   * @return Le joueur mis à jour
-   * @throws ExternalApiException En cas d'erreur de communication
-   */
-  public PlayerResponse addMonsterToPlayer(String username, String monsterId) {
-    String url = apiProperties.getPlayerBaseUrl() + "/api/players/" + username + "/add_monster";
+    /**
+     * Ajoute un monstre à un joueur dans l'API externe.
+     * 
+     * @param username  Le nom d'utilisateur du joueur
+     * @param monsterId L'ID du monstre à ajouter
+     * @return Le joueur mis à jour
+     * @throws ExternalApiException En cas d'erreur de communication
+     */
+    public PlayerResponse addMonsterToPlayer(String username, String monsterId) {
+        String url = apiProperties.getPlayerBaseUrl() + "/api/players/" + username + "/monsters";
 
     PlayerAddMonsterRequest request = new PlayerAddMonsterRequest(monsterId);
 
