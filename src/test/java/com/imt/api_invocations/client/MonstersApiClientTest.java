@@ -214,7 +214,7 @@ class MonstersApiClientTest {
 
             // Assert
             verify(restTemplate, times(1))
-                    .delete("http://localhost:8081/api/monsters/" + monsterId);
+                    .delete("http://localhost:8081/api/monsters/delete/" + monsterId);
         }
 
         @Test
@@ -230,7 +230,7 @@ class MonstersApiClientTest {
                     .doesNotThrowAnyException();
 
             verify(restTemplate, times(1))
-                    .delete("http://localhost:8081/api/monsters/" + monsterId);
+                    .delete("http://localhost:8081/api/monsters/delete/" + monsterId);
         }
 
         @Test
