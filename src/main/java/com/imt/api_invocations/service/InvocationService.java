@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 
 import com.imt.api_invocations.client.dto.monsters.CreateMonsterRequest;
 import com.imt.api_invocations.client.dto.monsters.CreateMonsterResponse;
+import com.imt.api_invocations.client.dto.monsters.CreateMonsterSkillRequest;
 import com.imt.api_invocations.client.dto.player.PlayerAddMonsterRequest;
 import com.imt.api_invocations.client.dto.player.PlayerResponse;
 import com.imt.api_invocations.client.MonstersApiClient;
@@ -36,10 +37,8 @@ public class InvocationService {
     private final PlayerApiClient playerApiClient;
     private final InvocationBufferRepository invocationBufferRepository;
 
-    public InvocationService(MonsterService monsterService,
-            SkillsService skillsService,
-            MonstersApiClient monstersApiClient,
-            PlayerApiClient playerApiClient,
+    public InvocationService(MonsterService monsterService, SkillsService skillsService,
+            MonstersApiClient monstersApiClient, PlayerApiClient playerApiClient,
             InvocationBufferRepository invocationBufferRepository) {
         this.monsterService = monsterService;
         this.skillsService = skillsService;
@@ -48,45 +47,38 @@ public class InvocationService {
         this.invocationBufferRepository = invocationBufferRepository;
     }
 
-    private GlobalMonsterDto mapToGlobalMonsterDto(MonsterMongoDto monsterMongoDto, List<SkillForMonsterDto> skills) {
-        return new GlobalMonsterDto(
-                monsterMongoDto.getElement(),
-                monsterMongoDto.getHp(),
-                monsterMongoDto.getAtk(),
-                monsterMongoDto.getDef(),
-                monsterMongoDto.getVit(),
-                skills,
-                monsterMongoDto.getRank());
+    private GlobalMonsterDto mapToGlobalMonsterDto(MonsterMongoDto monsterMongoDto,
+            List<SkillForMonsterDto> skills) {
+        return new GlobalMonsterDto(monsterMongoDto.getElement(), monsterMongoDto.getHp(),
+                monsterMongoDto.getAtk(), monsterMongoDto.getDef(), monsterMongoDto.getVit(),
+                skills, monsterMongoDto.getRank());
     }
 
     public GlobalMonsterDto invoke() {
         Rank rank = getRandomRankBasedOnAvailableData(monsterService);
         MonsterMongoDto monster = monsterService.getRandomMonsterByRank(rank);
-        List<SkillForMonsterDto> skills = skillsService.getRandomSkillsForMonster(monster.getId(), 3);
+        List<SkillForMonsterDto> skills =
+                skillsService.getRandomSkillsForMonster(monster.getId(), 3);
         return mapToGlobalMonsterDto(monster, skills);
     }
 
     private CreateMonsterRequest toCreateMonsterRequest(GlobalMonsterDto monster) {
-        return new CreateMonsterRequest(
-                monster.getElement(),
-                (int) monster.getHp(),
-                (int) monster.getAtk(),
-                (int) monster.getDef(),
-                (int) monster.getVit(),
-                monster.getSkills(),
-                monster.getRank());
+        List<CreateMonsterSkillRequest> skillRequests = monster.getSkills().stream()
+                .map(skill -> new CreateMonsterSkillRequest(skill.getNumber(), skill.getDamage(),
+                        skill.getRatio(), (int) skill.getCooldown(), (int) skill.getLvlMax(),
+                        skill.getRank()))
+                .toList();
+        return new CreateMonsterRequest(monster.getElement(), (int) monster.getHp(),
+                (int) monster.getAtk(), (int) monster.getDef(), (int) monster.getVit(),
+                skillRequests, monster.getRank());
     }
 
     private InvocationBufferDto createBufferEntry(String playerId, GlobalMonsterDto monster,
             CreateMonsterRequest monsterRequest) {
-        InvocationBufferDto bufferEntry = InvocationBufferDto.builder()
-                .playerId(playerId)
-                .monsterSnapshot(monster)
-                .monsterRequest(monsterRequest)
-                .status(InvocationStatus.PENDING)
-                .attemptCount(0)
-                .createdAt(LocalDateTime.now())
-                .build();
+        InvocationBufferDto bufferEntry =
+                InvocationBufferDto.builder().playerId(playerId).monsterSnapshot(monster)
+                        .monsterRequest(monsterRequest).status(InvocationStatus.PENDING)
+                        .attemptCount(0).createdAt(LocalDateTime.now()).build();
         return invocationBufferRepository.save(bufferEntry);
     }
 
@@ -103,7 +95,8 @@ public class InvocationService {
         invocationBufferRepository.save(entry);
     }
 
-    private void markCompleted(InvocationBufferDto entry, PlayerAddMonsterRequest request, PlayerResponse response) {
+    private void markCompleted(InvocationBufferDto entry, PlayerAddMonsterRequest request,
+            PlayerResponse response) {
         entry.setPlayerRequest(request);
         entry.setPlayerResponse(response);
         entry.setStatus(InvocationStatus.COMPLETED);
@@ -129,48 +122,50 @@ public class InvocationService {
         String createdMonsterId = null;
 
         try {
-            CreateMonsterResponse monsterResponse = monstersApiClient.createMonster(bufferEntry.getMonsterRequest());
+            CreateMonsterResponse monsterResponse =
+                    monstersApiClient.createMonster(bufferEntry.getMonsterRequest());
             markMonsterCreated(bufferEntry, monsterResponse);
             createdMonsterId = monsterResponse.getMonsterId();
 
             PlayerAddMonsterRequest playerRequest = new PlayerAddMonsterRequest(createdMonsterId);
             bufferEntry.setPlayerRequest(playerRequest);
             invocationBufferRepository.save(bufferEntry);
-            PlayerResponse playerResponse = playerApiClient.addMonsterToPlayer(playerId, createdMonsterId);
+            PlayerResponse playerResponse =
+                    playerApiClient.addMonsterToPlayer(playerId, createdMonsterId);
 
             markCompleted(bufferEntry, playerRequest, playerResponse);
 
-            logger.info("Invocation globale réussie. Monstre {} ajouté au joueur {}", createdMonsterId, playerId);
+            logger.info("Invocation globale réussie. Monstre {} ajouté au joueur {}",
+                    createdMonsterId, playerId);
             return monster;
 
         } catch (ExternalApiException e) {
             logger.error("Échec de l'invocation globale: {}", e.getMessage());
 
-            if (bufferEntry != null) {
-                markFailed(bufferEntry, e.getMessage());
-            }
+            markFailed(bufferEntry, e.getMessage());
 
             if (createdMonsterId != null) {
-                logger.warn("Déclenchement de la compensation: suppression du monstre {}", createdMonsterId);
+                logger.warn("Déclenchement de la compensation: suppression du monstre {}",
+                        createdMonsterId);
                 try {
                     monstersApiClient.deleteMonster(createdMonsterId);
                 } catch (Exception compensationError) {
-                    logger.error("Échec de la compensation pour le monstre {}", createdMonsterId, compensationError);
+                    logger.error("Échec de la compensation pour le monstre {}", createdMonsterId,
+                            compensationError);
                 }
             }
 
-            throw e;
+        throw e;
         }
     }
 
     /**
-     * Invoque un monstre et l'ajoute au joueur via les APIs externes.
-     * Utilise le pattern Saga avec compensation en cas d'échec.
+     * Invoque un monstre et l'ajoute au joueur via les APIs externes. Utilise le pattern Saga avec
+     * compensation en cas d'échec.
      * 
      * @param playerId L'ID du joueur qui reçoit le monstre
      * @return Le monstre invoqué
-     * @throws ExternalApiException En cas d'erreur de communication avec les APIs
-     *                              externes
+     * @throws ExternalApiException En cas d'erreur de communication avec les APIs externes
      */
     public GlobalMonsterDto globalInvoke(String playerId) {
         logger.info("Début de l'invocation globale pour le joueur: {}", playerId);

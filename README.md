@@ -5,7 +5,7 @@
 ### Le docker
 
 ```bach
-docker compose up
+docker compose up -d
 ```
 
 ### L'app en local
@@ -24,5 +24,5 @@ docker compose up -d --build
 ## Swager
 
 ```html
-http://localhost:8081/swagger-ui/index.html
+http://localhost:8085/swagger-ui/index.html
 ```

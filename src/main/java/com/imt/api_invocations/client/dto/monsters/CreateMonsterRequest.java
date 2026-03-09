@@ -2,7 +2,6 @@ package com.imt.api_invocations.client.dto.monsters;
 
 import com.imt.api_invocations.enums.Elementary;
 import com.imt.api_invocations.enums.Rank;
-import com.imt.api_invocations.service.dto.SkillForMonsterDto;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -18,6 +17,6 @@ public class CreateMonsterRequest {
     private Integer atk;
     private Integer def;
     private Integer vit;
-    private List<SkillForMonsterDto> skills;
+    private List<CreateMonsterSkillRequest> skills;
     private Rank rank;
 }
