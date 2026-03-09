@@ -455,8 +455,7 @@ class InvocationServiceTest {
         void should_MarkAsFailed_When_NoSnapshotAvailable() {
             // Arrange
             InvocationBufferDto bufferWithoutSnapshot = InvocationBufferDto.builder()
-                    .id("buffer-no-snapshot").playerId("player-123").monsterSnapshot(null) // Pas de
-                                                                                           // snapshot
+                    .id("buffer-no-snapshot").playerId("player-123").monsterSnapshot(null) // Pas de snapshot
                     .status(InvocationStatus.PENDING).attemptCount(0).build();
 
             when(invocationBufferRepository.findRecreatable())

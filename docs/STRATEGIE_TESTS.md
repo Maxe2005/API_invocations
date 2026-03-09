@@ -782,6 +782,7 @@ public class MonsterTestBuilder {
 3. Documentation des tests
 4. CI/CD pipeline
 
+PS: seules les Phases 1 et 2 ont été implémentés pour l'instant
 ---
 
 ## 📍 Checklist Finale
