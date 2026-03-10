@@ -33,6 +33,9 @@ public class DtoMapperMonster {
                 .stats(httpDto.getStats()).rank(httpDto.getRank())
                 .visualDescription(httpDto.getVisualDescription())
                 .cardDescription(httpDto.getCardDescription()).imageUrl(httpDto.getImageUrl())
+                .skills(httpDto.getSkills() == null ? List.of()
+                        : httpDto.getSkills().stream()
+                                .map(dtoMapperSkills::toSkillEntityForMonsterCreation).toList())
                 .build();
     }
 

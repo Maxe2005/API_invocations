@@ -4,26 +4,34 @@ import static com.imt.api_invocations.utils.Random.random;
 
 import com.imt.api_invocations.enums.Rank;
 import com.imt.api_invocations.persistence.MonsterRepository;
+import com.imt.api_invocations.persistence.SkillsRepository;
 import com.imt.api_invocations.persistence.entity.MonsterEntity;
+import com.imt.api_invocations.persistence.entity.SkillEntity;
 import com.imt.api_invocations.service.mapper.MonsterServiceMapper;
 import com.imt.api_invocations.utils.DataServiceInterface;
 import java.util.List;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class MonsterService implements DataServiceInterface {
 
   private final MonsterRepository monsterRepository;
+  private final SkillsRepository skillsRepository;
   private final MonsterServiceMapper monsterServiceMapper;
 
-  public MonsterService(MonsterRepository monsterRepository,
+  public MonsterService(MonsterRepository monsterRepository, SkillsRepository skillsRepository,
       MonsterServiceMapper monsterServiceMapper) {
     this.monsterRepository = monsterRepository;
+    this.skillsRepository = skillsRepository;
     this.monsterServiceMapper = monsterServiceMapper;
   }
 
+  @Transactional
   public String createMonster(MonsterEntity monsterEntity) {
-    return monsterRepository.save(monsterEntity);
+    String monsterId = monsterRepository.save(monsterEntity);
+    saveMonsterSkills(monsterId, monsterEntity.getSkills());
+    return monsterId;
   }
 
   public MonsterEntity getMonsterById(String id) {
@@ -74,5 +82,17 @@ public class MonsterService implements DataServiceInterface {
   public boolean hasAvailableData(Rank rank) {
     List<String> monsterIds = getAllMonsterIdByRank(rank);
     return !monsterIds.isEmpty();
+  }
+
+  private void saveMonsterSkills(String monsterId, List<SkillEntity> skills) {
+    if (skills == null || skills.isEmpty()) {
+      return;
+    }
+
+    skills.stream()
+        .map(skill -> SkillEntity.builder().monsterId(monsterId).name(skill.getName())
+            .description(skill.getDescription()).damage(skill.getDamage()).ratio(skill.getRatio())
+            .cooldown(skill.getCooldown()).lvlMax(skill.getLvlMax()).rank(skill.getRank()).build())
+        .forEach(skillsRepository::save);
   }
 }

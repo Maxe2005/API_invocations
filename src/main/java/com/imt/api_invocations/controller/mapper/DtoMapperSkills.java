@@ -5,6 +5,7 @@ import com.imt.api_invocations.controller.dto.input.SkillsHttpUpdateDto;
 import com.imt.api_invocations.controller.dto.output.SkillsWithIdDto;
 import com.imt.api_invocations.dto.RatioDto;
 import com.imt.api_invocations.dto.RatioUpdateDto;
+import com.imt.api_invocations.dto.SkillBaseDto;
 import com.imt.api_invocations.persistence.entity.SkillEntity;
 import org.springframework.stereotype.Component;
 
@@ -20,15 +21,22 @@ public class DtoMapperSkills {
    * by Jakarta validation framework
    */
   public SkillEntity toSkillEntity(SkillsHttpDto httpDto) {
-    if (httpDto.getMonsterId() == null || httpDto.getRatio() == null || httpDto.getRank() == null
-        || isBlank(httpDto.getName()) || isBlank(httpDto.getDescription())) {
+    if (httpDto.getMonsterId() == null) {
       throw new IllegalArgumentException("All fields must be provided for creation");
     }
-    validateRatio(httpDto.getRatio());
+    validateSkillFields(httpDto);
     return SkillEntity.builder().monsterId(httpDto.getMonsterId()).name(httpDto.getName())
         .description(httpDto.getDescription()).damage(httpDto.getDamage()).ratio(httpDto.getRatio())
         .cooldown(httpDto.getCooldown()).lvlMax(httpDto.getLvlMax()).rank(httpDto.getRank())
         .build();
+  }
+
+  /** Convert nested monster skill payload to SkillEntity before monsterId is known. */
+  public SkillEntity toSkillEntityForMonsterCreation(SkillBaseDto skillDto) {
+    validateSkillFields(skillDto);
+    return SkillEntity.builder().name(skillDto.getName()).description(skillDto.getDescription())
+        .damage(skillDto.getDamage()).ratio(skillDto.getRatio()).cooldown(skillDto.getCooldown())
+        .lvlMax(skillDto.getLvlMax()).rank(skillDto.getRank()).build();
   }
 
   /** Merge partial SkillsHttpDto into existing SkillEntity */
@@ -92,6 +100,14 @@ public class DtoMapperSkills {
     if (ratio.getStat() == null || ratio.getPercent() <= 0) {
       throw new IllegalArgumentException("All fields must be provided for creation");
     }
+  }
+
+  private void validateSkillFields(SkillBaseDto skillDto) {
+    if (skillDto.getRatio() == null || skillDto.getRank() == null || isBlank(skillDto.getName())
+        || isBlank(skillDto.getDescription())) {
+      throw new IllegalArgumentException("All fields must be provided for creation");
+    }
+    validateRatio(skillDto.getRatio());
   }
 
   private String valueOrExisting(String existing, String candidate) {
