@@ -58,3 +58,7 @@ management:
   endpoint:
     health:
       show-details: always
+
+# Affiche les endpoints Actuator dans la doc Springdoc
+springdoc:
+  show-actuator: true
