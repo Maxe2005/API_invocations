@@ -59,5 +59,6 @@
             "lvlMax": 5,
             "rank": "RARE"
         }
-    ]
+    ],
+  "imageUrl": "http://localhost:9000/game-assets/Pyrolosse.webp"
 }
