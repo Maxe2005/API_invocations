@@ -59,5 +59,6 @@
             "lvlMax": 3.0,
             "rank": "LEGENDARY"
         }
-    ]
+    ],
+  "imageUrl": "http://localhost:9000/game-assets/Aether-Primus.webp"
 }

@@ -31,4 +31,7 @@ public class MonsterSeedDto {
 
   @JsonProperty("skills")
   private List<SkillSeedDto> skills;
+
+  @JsonProperty("imageUrl")
+  private String imageUrl;
 }

@@ -11,6 +11,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import com.imt.api_invocations.controller.dto.output.MonsterStatsResponseDto;
 
 @RestController
 @RequestMapping("/api/invocation/stats")
@@ -19,6 +20,13 @@ import org.springframework.web.bind.annotation.*;
 public class StatsController {
 
   private final StatsService statsService;
+
+  @Operation(summary = "Statistiques globales des monstres")
+  @GetMapping("/monsters")
+  public ResponseEntity<MonsterStatsResponseDto> getMonstersStats() {
+    MonsterStatsResponseDto stats = statsService.getMonsterStats();
+    return ResponseEntity.ok(stats);
+  }
 
   @Operation(
       summary = "Vérifier la validité des taux de drop par rang",
@@ -62,7 +70,7 @@ public class StatsController {
                     schema = @Schema(implementation = String.class))),
         @ApiResponse(responseCode = "401", description = "Non authentifié", content = @Content)
       })
-  @GetMapping("get-loot-rate")
+  @GetMapping("/get-loot-rate")
   public ResponseEntity<String> getLootRatesString(
       @Parameter(
               description =

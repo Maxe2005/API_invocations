@@ -148,7 +148,7 @@ public class DatabaseSeeder implements CommandLineRunner {
     return MonsterEntity.builder().name(seedDto.getNom())
         .element(Elementary.valueOf(seedDto.getElement())).stats(stats)
         .rank(Rank.valueOf(seedDto.getRang())).visualDescription(seedDto.getDescriptionVisuelle())
-        .cardDescription(seedDto.getDescriptionCarte()).imageUrl("").build();
+        .cardDescription(seedDto.getDescriptionCarte()).imageUrl(seedDto.getImageUrl()).build();
   }
 
   /** Convertit un SkillSeedDto en SkillEntity */
