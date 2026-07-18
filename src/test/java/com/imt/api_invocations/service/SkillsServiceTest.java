@@ -1,34 +1,42 @@
-// package com.imt.api_invocations.service;
+package com.imt.api_invocations.service;
 
-// import com.imt.api_invocations.enums.Elementary;
-// import com.imt.api_invocations.enums.Rank;
-// import com.imt.api_invocations.enums.Stat;
-// import com.imt.api_invocations.persistence.SkillsRepository;
-// import com.imt.api_invocations.persistence.dto.MonsterMongoDto;
-// import com.imt.api_invocations.persistence.dto.RatioDto;
-// import com.imt.api_invocations.persistence.dto.SkillsMongoDto;
-// import org.junit.jupiter.api.BeforeEach;
-// import org.junit.jupiter.api.Test;
-// import org.junit.jupiter.api.extension.ExtendWith;
-// import org.mockito.Mock;
-// import org.mockito.junit.jupiter.MockitoExtension;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.ArgumentMatchers.argThat;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
-// import java.util.List;
+import java.lang.reflect.Field;
+import java.util.ArrayList;
+import java.util.List;
 
-// import static org.junit.jupiter.api.Assertions.*;
-// import static org.mockito.ArgumentMatchers.any;
-// import static org.mockito.Mockito.*;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 
-// @ExtendWith(MockitoExtension.class)
-// class SkillsServiceTest {
+import com.imt.api_invocations.enums.Rank;
+import com.imt.api_invocations.enums.Stat;
+import com.imt.api_invocations.persistence.SkillsRepository;
+import com.imt.api_invocations.persistence.dto.MonsterMongoDto;
+import com.imt.api_invocations.persistence.dto.RatioDto;
+import com.imt.api_invocations.persistence.dto.SkillsMongoDto;
+import com.imt.api_invocations.service.dto.SkillForMonsterDto;
 
-//     @Mock
-//     private SkillsRepository skillsRepository;
+@ExtendWith(MockitoExtension.class)
+@DisplayName("SkillsService - Tests Unitaires")
+class SkillsServiceTest {
 
-//     @Mock
-//     private MonsterService monsterService;
+    @Mock
+    private SkillsRepository skillsRepository;
 
-//     private SkillsService skillsService;
+    @Mock
+    private MonsterService monsterService;
+
+    @InjectMocks
+    private SkillsService skillsService;
 
 //     @BeforeEach
 //     void setUp() {
@@ -46,7 +54,7 @@
 // Rank.COMMON));
 //         when(skillsRepository.save(any(SkillsMongoDto.class))).thenReturn("skill-id");
 
-//         String result = skillsService.createSkill(skill);
+        String result = skillsService.createSkill(skill);
 
 //         assertEquals("skill-id", result);
 //         verify(skillsRepository).save(any(SkillsMongoDto.class));
@@ -86,7 +94,7 @@
 //                 .thenReturn(new MonsterMongoDto("id", Elementary.FIRE, 100.0, 10.0, 5.0, 50.0,
 // Rank.COMMON));
 
-//         skillsService.updateSkill(skillId, skill);
+        skillsService.updateSkill("target-id", payload);
 
 //         verify(skillsRepository).update(any(SkillsMongoDto.class));
 //     }
@@ -111,29 +119,50 @@
 
 //         when(skillsRepository.findByMonsterId(monsterId)).thenReturn(List.of(skill));
 
-//         List<SkillsMongoDto> result = skillsService.getSkillByMonsterId(monsterId);
+        List<SkillForMonsterDto> result = skillsService.getRandomSkillsForMonster("m-1", 3);
 
-//         assertEquals(1, result.size());
-//         assertEquals(skill, result.get(0));
-//     }
+        assertThat(result).hasSize(3);
+        assertThat(result).extracting(SkillForMonsterDto::getNumber).containsExactly(1, 2, 3);
+    }
 
-//     @Test
-//     void deleteSkillByMonsterId() {
-//         String monsterId = "monster-id";
-//         when(skillsRepository.deleteByMonsterId(monsterId)).thenReturn(5L);
+    @Test
+    @DisplayName("getRandomSkillsForMonster limite au nombre de skills disponibles")
+    void should_LimitToAvailableSkills_When_RequestedMoreThanAvailable() {
+        List<SkillsMongoDto> skills = new ArrayList<>(List.of(
+                new SkillsMongoDto("s-1", "m-1", 100.0, new RatioDto(Stat.ATK, 1.1), 2.0, 5.0,
+                        Rank.COMMON),
+                new SkillsMongoDto("s-2", "m-1", 130.0, new RatioDto(Stat.DEF, 1.0), 3.0, 8.0,
+                        Rank.COMMON)));
+        when(skillsRepository.findByMonsterId("m-1")).thenReturn(skills);
 
-//         Long result = skillsService.deleteSkillByMonsterId(monsterId);
+        List<SkillForMonsterDto> result = skillsService.getRandomSkillsForMonster("m-1", 3);
 
-//         assertEquals(5L, result);
-//     }
+        assertThat(result).hasSize(2);
+        assertThat(result).extracting(SkillForMonsterDto::getNumber).containsExactly(1, 2);
+    }
 
-//     @Test
-//     void deleteSkillById() {
-//         String id = "skill-id";
-//         when(skillsRepository.deleteById(id)).thenReturn(true);
+    @Test
+    @DisplayName("hasAvailableData retourne false si possibleSkills non initialisé")
+    void should_ReturnFalse_When_PossibleSkillsIsNull() {
+        assertThat(skillsService.hasAvailableData(Rank.COMMON)).isFalse();
+    }
 
-//         boolean result = skillsService.deleteSkillById(id);
+    @Test
+    @DisplayName("hasAvailableData retourne true/false selon la disponibilité du rank")
+    void should_ReturnAvailabilityByRank_When_PossibleSkillsInitialized() throws Exception {
+        setPossibleSkills(List.of(
+                new SkillsMongoDto("s-1", "m-1", 100.0, new RatioDto(Stat.ATK, 1.0), 2.0, 5.0,
+                        Rank.COMMON),
+                new SkillsMongoDto("s-2", "m-1", 130.0, new RatioDto(Stat.DEF, 1.0), 3.0, 8.0,
+                        Rank.RARE)));
 
-//         assertTrue(result);
-//     }
-// }
+        assertThat(skillsService.hasAvailableData(Rank.COMMON)).isTrue();
+        assertThat(skillsService.hasAvailableData(Rank.EPIC)).isFalse();
+    }
+
+    private void setPossibleSkills(List<SkillsMongoDto> possibleSkills) throws Exception {
+        Field field = SkillsService.class.getDeclaredField("possibleSkills");
+        field.setAccessible(true);
+        field.set(skillsService, possibleSkills);
+    }
+}

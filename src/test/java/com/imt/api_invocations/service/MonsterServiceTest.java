@@ -1,28 +1,33 @@
-// package com.imt.api_invocations.service;
+package com.imt.api_invocations.service;
 
-// import com.imt.api_invocations.enums.Elementary;
-// import com.imt.api_invocations.enums.Rank;
-// import com.imt.api_invocations.persistence.MonsterRepository;
-// import com.imt.api_invocations.persistence.dto.MonsterMongoDto;
-// import org.junit.jupiter.api.BeforeEach;
-// import org.junit.jupiter.api.Test;
-// import org.junit.jupiter.api.extension.ExtendWith;
-// import org.mockito.Mock;
-// import org.mockito.junit.jupiter.MockitoExtension;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
-// import java.util.List;
+import java.util.List;
 
-// import static org.junit.jupiter.api.Assertions.*;
-// import static org.mockito.ArgumentMatchers.any;
-// import static org.mockito.Mockito.*;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 
-// @ExtendWith(MockitoExtension.class)
-// class MonsterServiceTest {
+import com.imt.api_invocations.enums.Elementary;
+import com.imt.api_invocations.enums.Rank;
+import com.imt.api_invocations.persistence.MonsterRepository;
+import com.imt.api_invocations.persistence.dto.MonsterMongoDto;
 
-//     @Mock
-//     private MonsterRepository monsterRepository;
+@ExtendWith(MockitoExtension.class)
+@DisplayName("MonsterService - Tests Unitaires")
+class MonsterServiceTest {
 
-//     private MonsterService monsterService;
+    @Mock
+    private MonsterRepository monsterRepository;
+
+    @InjectMocks
+    private MonsterService monsterService;
 
 //     @BeforeEach
 //     void setUp() {
@@ -35,7 +40,7 @@
 // Rank.COMMON);
 //         when(monsterRepository.save(any(MonsterMongoDto.class))).thenReturn("some-id");
 
-//         String result = monsterService.createMonster(monster);
+        String result = monsterService.createMonster(monster);
 
 //         assertEquals("some-id", result);
 //         verify(monsterRepository).save(any(MonsterMongoDto.class));
@@ -48,10 +53,20 @@
 // 50.0, Rank.COMMON);
 //         when(monsterRepository.findByID(id)).thenReturn(monster);
 
-//         MonsterMongoDto result = monsterService.getMonsterById(id);
+        MonsterMongoDto result = monsterService.getMonsterById("m-2");
 
-//         assertEquals(monster, result);
-//     }
+        assertThat(result).isEqualTo(monster);
+    }
+
+    @Test
+    @DisplayName("getMonsterById doit retourner null si inexistant")
+    void should_ReturnNull_When_MonsterDoesNotExist() {
+        when(monsterRepository.findByID("missing")).thenReturn(null);
+
+        MonsterMongoDto result = monsterService.getMonsterById("missing");
+
+        assertThat(result).isNull();
+    }
 
 //     @Test
 //     void getAllMonsters() {
@@ -61,10 +76,10 @@
 // Rank.RARE);
 //         when(monsterRepository.findAll()).thenReturn(List.of(monster1, monster2));
 
-//         List<MonsterMongoDto> result = monsterService.getAllMonsters();
+        List<MonsterMongoDto> result = monsterService.getAllMonsters();
 
-//         assertEquals(2, result.size());
-//     }
+        assertThat(result).containsExactlyElementsOf(monsters);
+    }
 
 //     @Test
 //     void getAllMonsterIds() {

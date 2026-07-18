@@ -6,6 +6,7 @@ import com.imt.api_invocations.client.MonstersApiClient;
 import com.imt.api_invocations.client.PlayerApiClient;
 import com.imt.api_invocations.client.dto.monsters.CreateMonsterRequest;
 import com.imt.api_invocations.client.dto.monsters.CreateMonsterResponse;
+import com.imt.api_invocations.client.dto.monsters.CreateMonsterSkillRequest;
 import com.imt.api_invocations.client.dto.player.PlayerAddMonsterRequest;
 import com.imt.api_invocations.client.dto.player.PlayerResponse;
 import com.imt.api_invocations.controller.dto.output.GlobalMonsterWithIdDto;
