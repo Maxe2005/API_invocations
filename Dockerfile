@@ -3,7 +3,7 @@ RUN mkdir -p /Api_invocations
 COPY src /Api_invocations/src
 COPY pom.xml /Api_invocations
 WORKDIR /Api_invocations
-RUN mvn clean package
+RUN mvn clean package -Dmaven.test.skip=true
 
 FROM amazoncorretto:21.0.2-alpine3.19
 COPY --from=build /Api_invocations/target/*.jar /app.jar

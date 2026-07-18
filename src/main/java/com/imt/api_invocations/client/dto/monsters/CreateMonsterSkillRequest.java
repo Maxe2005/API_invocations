@@ -4,7 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 import com.imt.api_invocations.enums.Rank;
-import com.imt.api_invocations.persistence.dto.RatioDto;
+import com.imt.api_invocations.dto.RatioDto;
 
 @Getter
 @AllArgsConstructor
