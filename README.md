@@ -19,13 +19,19 @@ L'API permet d'invoquer des monstres aléatoires avec des probabilités par rang
 
 ## Démarer
 
-### Le docker
+### Le docker (via l'orchestrateur)
+
+Ce service se lance **exclusivement** via le dépôt orchestrateur [GatchaApi](https://github.com/Maxe2005/GatchaApi) et son `docker-compose.yaml` racine (il n'y a plus de `docker-compose.yml` local dans ce dépôt). Toute la configuration (datasource, URLs des APIs externes, `app.auth.enabled`) est fournie par l'orchestrateur.
 
 ```bash
-docker compose up -d
+# Depuis la racine du dépôt GatchaApi
+make up                        # toute la stack
+make restart-api-invocations   # rebuild + restart de ce service uniquement
 ```
 
 ### L'app en local
+
+Le profil `local` pointe sur le PostgreSQL exposé par la stack racine (`localhost:5433`) et sur les APIs exposées en local (`8081`/`8082`/`8083`) :
 
 ```bash
 ./mvnw spring-boot:run -Dspring-boot.run.arguments="--spring.profiles.active=local"
@@ -34,6 +40,7 @@ docker compose up -d
 ## Vider et relancer BDD par défaut
 
 ```bash
+# Depuis la racine du dépôt GatchaApi (⚠️ supprime les volumes de toute la stack)
 docker compose down -v
 docker compose up -d --build
 ```
@@ -41,7 +48,7 @@ docker compose up -d --build
 ## Swagger
 
 ```html
-http://localhost:8085/swagger-ui/index.html
+http://localhost:8080/swagger-ui/index.html
 ```
 
 ## Visualiser la BDD posgreSQL avec pgAdmin
@@ -54,7 +61,7 @@ http://localhost:8085/swagger-ui/index.html
     - Clic droit "Servers" → "Register" → "Server"
     - Onglet "General" → Name : api_invocations
     - Onglet "Connection" :
-        - Host : postgres
+        - Host : postgres-invocations
         - Port : 5432
         - Database : api_invocationsdb
         - Username : api_invocations

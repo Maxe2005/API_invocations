@@ -2,7 +2,7 @@ spring.application.name: api_invocations
 
 spring:
   datasource:
-    url: jdbc:postgresql://localhost:5432/api_invocationsdb
+    url: jdbc:postgresql://localhost:5433/api_invocationsdb
     username: api_invocations
     password: api_invocations
   jpa:
@@ -43,9 +43,9 @@ app:
 # Configuration des APIs externes
 external:
   api:
-    monsters-base-url: http://api_monsters:8080
-    player-base-url: http://api_joueur:8080
-    auth-base-url: http://api_auth:8080
+    monsters-base-url: http://localhost:8083
+    player-base-url: http://localhost:8082
+    auth-base-url: http://localhost:8081
     connection-timeout: 5000
     read-timeout: 5000
 
