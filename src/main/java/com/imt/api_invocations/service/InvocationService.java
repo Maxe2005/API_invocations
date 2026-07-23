@@ -97,7 +97,8 @@ public class InvocationService {
   private String executeInvocation(GlobalMonsterDto monster, String playerId,
       InvocationBufferDto bufferEntry) {
     if (bufferEntry.getMonsterRequest() == null) {
-      bufferEntry.setMonsterRequest(invocationServiceMapper.toCreateMonsterRequest(monster));
+      bufferEntry.setMonsterRequest(
+          invocationServiceMapper.toCreateMonsterRequest(monster, playerId));
       bufferEntry = invocationBufferRepository.save(bufferEntry);
     }
 
@@ -155,7 +156,8 @@ public class InvocationService {
     logger.info("Début de l'invocation globale pour le joueur: {}", playerId);
 
     GlobalMonsterDto monster = invoke();
-    CreateMonsterRequest monsterRequest = invocationServiceMapper.toCreateMonsterRequest(monster);
+    CreateMonsterRequest monsterRequest =
+        invocationServiceMapper.toCreateMonsterRequest(monster, playerId);
 
     InvocationBufferDto bufferEntry = createBufferEntry(playerId, monster, monsterRequest);
 

@@ -20,9 +20,9 @@ public class InvocationServiceMapper {
         .skills(skills).build();
   }
 
-  public CreateMonsterRequest toCreateMonsterRequest(GlobalMonsterDto monster) {
-    return CreateMonsterRequest.builder().name(monster.getName()).element(monster.getElement())
-        .stats(monster.getStats()).rank(monster.getRank())
+  public CreateMonsterRequest toCreateMonsterRequest(GlobalMonsterDto monster, String playerId) {
+    return CreateMonsterRequest.builder().playerId(playerId).name(monster.getName())
+        .element(monster.getElement()).stats(monster.getStats()).rank(monster.getRank())
         .cardDescription(monster.getCardDescription()).imageUrl(monster.getImageUrl())
         .skills(monster.getSkills()).build();
   }
