@@ -11,6 +11,8 @@ import lombok.experimental.SuperBuilder;
 @NoArgsConstructor
 public class CreateMonsterRequest extends GlobalMonsterDto {
 
+    private String playerId;
+
     @Override
     @JsonIgnore
     public String getVisualDescription() {
