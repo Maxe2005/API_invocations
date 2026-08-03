@@ -1,12 +1,17 @@
 package com.imt.api_invocations.exception;
 
 import static org.assertj.core.api.Assertions.*;
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.mock;
 
+import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.springframework.context.support.DefaultMessageSourceResolvable;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.method.annotation.HandlerMethodValidationException;
 
 @DisplayName("GlobalExceptionHandler - Tests Unitaires")
 class GlobalExceptionHandlerTest {
@@ -40,7 +45,7 @@ class GlobalExceptionHandlerTest {
 
             CustomError error = response.getBody().getTheErrorsYOUMade().get(0);
             assertThat(error.statusCode()).isEqualTo(502);
-            assertThat(error.message()).contains("Erreur de communication avec une API externe");
+            assertThat(error.message()).contains("Erreur de communication avec API externe");
             assertThat(error.message()).contains(errorMessage);
         }
 
@@ -157,11 +162,19 @@ class GlobalExceptionHandlerTest {
     @DisplayName("Tests de handleValidationException()")
     class HandleValidationExceptionTests {
 
+        private HandlerMethodValidationException validationExceptionWithMessage(String message) {
+            HandlerMethodValidationException exception = mock(HandlerMethodValidationException.class);
+            doReturn(List.of(new DefaultMessageSourceResolvable(new String[] {"code"}, message)))
+                    .when(exception).getAllErrors();
+            return exception;
+        }
+
         @Test
         @DisplayName("Doit retourner HTTP 400 pour les erreurs de validation")
         void should_Return400_When_ValidationExceptionThrown() {
             // Arrange
-            Exception exception = new RuntimeException("Validation failed");
+            HandlerMethodValidationException exception =
+                    validationExceptionWithMessage("Validation failed");
 
             // Act
             ResponseEntity<Errors> response = exceptionHandler.handleValidationException(exception);
@@ -175,7 +188,8 @@ class GlobalExceptionHandlerTest {
         void should_ReturnErrorsWithDetails_When_ValidationExceptionThrown() {
             // Arrange
             String validationMessage = "Validation failed for argument";
-            Exception exception = new RuntimeException(validationMessage);
+            HandlerMethodValidationException exception =
+                    validationExceptionWithMessage(validationMessage);
 
             // Act
             ResponseEntity<Errors> response = exceptionHandler.handleValidationException(exception);
@@ -193,7 +207,8 @@ class GlobalExceptionHandlerTest {
         @DisplayName("Doit gérer les exceptions de validation génériques")
         void should_HandleGenericValidationException_When_Thrown() {
             // Arrange
-            Exception exception = new RuntimeException("Validation error");
+            HandlerMethodValidationException exception =
+                    validationExceptionWithMessage("Validation error");
 
             // Act
             ResponseEntity<Errors> response = exceptionHandler.handleValidationException(exception);
@@ -208,7 +223,8 @@ class GlobalExceptionHandlerTest {
         @DisplayName("Doit créer un CustomError avec status 400")
         void should_CreateCustomErrorWith400Status_When_ValidationExceptionThrown() {
             // Arrange
-            Exception exception = new RuntimeException("Validation failed");
+            HandlerMethodValidationException exception =
+                    validationExceptionWithMessage("Validation failed");
 
             // Act
             ResponseEntity<Errors> response = exceptionHandler.handleValidationException(exception);
@@ -231,7 +247,10 @@ class GlobalExceptionHandlerTest {
             ExternalApiException externalException = new ExternalApiException("External error");
             IllegalArgumentException illegalArgException =
                     new IllegalArgumentException("Illegal arg");
-            Exception validationException = new RuntimeException("Validation error");
+            HandlerMethodValidationException validationException = mock(
+                    HandlerMethodValidationException.class);
+            doReturn(List.of(new DefaultMessageSourceResolvable(new String[] {"code"}, "Validation error")))
+                    .when(validationException).getAllErrors();
 
             // Act
             ResponseEntity<Errors> response1 =

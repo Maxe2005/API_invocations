@@ -56,7 +56,7 @@ class PlayerApiClientTest {
             String username = "player123";
             String monsterId = "monster-456";
             PlayerResponse expectedResponse =
-                    new PlayerResponse(username, 1, 0.0, 100.0, Arrays.asList(monsterId));
+                    new PlayerResponse("player-id", username, 1, 0.0, Arrays.asList(monsterId));
             ResponseEntity<PlayerResponse> responseEntity =
                     new ResponseEntity<>(expectedResponse, HttpStatus.OK);
 
@@ -69,7 +69,7 @@ class PlayerApiClientTest {
             // Assert
             assertThat(result).isNotNull();
             assertThat(result.getUsername()).isEqualTo(username);
-            assertThat(result.getMonsters()).contains(monsterId);
+            assertThat(result.getMonsterIds()).contains(monsterId);
 
             verify(restTemplate, times(1)).postForEntity(
                     eq("http://localhost:8082/api/players/player123/monsters"),
@@ -83,7 +83,7 @@ class PlayerApiClientTest {
             String username = "player123";
             String monsterId = "monster-789";
             PlayerResponse expectedResponse =
-                    new PlayerResponse(username, 1, 0.0, 100.0, Arrays.asList(monsterId));
+                    new PlayerResponse("player-id", username, 1, 0.0, Arrays.asList(monsterId));
             ResponseEntity<PlayerResponse> responseEntity =
                     new ResponseEntity<>(expectedResponse, HttpStatus.OK);
 
@@ -110,7 +110,7 @@ class PlayerApiClientTest {
             String username = "john_doe";
             String monsterId = "monster-123";
             PlayerResponse expectedResponse =
-                    new PlayerResponse(username, 1, 0.0, 100.0, Arrays.asList(monsterId));
+                    new PlayerResponse("player-id", username, 1, 0.0, Arrays.asList(monsterId));
             ResponseEntity<PlayerResponse> responseEntity =
                     new ResponseEntity<>(expectedResponse, HttpStatus.OK);
 
@@ -139,8 +139,9 @@ class PlayerApiClientTest {
 
             // Act & Assert
             assertThatThrownBy(() -> playerApiClient.addMonsterToPlayer(username, monsterId))
-                    .isInstanceOf(ExternalApiException.class).hasMessageContaining(
-                            "Échec de l'ajout du monstre au joueur dans l'API Player");
+                    .isInstanceOf(ExternalApiException.class)
+                    .hasMessageContaining("Erreur HTTP 404")
+                    .hasMessageContaining("lors de l'ajout du monstre");
 
             verify(restTemplate, times(1)).postForEntity(anyString(),
                     any(PlayerAddMonsterRequest.class), eq(PlayerResponse.class));
@@ -160,8 +161,8 @@ class PlayerApiClientTest {
 
             // Act & Assert
             assertThatThrownBy(() -> playerApiClient.addMonsterToPlayer(username, monsterId))
-                    .isInstanceOf(ExternalApiException.class).hasMessageContaining(
-                            "Échec de l'ajout du monstre au joueur dans l'API Player");
+                    .isInstanceOf(ExternalApiException.class)
+                    .hasMessageContaining("Erreur HTTP 400");
         }
 
         @Test
@@ -178,8 +179,8 @@ class PlayerApiClientTest {
 
             // Act & Assert
             assertThatThrownBy(() -> playerApiClient.addMonsterToPlayer(username, monsterId))
-                    .isInstanceOf(ExternalApiException.class).hasMessageContaining(
-                            "Échec de l'ajout du monstre au joueur dans l'API Player");
+                    .isInstanceOf(ExternalApiException.class)
+                    .hasMessageContaining("Erreur HTTP 500");
         }
 
         @Test
@@ -196,7 +197,7 @@ class PlayerApiClientTest {
             // Act & Assert
             assertThatThrownBy(() -> playerApiClient.addMonsterToPlayer(username, monsterId))
                     .isInstanceOf(ExternalApiException.class)
-                    .hasMessageContaining("Échec de l'ajout du monstre au joueur dans l'API Player")
+                    .hasMessageContaining("Échec de connexion à l'API Player")
                     .hasCauseInstanceOf(RestClientException.class);
 
             verify(restTemplate, times(1)).postForEntity(anyString(),
@@ -228,7 +229,7 @@ class PlayerApiClientTest {
             String username = "player123";
             String monsterId = "monster-456";
             PlayerResponse response =
-                    new PlayerResponse(username, 1, 0.0, 100.0, Arrays.asList(monsterId));
+                    new PlayerResponse("player-id", username, 1, 0.0, Arrays.asList(monsterId));
             ResponseEntity<PlayerResponse> responseEntity =
                     new ResponseEntity<>(response, HttpStatus.ACCEPTED); // 202 au lieu de 200
 
@@ -253,8 +254,8 @@ class PlayerApiClientTest {
 
             // Act & Assert
             assertThatThrownBy(() -> playerApiClient.addMonsterToPlayer(username, monsterId))
-                    .isInstanceOf(ExternalApiException.class).hasMessageContaining(
-                            "Échec de l'ajout du monstre au joueur dans l'API Player");
+                    .isInstanceOf(ExternalApiException.class)
+                    .hasMessageContaining("Échec de connexion à l'API Player");
         }
     }
 }
