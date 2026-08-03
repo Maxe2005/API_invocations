@@ -72,36 +72,6 @@ class DtoMapperMonsterTest {
   }
 
   @Test
-  @DisplayName(
-      "updateMonsterEntity(HttpDto) fusionne partiel et existant, en gardant les stats non fournies")
-  void should_MergePartialHttpDtoIntoExisting_When_UpdateCalled() {
-    MonsterEntity existing =
-        MonsterEntity.builder()
-            .id("m-1")
-            .name("Ancien")
-            .element(Elementary.WATER)
-            .stats(StatsDto.builder().hp(120).atk(60).def(50).vit(35).build())
-            .rank(Rank.RARE)
-            .visualDescription("old-visual")
-            .cardDescription("old-card")
-            .imageUrl("old-url")
-            .build();
-    MonsterHttpDto partial =
-        MonsterHttpDto.builder()
-            .stats(StatsDto.builder().hp(999).atk(0).def(0).vit(44).build())
-            .build();
-
-    MonsterEntity result = mapper.updateMonsterEntity(existing, partial);
-
-    assertThat(result.getId()).isEqualTo("m-1");
-    assertThat(result.getElement()).isEqualTo(Elementary.WATER);
-    assertThat(result.getStats().getHp()).isEqualTo(999);
-    assertThat(result.getStats().getAtk()).isEqualTo(60);
-    assertThat(result.getStats().getVit()).isEqualTo(44);
-    assertThat(result.getRank()).isEqualTo(Rank.RARE);
-  }
-
-  @Test
   @DisplayName("updateMonsterEntity(HttpUpdateDto) ne touche que les champs explicitement fournis")
   void should_MergePartialUpdateDtoIntoExisting_When_UpdateCalled() {
     MonsterEntity existing =

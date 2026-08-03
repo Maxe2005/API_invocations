@@ -46,22 +46,6 @@ public class DtoMapperMonster {
         .build();
   }
 
-  /** Merge partial MonsterHttpDto into existing MonsterEntity */
-  public MonsterEntity updateMonsterEntity(MonsterEntity existing, MonsterHttpDto partial) {
-    return MonsterEntity.builder()
-        .id(existing.getId())
-        .name(valueOrExisting(existing.getName(), partial.getName()))
-        .element(partial.getElement() != null ? partial.getElement() : existing.getElement())
-        .stats(mergeStats(existing.getStats(), partial.getStats()))
-        .rank(partial.getRank() != null ? partial.getRank() : existing.getRank())
-        .visualDescription(
-            valueOrExisting(existing.getVisualDescription(), partial.getVisualDescription()))
-        .cardDescription(
-            valueOrExisting(existing.getCardDescription(), partial.getCardDescription()))
-        .imageUrl(valueOrExisting(existing.getImageUrl(), partial.getImageUrl()))
-        .build();
-  }
-
   /**
    * Merge partial MonsterHttpUpdateDto into existing MonsterEntity Uses nullable types to
    * distinguish between missing and null values Supports fine-grained updates of nested stats
@@ -116,31 +100,8 @@ public class DtoMapperMonster {
     return toGlobalMonsterWithIdDto(monsterEntity, skills);
   }
 
-  private StatsDto mergeStats(StatsDto existing, StatsDto partial) {
-    if (partial == null) {
-      return existing;
-    }
-    if (existing == null) {
-      return partial;
-    }
-    return StatsDto.builder()
-        .hp(partial.getHp() > 0 ? partial.getHp() : existing.getHp())
-        .atk(partial.getAtk() > 0 ? partial.getAtk() : existing.getAtk())
-        .def(partial.getDef() > 0 ? partial.getDef() : existing.getDef())
-        .vit(partial.getVit() > 0 ? partial.getVit() : existing.getVit())
-        .build();
-  }
-
-  private String valueOrExisting(String existing, String candidate) {
-    return isBlank(candidate) ? existing : candidate;
-  }
-
   private Long valueOrExisting(Long existing, Long candidate) {
     return candidate == null ? existing : candidate;
-  }
-
-  private boolean isBlank(String value) {
-    return value == null || value.isBlank();
   }
 
   /**
