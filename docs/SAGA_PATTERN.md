@@ -91,34 +91,43 @@ Service A → Événement → Service B → Événement → Service C
 └────────────────────────┘
 ```
 
-## Code de la méthode globalInvoke()
+## Buffer d'audit et de rejeu (`invocation_buffer`)
+
+Contrairement à la version simplifiée ci-dessus, l'implémentation réelle **persiste chaque
+invocation avant tout appel externe**, dans la table PostgreSQL `invocation_buffer`
+(`InvocationBufferDto`, colonnes JSONB pour le snapshot du monstre et les requêtes/réponses
+échangées). Ce buffer sert à la fois d'audit et de mécanisme de rejeu :
+
+- Statuts : `PENDING` → `MONSTER_CREATED` → `COMPLETED` / `FAILED` / `ABANDONED`.
+- `POST /api/invocation/recreate` rejoue toutes les entrées non `COMPLETED` (et non
+  `ABANDONED`) en réutilisant le snapshot et les requêtes déjà persistées, sans consommer un
+  nouveau tirage aléatoire.
+- Un plafond configurable (`app.invocation.max-attempts`, défaut 5) fait passer une entrée en
+  `ABANDONED` de façon définitive au-delà d'un certain nombre de tentatives (appel initial +
+  rejeux), pour éviter un rejeu infini.
+
+## Code de la méthode globalInvoke() (simplifié)
 
 ```java
-public GlobalMonsterDto globalInvoke(String playerId) {
+public GlobalMonsterWithIdDto globalInvoke(String playerId) {
     logger.info("Début de l'invocation globale pour le joueur: {}", playerId);
-    
-    String createdMonsterId = null;
-    
-    try {
-        // Étape 1: Invoquer un monstre localement
-        GlobalMonsterDto monster = invoke();
-        
-        // Étape 2: Créer le monstre dans l'API Monsters
-        createdMonsterId = monstersApiClient.createMonster(monster);
-        
-        // Étape 3: Ajouter le monstre au joueur
-        playerApiClient.addMonsterToPlayer(playerId, createdMonsterId);
-        
-        return monster;
-        
-    } catch (ExternalApiException e) {
-        // COMPENSATION: Supprimer le monstre si créé
-        if (createdMonsterId != null) {
-            monstersApiClient.deleteMonster(createdMonsterId);
-        }
-        throw e; // Propager l'erreur
-    }
+
+    GlobalMonsterDto monster = invoke();
+    CreateMonsterRequest monsterRequest = invocationServiceMapper.toCreateMonsterRequest(monster, playerId);
+
+    // Persistance en buffer AVANT tout appel externe (statut PENDING)
+    InvocationBufferDto bufferEntry = createBufferEntry(playerId, monster, monsterRequest);
+
+    String createdMonsterId = executeInvocation(monster, playerId, bufferEntry);
+    return invocationServiceMapper.toGlobalMonsterWithIdDto(monster, createdMonsterId);
 }
+
+// executeInvocation() (appelé aussi par replayBufferedInvocations()) :
+// - vérifie le plafond de tentatives (sinon ABANDONED)
+// - crée le monstre dans API Monsters, marque MONSTER_CREATED
+// - ajoute le monstre au joueur via API Joueur, marque COMPLETED
+// - en cas d'échec : marque FAILED, puis déclenche la compensation
+//   (deleteMonster, retentée une fois si le premier essai échoue)
 ```
 
 ## Cas d'usage
@@ -152,25 +161,17 @@ Résultat : Monstre supprimé, cohérence restaurée
 ## Limitations et améliorations futures
 
 ### Limitations actuelles
-- **Compensation manuelle** : Si `deleteMonster()` échoue, incohérence possible
-- **Pas de retry** : Une seule tentative par étape
-- **Synchrone** : Bloque jusqu'à la fin de toutes les étapes
+- **Compensation à retry unique** : `deleteMonster()` est retentée une fois immédiatement si le
+  premier essai échoue ; si les deux échouent, le buffer est marqué avec une raison explicite
+  mentionnant le monstre orphelin (traçable en base), mais sans retry différé ni file dédiée.
+- **Pas de retry sur `createMonster`/`addMonsterToPlayer`** : une seule tentative par étape lors
+  d'un appel donné (le rejeu via `POST /api/invocation/recreate` est manuel/périodique, pas un
+  retry automatique immédiat) — voir Resilience4j ci-dessous.
+- **Synchrone** : Bloque jusqu'à la fin de toutes les étapes.
 
 ### Améliorations possibles
 
-#### 1. Table de Saga Log
-Persister l'état de chaque saga pour reprise en cas de crash :
-```java
-@Entity
-public class SagaLog {
-    private String sagaId;
-    private String step;
-    private String status; // PENDING, COMPLETED, COMPENSATING, FAILED
-    private String compensationData;
-}
-```
-
-#### 2. Retry avec Exponential Backoff
+#### 1. Retry avec Exponential Backoff
 ```java
 @Retryable(
     value = {ExternalApiException.class},
@@ -182,7 +183,7 @@ public String createMonster(GlobalMonsterDto monster) {
 }
 ```
 
-#### 3. Circuit Breaker
+#### 2. Circuit Breaker
 ```java
 @CircuitBreaker(name = "monstersApi", fallbackMethod = "createMonsterFallback")
 public String createMonster(GlobalMonsterDto monster) {
@@ -190,7 +191,7 @@ public String createMonster(GlobalMonsterDto monster) {
 }
 ```
 
-#### 4. Saga asynchrone avec Event Sourcing
+#### 3. Saga asynchrone avec Event Sourcing
 Utiliser Kafka/RabbitMQ pour décorréler les étapes :
 ```
 InvocationService → Event: MonsterCreated → PlayerService

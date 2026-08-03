@@ -81,8 +81,8 @@ Si l'étape 3 échoue :
 {
   "errors": [
     {
-      "code": 502,
-      "message": "Erreur de communication avec une API externe: ..."
+      "statusCode": 502,
+      "message": "Erreur de communication avec API Monsters: ..."
     }
   ]
 }

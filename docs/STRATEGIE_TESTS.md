@@ -1,5 +1,23 @@
 # Stratégie de Tests - API Invocations
 
+> ⚠️ **Statut réel (2026-08)** : seule la **PARTIE 1 (Tests Unitaires)** est effectivement
+> implémentée, avec **Mockito + AssertJ + JUnit 5** uniquement (`mockito-core`,
+> `mockito-junit-jupiter`, `assertj-core`, déjà fournis par `spring-boot-starter-test` — aucune
+> dépendance à ajouter). Elle couvre les services, clients API, mappers, utilitaires et
+> `GlobalExceptionHandler` avec des tests unitaires classiques (mocks, pas de contexte Spring).
+>
+> Tout le reste de ce document — **PARTIE 2 (Intégration : Testcontainers, MockMvc, WireMock)**,
+> **PARTIE 3 (E2E)**, **PARTIE 4 (JaCoCo)** — décrit une stratégie cible **jamais implémentée** :
+> aucune de ces dépendances n'est dans `pom.xml`, aucun test `@SpringBootTest`/`@WebMvcTest` /
+> Testcontainers / WireMock n'existe dans `src/test`. Le PARTIE 2.1 mentionne explicitement
+> MongoDB (`testcontainers-mongodb`), qui date d'avant la migration vers PostgreSQL : si cette
+> partie est un jour engagée, il faudra le module `testcontainers-postgresql`, pas MongoDB.
+>
+> Traiter ces sections comme une roadmap non engagée plutôt que comme une description de
+> l'existant. Voir `docs/AUDIT_API_INVOCATIONS.md` (items G1-G4) pour les ajouts de tests
+> unitaires/MockMvc effectivement priorisés à court terme, qui n'impliquent ni Testcontainers ni
+> WireMock (des mocks suffisent pour `@WebMvcTest` sur les controllers).
+
 ## Vue d'ensemble
 
 Cette stratégie vise à atteindre une couverture optimale et fonctionnelle de l'application selon la pyramide de tests :

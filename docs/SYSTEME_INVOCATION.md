@@ -173,17 +173,22 @@ L'invocation globale coordonne les appels aux API externes (Monsters et Player) 
 | **PENDING** | Invocation initiée, en attente |
 | **MONSTER_CREATED** | Monstre créé avec succès dans l'API Monsters |
 | **COMPLETED** | Monstre ajouté au joueur avec succès |
-| **FAILED** | Échec de l'invocation (avec raison) |
+| **FAILED** | Échec de l'invocation (avec raison) — rejouable via `POST /api/invocation/recreate` |
+| **ABANDONED** | Plafond de tentatives atteint (`app.invocation.max-attempts`, défaut 5) — définitif, exclu du rejeu |
 
 ### Mécanisme de compensation (Saga)
 
 En cas d'échec lors de l'ajout du monstre au joueur :
 1. Le monstre a déjà été créé dans l'API Monsters
 2. Le système déclenche automatiquement la **compensation**
-3. Le monstre est **supprimé** de l'API Monsters via `deleteMonster()`
+3. Le monstre est **supprimé** de l'API Monsters via `deleteMonster()`, retentée une fois
+   immédiatement si le premier essai échoue
 4. Le buffer est marqué `FAILED` avec la raison de l'échec
 
-⚠️ **Limite** : Si la compensation échoue également, une erreur est loggée mais l'opération continue.
+⚠️ **Limite** : Si les deux tentatives de compensation échouent, le buffer est marqué avec une
+raison explicite mentionnant le monstre orphelin (traçable en base via `failureReason`), mais il
+n'y a ni retry différé ni file/alerting dédié pour ce cas — une intervention manuelle reste
+nécessaire.
 
 ## Replay d'invocations échouées
 
@@ -219,8 +224,9 @@ Le système peut **rejouer automatiquement** les invocations qui ont échoué :
 
 Une invocation peut être rejouée si :
 - Elle a un snapshot du monstre sauvegardé
-- Elle n'est pas déjà COMPLETED
-- Le nombre de tentatives n'a pas atteint la limite (si définie)
+- Elle est en statut `PENDING`, `MONSTER_CREATED` ou `FAILED` (ni `COMPLETED` ni `ABANDONED`)
+- Le nombre de tentatives n'a pas atteint le plafond configuré (`app.invocation.max-attempts`,
+  défaut 5) — au-delà, l'entrée passe à `ABANDONED` au lieu d'être rejouée
 
 ## Persistance et traçabilité
 
@@ -285,9 +291,9 @@ Nouveaux taux :
 
 ## Endpoints associés
 
-- `POST /api/invocations/invoke` : Invocation simple (retourne le monstre sans persistance)
-- `POST /api/invocations/global-invoke?playerId={id}` : Invocation globale avec Saga
-- `POST /api/invocations/replay` : Rejoue les invocations échouées
+- `GET /api/invocation/invoque` : Invocation simple (retourne le monstre sans persistance)
+- `POST /api/invocation/global-invoque/{playerId}` : Invocation globale avec Saga
+- `POST /api/invocation/recreate` : Rejoue les invocations bufferisées non terminales
 
 ## Logs et monitoring
 
