@@ -263,11 +263,11 @@ public class MonsterImportExportService {
                 for (var imgKey : imageMap.keySet()) {
                     if (imgKey.startsWith(e.getKey() + "/")) {
                         String imageName = imgKey.substring(imgKey.indexOf('/') + 1);
-                        String uploadUrl = "http://localhost:9000/raw-assets/monsters/" + imageName;
+                        String uploadUrl = assetsHost + "/raw-assets/monsters/" + imageName;
                         try {
                             restTemplate.put(uploadUrl, imageMap.get(imgKey));
                         } catch (RestClientException ex) {
-                            log.info("Failed to upload image {}: {}", uploadUrl, ex.getMessage());
+                            log.warn("Failed to upload image {}: {}", uploadUrl, ex.getMessage());
                         }
                         break;
                     }
