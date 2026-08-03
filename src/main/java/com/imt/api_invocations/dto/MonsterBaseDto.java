@@ -9,6 +9,8 @@ import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import jakarta.persistence.MappedSuperclass;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -21,12 +23,14 @@ import lombok.experimental.SuperBuilder;
 @Schema(description = "Informations de base d'un monstre")
 public class MonsterBaseDto {
 
+  @NotBlank(message = "Name must be provided")
   @Schema(
       description = "Nom du monstre",
       example = "Pyrolosse",
       requiredMode = Schema.RequiredMode.REQUIRED)
   private String name;
 
+  @NotNull(message = "Element must be provided")
   @Valid
   @Enumerated(EnumType.STRING)
   @Schema(
@@ -35,6 +39,7 @@ public class MonsterBaseDto {
       requiredMode = Schema.RequiredMode.REQUIRED)
   private Elementary element;
 
+  @NotNull(message = "Stats must be provided")
   @Valid
   @Embedded
   @Schema(
@@ -42,6 +47,7 @@ public class MonsterBaseDto {
       requiredMode = Schema.RequiredMode.REQUIRED)
   private StatsDto stats;
 
+  @NotNull(message = "Rank must be provided")
   @Valid
   @Enumerated(EnumType.STRING)
   @Schema(
@@ -50,23 +56,29 @@ public class MonsterBaseDto {
       requiredMode = Schema.RequiredMode.REQUIRED)
   private Rank rank;
 
+  @NotBlank(message = "Visual description must be provided")
   @Column(length = 2000)
   @Schema(
       description = "Description visuelle du monstre",
-      example = "Un dragon enflammé aux écailles rouges incandescentes")
+      example = "Un dragon enflammé aux écailles rouges incandescentes",
+      requiredMode = Schema.RequiredMode.REQUIRED)
   private String visualDescription;
 
+  @NotBlank(message = "Card description must be provided")
   @Size(max = 255, message = "Card description must be at most 255 characters")
   @Column(length = 255)
   @Schema(
       description = "Description textuelle pour la carte du monstre (max 255 caractères)",
       example = "Dragon légendaire maîtris ant les flammes infernales",
-      maxLength = 255)
+      maxLength = 255,
+      requiredMode = Schema.RequiredMode.REQUIRED)
   private String cardDescription;
 
+  @NotBlank(message = "Image URL must be provided")
   @Column(length = 1000)
   @Schema(
       description = "URL de l'image du monstre",
-      example = "https://cdn.gatch-game.imt/monsters/pyrolosse.png")
+      example = "https://cdn.gatch-game.imt/monsters/pyrolosse.png",
+      requiredMode = Schema.RequiredMode.REQUIRED)
   private String imageUrl;
 }

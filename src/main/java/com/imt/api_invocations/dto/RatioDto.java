@@ -8,6 +8,7 @@ import jakarta.persistence.Enumerated;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.DecimalMax;
 import jakarta.validation.constraints.DecimalMin;
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -25,6 +26,7 @@ import lombok.experimental.SuperBuilder;
 @Schema(description = "Configuration du ratio de scaling d'une compétence sur une statistique")
 public class RatioDto {
 
+  @NotNull(message = "Stat must be provided")
   @Valid
   @Enumerated(EnumType.STRING)
   @Schema(
@@ -34,7 +36,7 @@ public class RatioDto {
       requiredMode = Schema.RequiredMode.REQUIRED)
   private Stat stat;
 
-  @DecimalMin(value = "0.0", message = "Percent must be at least 0")
+  @DecimalMin(value = "0.0", inclusive = false, message = "Percent must be greater than 0")
   @DecimalMax(value = "100.0", message = "Percent must not exceed 100")
   @Schema(
       description = "Pourcentage de la statistique ajouté aux dégâts (0-100)",

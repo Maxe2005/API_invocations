@@ -4,8 +4,11 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.imt.api_invocations.client.ApiGenerateGatchaClient;
 import com.imt.api_invocations.client.dto.gatcha.SignedUrlRequest;
 import com.imt.api_invocations.config.ImportProperties;
+import com.imt.api_invocations.controller.dto.input.MonsterHttpDto;
 import com.imt.api_invocations.controller.mapper.DtoMapperMonster;
 import com.imt.api_invocations.persistence.entity.MonsterEntity;
+import jakarta.validation.ConstraintViolation;
+import jakarta.validation.Validator;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -13,6 +16,7 @@ import java.io.OutputStream;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 import java.util.zip.ZipOutputStream;
@@ -40,16 +44,19 @@ public class MonsterImportExportService {
 
   private final ApiGenerateGatchaClient generateGatchaClient;
   private final ImportProperties importProperties;
+  private final Validator validator;
 
   public MonsterImportExportService(
       MonsterService monsterService,
       DtoMapperMonster dtoMapper,
       ApiGenerateGatchaClient generateGatchaClient,
-      ImportProperties importProperties) {
+      ImportProperties importProperties,
+      Validator validator) {
     this.monsterService = monsterService;
     this.dtoMapper = dtoMapper;
     this.generateGatchaClient = generateGatchaClient;
     this.importProperties = importProperties;
+    this.validator = validator;
   }
 
   public void writeMonstersExport(OutputStream out, java.util.List<String> ids) throws IOException {
@@ -267,9 +274,16 @@ public class MonsterImportExportService {
     int created = 0;
     for (Map.Entry<String, byte[]> e : jsonMap.entrySet()) {
       try {
-        var dto =
-            objectMapper.readValue(
-                e.getValue(), com.imt.api_invocations.controller.dto.input.MonsterHttpDto.class);
+        var dto = objectMapper.readValue(e.getValue(), MonsterHttpDto.class);
+        Set<ConstraintViolation<MonsterHttpDto>> violations = validator.validate(dto);
+        if (!violations.isEmpty()) {
+          throw new IllegalArgumentException(
+              "Validation failed: "
+                  + violations.stream()
+                      .map(v -> v.getPropertyPath() + ": " + v.getMessage())
+                      .reduce((a, b) -> a + ", " + b)
+                      .orElse(""));
+        }
         monsterService.createMonster(dtoMapper.toMonsterEntity(dto));
         created++;
 

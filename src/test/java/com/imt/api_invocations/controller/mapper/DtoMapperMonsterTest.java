@@ -1,7 +1,6 @@
 package com.imt.api_invocations.controller.mapper;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import com.imt.api_invocations.controller.dto.input.MonsterHttpDto;
 import com.imt.api_invocations.controller.dto.input.MonsterHttpUpdateDto;
@@ -12,7 +11,11 @@ import com.imt.api_invocations.enums.Elementary;
 import com.imt.api_invocations.enums.Rank;
 import com.imt.api_invocations.persistence.entity.MonsterEntity;
 import com.imt.api_invocations.persistence.entity.SkillEntity;
+import jakarta.validation.ConstraintViolation;
+import jakarta.validation.Validation;
+import jakarta.validation.Validator;
 import java.util.List;
+import java.util.Set;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -20,6 +23,7 @@ import org.junit.jupiter.api.Test;
 class DtoMapperMonsterTest {
 
   private final DtoMapperMonster mapper = new DtoMapperMonster(new DtoMapperSkills());
+  private final Validator validator = Validation.buildDefaultValidatorFactory().getValidator();
 
   private MonsterHttpDto validHttpDto() {
     return MonsterHttpDto.builder()
@@ -48,8 +52,8 @@ class DtoMapperMonsterTest {
   }
 
   @Test
-  @DisplayName("toMonsterEntity lance IllegalArgumentException si champs manquants")
-  void should_ThrowIllegalArgumentException_When_RequiredFieldMissing() {
+  @DisplayName("MonsterHttpDto avec un champ requis manquant lève une violation Bean Validation")
+  void should_ReportConstraintViolation_When_RequiredFieldMissing() {
     MonsterHttpDto missingElement =
         MonsterHttpDto.builder()
             .name("Pyrolosse")
@@ -61,9 +65,10 @@ class DtoMapperMonsterTest {
             .imageUrl("url")
             .build();
 
-    assertThatThrownBy(() -> mapper.toMonsterEntity(missingElement))
-        .isInstanceOf(IllegalArgumentException.class)
-        .hasMessageContaining("All fields must be provided");
+    Set<ConstraintViolation<MonsterHttpDto>> violations = validator.validate(missingElement);
+
+    assertThat(violations)
+        .anyMatch(violation -> violation.getPropertyPath().toString().equals("element"));
   }
 
   @Test

@@ -17,14 +17,11 @@ import org.springframework.stereotype.Component;
 public class DtoMapperSkills {
 
   /**
-   * Convert SkillsHttpDto to SkillEntity Note: Numeric validations (@IntRange) are already applied
-   * by Jakarta validation framework
+   * Convert SkillsHttpDto to SkillEntity. Field-level validation (required fields, ratio/damage
+   * ranges) is enforced declaratively via Bean Validation annotations on {@link SkillBaseDto} /
+   * {@link SkillsHttpDto}, cascaded by {@code @Valid} at the HTTP boundary.
    */
   public SkillEntity toSkillEntity(SkillsHttpDto httpDto) {
-    if (httpDto.getMonsterId() == null) {
-      throw new IllegalArgumentException("All fields must be provided for creation");
-    }
-    validateSkillFields(httpDto);
     return SkillEntity.builder()
         .monsterId(httpDto.getMonsterId())
         .name(httpDto.getName())
@@ -39,7 +36,6 @@ public class DtoMapperSkills {
 
   /** Convert nested monster skill payload to SkillEntity before monsterId is known. */
   public SkillEntity toSkillEntityForMonsterCreation(SkillBaseDto skillDto) {
-    validateSkillFields(skillDto);
     return SkillEntity.builder()
         .name(skillDto.getName())
         .description(skillDto.getDescription())
@@ -117,22 +113,6 @@ public class DtoMapperSkills {
         .stat(partial.getStat() != null ? partial.getStat() : existing.getStat())
         .percent(partial.getPercent() > 0 ? partial.getPercent() : existing.getPercent())
         .build();
-  }
-
-  private void validateRatio(RatioDto ratio) {
-    if (ratio.getStat() == null || ratio.getPercent() <= 0) {
-      throw new IllegalArgumentException("All fields must be provided for creation");
-    }
-  }
-
-  private void validateSkillFields(SkillBaseDto skillDto) {
-    if (skillDto.getRatio() == null
-        || skillDto.getRank() == null
-        || isBlank(skillDto.getName())
-        || isBlank(skillDto.getDescription())) {
-      throw new IllegalArgumentException("All fields must be provided for creation");
-    }
-    validateRatio(skillDto.getRatio());
   }
 
   private String valueOrExisting(String existing, String candidate) {

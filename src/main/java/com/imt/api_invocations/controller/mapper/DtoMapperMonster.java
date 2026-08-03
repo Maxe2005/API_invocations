@@ -21,18 +21,14 @@ public class DtoMapperMonster {
 
   private final DtoMapperSkills dtoMapperSkills;
 
-  /** Convert MonsterHttpDto to MonsterEntity */
+  /**
+   * Convert MonsterHttpDto to MonsterEntity. Field-level validation (required fields, stat ranges)
+   * is enforced declaratively via Bean Validation annotations on {@link
+   * com.imt.api_invocations.dto.MonsterBaseDto}/{@link StatsDto} — cascaded automatically by
+   * {@code @Valid} at the HTTP boundary, and explicitly via {@link jakarta.validation.Validator}
+   * for callers that bypass Spring MVC (e.g. {@code MonsterImportExportService}).
+   */
   public MonsterEntity toMonsterEntity(MonsterHttpDto httpDto) {
-    if (httpDto.getElement() == null
-        || httpDto.getStats() == null
-        || httpDto.getRank() == null
-        || isBlank(httpDto.getName())
-        || isBlank(httpDto.getVisualDescription())
-        || isBlank(httpDto.getCardDescription())
-        || isBlank(httpDto.getImageUrl())) {
-      throw new IllegalArgumentException("All fields must be provided for creation");
-    }
-    validateStats(httpDto.getStats());
     return MonsterEntity.builder()
         .name(httpDto.getName())
         .element(httpDto.getElement())
@@ -133,12 +129,6 @@ public class DtoMapperMonster {
         .def(partial.getDef() > 0 ? partial.getDef() : existing.getDef())
         .vit(partial.getVit() > 0 ? partial.getVit() : existing.getVit())
         .build();
-  }
-
-  private void validateStats(StatsDto stats) {
-    if (stats.getHp() <= 0 || stats.getAtk() <= 0 || stats.getDef() <= 0 || stats.getVit() <= 0) {
-      throw new IllegalArgumentException("All fields must be provided for creation");
-    }
   }
 
   private String valueOrExisting(String existing, String candidate) {

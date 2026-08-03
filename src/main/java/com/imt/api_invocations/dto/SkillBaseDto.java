@@ -10,6 +10,8 @@ import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import jakarta.persistence.MappedSuperclass;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
@@ -26,16 +28,19 @@ import lombok.experimental.SuperBuilder;
 @Schema(description = "Informations de base d'une compétence")
 public class SkillBaseDto {
 
+  @NotBlank(message = "Name must be provided")
   @Schema(
       description = "Nom de la compétence",
       example = "Boule de feu",
       requiredMode = Schema.RequiredMode.REQUIRED)
   private String name;
 
+  @NotBlank(message = "Description must be provided")
   @Column(length = 1000)
   @Schema(
       description = "Description de l'effet de la compétence",
-      example = "Lance une boule de feu enflammée qui inflige des dégâts de feu à l'ennemi")
+      example = "Lance une boule de feu enflammée qui inflige des dégâts de feu à l'ennemi",
+      requiredMode = Schema.RequiredMode.REQUIRED)
   private String description;
 
   @IntRange(constraintType = ConstraintType.DAMAGE, fieldName = "Damage")
@@ -46,6 +51,7 @@ public class SkillBaseDto {
       requiredMode = Schema.RequiredMode.REQUIRED)
   private long damage;
 
+  @NotNull(message = "Ratio must be provided")
   @Valid
   @Embedded
   @Schema(
@@ -69,6 +75,7 @@ public class SkillBaseDto {
       requiredMode = Schema.RequiredMode.REQUIRED)
   private long lvlMax;
 
+  @NotNull(message = "Rank must be provided")
   @Valid
   @Enumerated(EnumType.STRING)
   @Schema(

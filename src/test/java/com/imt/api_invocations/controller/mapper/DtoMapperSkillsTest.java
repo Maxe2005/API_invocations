@@ -1,7 +1,6 @@
 package com.imt.api_invocations.controller.mapper;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import com.imt.api_invocations.controller.dto.input.SkillsHttpDto;
 import com.imt.api_invocations.controller.dto.input.SkillsHttpUpdateDto;
@@ -11,6 +10,10 @@ import com.imt.api_invocations.dto.RatioUpdateDto;
 import com.imt.api_invocations.enums.Rank;
 import com.imt.api_invocations.enums.Stat;
 import com.imt.api_invocations.persistence.entity.SkillEntity;
+import jakarta.validation.ConstraintViolation;
+import jakarta.validation.Validation;
+import jakarta.validation.Validator;
+import java.util.Set;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -18,6 +21,7 @@ import org.junit.jupiter.api.Test;
 class DtoMapperSkillsTest {
 
   private final DtoMapperSkills mapper = new DtoMapperSkills();
+  private final Validator validator = Validation.buildDefaultValidatorFactory().getValidator();
 
   private SkillsHttpDto validHttpDto() {
     return SkillsHttpDto.builder()
@@ -47,8 +51,8 @@ class DtoMapperSkillsTest {
   }
 
   @Test
-  @DisplayName("toSkillEntity lance IllegalArgumentException si le monsterId est manquant")
-  void should_ThrowIllegalArgumentException_When_MonsterIdMissing() {
+  @DisplayName("SkillsHttpDto sans monsterId lève une violation Bean Validation")
+  void should_ReportConstraintViolation_When_MonsterIdMissing() {
     SkillsHttpDto invalid =
         SkillsHttpDto.builder()
             .monsterId(null)
@@ -61,9 +65,10 @@ class DtoMapperSkillsTest {
             .rank(Rank.RARE)
             .build();
 
-    assertThatThrownBy(() -> mapper.toSkillEntity(invalid))
-        .isInstanceOf(IllegalArgumentException.class)
-        .hasMessageContaining("All fields must be provided");
+    Set<ConstraintViolation<SkillsHttpDto>> violations = validator.validate(invalid);
+
+    assertThat(violations)
+        .anyMatch(violation -> violation.getPropertyPath().toString().equals("monsterId"));
   }
 
   @Test
