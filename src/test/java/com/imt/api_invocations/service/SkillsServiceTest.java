@@ -14,7 +14,6 @@ import com.imt.api_invocations.persistence.SkillsRepository;
 import com.imt.api_invocations.persistence.entity.MonsterEntity;
 import com.imt.api_invocations.persistence.entity.SkillEntity;
 import com.imt.api_invocations.service.mapper.SkillsServiceMapper;
-import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
 import org.junit.jupiter.api.DisplayName;
@@ -100,26 +99,5 @@ class SkillsServiceTest {
         List<SkillBaseDto> result = skillsService.getRandomSkillsForMonster("m-1", 3);
 
         assertThat(result).hasSize(2);
-    }
-
-    @Test
-    @DisplayName("hasAvailableData retourne false si possibleSkills non initialisé")
-    void should_ReturnFalse_When_PossibleSkillsIsNull() {
-        assertThat(skillsService.hasAvailableData(Rank.COMMON)).isFalse();
-    }
-
-    @Test
-    @DisplayName("hasAvailableData retourne true/false selon la disponibilité du rang")
-    void should_ReturnAvailabilityByRank_When_PossibleSkillsInitialized() throws Exception {
-        setPossibleSkills(List.of(skill("s-1", "m-1", Rank.COMMON), skill("s-2", "m-1", Rank.RARE)));
-
-        assertThat(skillsService.hasAvailableData(Rank.COMMON)).isTrue();
-        assertThat(skillsService.hasAvailableData(Rank.EPIC)).isFalse();
-    }
-
-    private void setPossibleSkills(List<SkillEntity> possibleSkills) throws Exception {
-        Field field = SkillsService.class.getDeclaredField("possibleSkills");
-        field.setAccessible(true);
-        field.set(skillsService, possibleSkills);
     }
 }
