@@ -213,16 +213,14 @@ class RandomTest {
         }
 
         @Test
-        @DisplayName("Doit retourner null si aucun rank disponible")
-        void should_ReturnNull_When_NoRankAvailable() {
+        @DisplayName("Doit lever IllegalStateException si aucun rank disponible")
+        void should_ThrowIllegalStateException_When_NoRankAvailable() {
             // Arrange
             when(dataService.hasAvailableData(any(Rank.class))).thenReturn(false);
 
-            // Act
-            Rank result = Random.getRandomRankBasedOnAvailableData(dataService);
-
-            // Assert
-            assertThat(result).isNull();
+            // Act & Assert
+            assertThatThrownBy(() -> Random.getRandomRankBasedOnAvailableData(dataService))
+                    .isInstanceOf(IllegalStateException.class);
         }
 
         @Test
