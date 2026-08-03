@@ -33,25 +33,25 @@ public class PlayerApiClient {
   /**
    * Ajoute un monstre à un joueur dans l'API externe.
    *
-   * @param username Le nom d'utilisateur du joueur
+   * @param playerId L'identifiant du joueur
    * @param monsterId L'ID du monstre à ajouter
    * @return Le joueur mis à jour
    * @throws ExternalApiException En cas d'erreur de communication
    */
-  public PlayerResponse addMonsterToPlayer(String username, String monsterId) {
-    String url = apiProperties.getPlayerBaseUrl() + "/api/players/" + username + "/monsters";
+  public PlayerResponse addMonsterToPlayer(String playerId, String monsterId) {
+    String url = apiProperties.getPlayerBaseUrl() + "/api/players/" + playerId + "/monsters";
 
     PlayerAddMonsterRequest request = new PlayerAddMonsterRequest(monsterId);
 
     try {
       logger.info(
-          "Ajout du monstre {} au joueur {} via l'API Player: {}", monsterId, username, url);
+          "Ajout du monstre {} au joueur {} via l'API Player: {}", monsterId, playerId, url);
 
       ResponseEntity<PlayerResponse> response =
           restTemplate.postForEntity(url, request, PlayerResponse.class);
 
       if (response.getStatusCode() == HttpStatus.OK && response.getBody() != null) {
-        logger.info("Monstre {} ajouté avec succès au joueur {}", monsterId, username);
+        logger.info("Monstre {} ajouté avec succès au joueur {}", monsterId, playerId);
         return response.getBody();
       }
 
@@ -65,7 +65,7 @@ public class PlayerApiClient {
       String errorMsg =
           String.format(
               "Erreur HTTP %d lors de l'ajout du monstre %s au joueur %s",
-              e.getStatusCode().value(), monsterId, username);
+              e.getStatusCode().value(), monsterId, playerId);
       logger.error(errorMsg, e);
       throw new ExternalApiException(
           "Player API", e.getStatusCode().value(), e.getResponseBodyAsString(), errorMsg, e);
@@ -73,7 +73,7 @@ public class PlayerApiClient {
       String errorMsg =
           String.format(
               "Échec de connexion à l'API Player pour l'ajout du monstre %s au joueur %s: %s",
-              monsterId, username, e.getMessage());
+              monsterId, playerId, e.getMessage());
       logger.error(errorMsg, e);
       throw new ExternalApiException(
           "Player API", HttpStatus.BAD_GATEWAY.value(), null, errorMsg, e);
