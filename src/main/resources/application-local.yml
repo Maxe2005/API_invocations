@@ -16,4 +16,6 @@ app:
     enabled: false
 
 server:
-  port: 8081
+  # 8090 pour ne pas entrer en collision avec le port hôte 8081 d'api-authentification
+  # dans la stack Docker (cf. root docker-compose.yaml).
+  port: 8090
