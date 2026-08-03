@@ -27,7 +27,8 @@ public class MonsterRepository {
   }
 
   public MonsterEntity findByID(String id, boolean includeSkills) {
-    return includeSkills ? monsterJpaRepository.findByIdWithSkills(id).orElse(null)
+    return includeSkills
+        ? monsterJpaRepository.findByIdWithSkills(id).orElse(null)
         : monsterJpaRepository.findByIdNoSkills(id).orElse(null);
   }
 
@@ -40,7 +41,8 @@ public class MonsterRepository {
   }
 
   public List<MonsterEntity> findAll(boolean includeSkills) {
-    return includeSkills ? monsterJpaRepository.findAllWithSkills()
+    return includeSkills
+        ? monsterJpaRepository.findAllWithSkills()
         : monsterJpaRepository.findAllNoSkills();
   }
 
@@ -50,7 +52,8 @@ public class MonsterRepository {
 
   public MonsterEntity findByElement(String element) {
     return monsterJpaRepository.findAllNoSkills().stream()
-        .filter(monster -> monster.getElement().toString().equalsIgnoreCase(element)).findFirst()
+        .filter(monster -> monster.getElement().toString().equalsIgnoreCase(element))
+        .findFirst()
         .orElse(null);
   }
 

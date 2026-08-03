@@ -9,16 +9,16 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 public class SignedUrlResponse {
-    private String id;
+  private String id;
 
-    @JsonProperty("input_url")
-    private String inputUrl;
+  @JsonProperty("input_url")
+  private String inputUrl;
 
-    @JsonProperty("signed_url")
-    private String signedUrl;
+  @JsonProperty("signed_url")
+  private String signedUrl;
 
-    @JsonProperty("expires_in")
-    private Integer expiresIn;
+  @JsonProperty("expires_in")
+  private Integer expiresIn;
 
-    private String error;
+  private String error;
 }

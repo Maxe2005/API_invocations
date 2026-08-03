@@ -9,15 +9,18 @@ import org.springframework.web.client.RestTemplate;
 @Configuration
 public class RestClientConfig {
 
-    /**
-     * Configure RestTemplate avec un intercepteur qui ajoute automatiquement le bearer token à
-     * toutes les requêtes sortantes, et des timeouts de connexion/lecture pour ne jamais bloquer
-     * indéfiniment sur une API externe indisponible.
-     */
-    @Bean
-    public RestTemplate restTemplate(RestTemplateBuilder builder, ExternalApiProperties apiProperties) {
-        return builder.interceptors(new BearerTokenRestTemplateInterceptor())
-                .connectTimeout(Duration.ofMillis(apiProperties.getConnectionTimeout()))
-                .readTimeout(Duration.ofMillis(apiProperties.getReadTimeout())).build();
-    }
+  /**
+   * Configure RestTemplate avec un intercepteur qui ajoute automatiquement le bearer token à toutes
+   * les requêtes sortantes, et des timeouts de connexion/lecture pour ne jamais bloquer
+   * indéfiniment sur une API externe indisponible.
+   */
+  @Bean
+  public RestTemplate restTemplate(
+      RestTemplateBuilder builder, ExternalApiProperties apiProperties) {
+    return builder
+        .interceptors(new BearerTokenRestTemplateInterceptor())
+        .connectTimeout(Duration.ofMillis(apiProperties.getConnectionTimeout()))
+        .readTimeout(Duration.ofMillis(apiProperties.getReadTimeout()))
+        .build();
+  }
 }

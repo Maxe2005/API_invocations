@@ -6,9 +6,9 @@ import java.util.List;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface SkillJpaRepository extends JpaRepository<SkillEntity, String> {
-    List<SkillEntity> findByMonsterId(String monsterId);
+  List<SkillEntity> findByMonsterId(String monsterId);
 
-    Long deleteByMonsterId(String monsterId);
+  Long deleteByMonsterId(String monsterId);
 
-    List<SkillEntity> findByRank(Rank rank);
+  List<SkillEntity> findByRank(Rank rank);
 }

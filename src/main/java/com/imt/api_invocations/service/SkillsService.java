@@ -1,6 +1,7 @@
 package com.imt.api_invocations.service;
 
-import static com.imt.api_invocations.utils.Random.*;
+import static com.imt.api_invocations.utils.Random.getRandomRankBasedOnAvailableData;
+import static com.imt.api_invocations.utils.Random.random;
 
 import com.imt.api_invocations.dto.SkillBaseDto;
 import com.imt.api_invocations.enums.Rank;
@@ -19,7 +20,9 @@ public class SkillsService {
   private final MonsterService monsterService;
   private final SkillsServiceMapper skillsServiceMapper;
 
-  public SkillsService(SkillsRepository skillsRepository, MonsterService monsterService,
+  public SkillsService(
+      SkillsRepository skillsRepository,
+      MonsterService monsterService,
       SkillsServiceMapper skillsServiceMapper) {
     this.skillsRepository = skillsRepository;
     this.monsterService = monsterService;
@@ -65,10 +68,8 @@ public class SkillsService {
 
   public List<SkillBaseDto> getRandomSkillsForMonster(String monsterId, int numberOfSkills)
       throws IllegalStateException {
-    List<SkillEntity> possibleSkills =
-        new ArrayList<>(skillsRepository.findByMonsterId(monsterId));
-    DataServiceInterface availability =
-        rank -> !filterSkillsByRank(possibleSkills, rank).isEmpty();
+    List<SkillEntity> possibleSkills = new ArrayList<>(skillsRepository.findByMonsterId(monsterId));
+    DataServiceInterface availability = rank -> !filterSkillsByRank(possibleSkills, rank).isEmpty();
     int maxSkillsAvailable = possibleSkills.size();
     List<SkillEntity> selectedSkills = new ArrayList<>();
     for (int i = 0; i < numberOfSkills && i < maxSkillsAvailable; i++) {

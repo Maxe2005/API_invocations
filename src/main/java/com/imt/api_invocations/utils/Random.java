@@ -24,8 +24,7 @@ public class Random {
     }
 
     if (totalAvailableRate <= 0) {
-      throw new IllegalStateException(
-          "Aucune donnée disponible pour aucun rang (catalogue vide)");
+      throw new IllegalStateException("Aucune donnée disponible pour aucun rang (catalogue vide)");
     }
 
     // 2. Tirage entre 0 et totalAvailableRate

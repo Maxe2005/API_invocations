@@ -1,6 +1,7 @@
 package com.imt.api_invocations.service;
 
-import static com.imt.api_invocations.utils.Random.*;
+import static com.imt.api_invocations.utils.Random.getRealDropRateForRank;
+
 import com.imt.api_invocations.controller.dto.output.MonsterStatsResponseDto;
 import com.imt.api_invocations.controller.dto.output.MonsterStatsResponseDto.StatSummary;
 import com.imt.api_invocations.enums.Rank;
@@ -9,7 +10,6 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.List;
 import java.util.LongSummaryStatistics;
-import java.util.stream.Collectors;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -32,12 +32,9 @@ public class StatsService {
 
     // Extract stats into primitive lists
     List<Long> hps = monsters.stream().map(m -> m.getStats().getHp()).toList();
-    List<Long> vats =
-        monsters.stream().map(m -> m.getStats().getVit()).toList();
-    List<Long> defs =
-        monsters.stream().map(m -> m.getStats().getDef()).toList();
-    List<Long> atks =
-        monsters.stream().map(m -> m.getStats().getAtk()).toList();
+    List<Long> vats = monsters.stream().map(m -> m.getStats().getVit()).toList();
+    List<Long> defs = monsters.stream().map(m -> m.getStats().getDef()).toList();
+    List<Long> atks = monsters.stream().map(m -> m.getStats().getAtk()).toList();
 
     StatSummary hpSummary = summarize(hps);
     StatSummary vitSummary = summarize(vats);
@@ -60,8 +57,7 @@ public class StatsService {
   }
 
   private double roundHalfUp(double value, int places) {
-    if (places < 0)
-      throw new IllegalArgumentException();
+    if (places < 0) throw new IllegalArgumentException();
     BigDecimal bd = BigDecimal.valueOf(value);
     bd = bd.setScale(places, RoundingMode.HALF_UP);
     return bd.doubleValue();
@@ -81,8 +77,11 @@ public class StatsService {
     sb.append("Theoretical Drop Rates:\n");
     for (Rank rank : Rank.values()) {
       List<String> monsters = monsterService.getAllMonsterIdByRank(rank);
-      sb.append("\t").append(rank.name()).append(": ")
-          .append(String.format("%.2f", rank.getDropRate() * 100)).append("%, \n");
+      sb.append("\t")
+          .append(rank.name())
+          .append(": ")
+          .append(String.format("%.2f", rank.getDropRate() * 100))
+          .append("%, \n");
       sb.append("\t\t").append(monsters.size()).append(" monsters -> ");
       if (monsters.isEmpty()) {
         sb.append("0");
@@ -109,8 +108,11 @@ public class StatsService {
     for (Rank rank : Rank.values()) {
       List<String> monsters = monsterService.getAllMonsterIdByRank(rank);
       float realDropRate = getRealDropRateForRank(rank, monsterService);
-      sb.append("\t").append(rank.name()).append(": ")
-          .append(String.format("%.2f", realDropRate * 100)).append("%, \n");
+      sb.append("\t")
+          .append(rank.name())
+          .append(": ")
+          .append(String.format("%.2f", realDropRate * 100))
+          .append("%, \n");
       sb.append("\t\t").append(monsters.size()).append(" monsters -> ");
       if (monsters.isEmpty()) {
         sb.append("0");

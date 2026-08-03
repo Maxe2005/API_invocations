@@ -141,25 +141,43 @@ public class DatabaseSeeder implements CommandLineRunner {
 
   /** Convertit un MonsterSeedDto en MonsterEntity */
   private MonsterEntity convertToMonsterEntity(MonsterSeedDto seedDto) {
-    StatsDto stats = StatsDto.builder().hp(seedDto.getStats().getHp().longValue())
-        .atk(seedDto.getStats().getAtk().longValue()).def(seedDto.getStats().getDef().longValue())
-        .vit(seedDto.getStats().getVit().longValue()).build();
+    StatsDto stats =
+        StatsDto.builder()
+            .hp(seedDto.getStats().getHp().longValue())
+            .atk(seedDto.getStats().getAtk().longValue())
+            .def(seedDto.getStats().getDef().longValue())
+            .vit(seedDto.getStats().getVit().longValue())
+            .build();
 
-    return MonsterEntity.builder().name(seedDto.getNom())
-        .element(Elementary.valueOf(seedDto.getElement())).stats(stats)
-        .rank(Rank.valueOf(seedDto.getRang())).visualDescription(seedDto.getDescriptionVisuelle())
-        .cardDescription(seedDto.getDescriptionCarte()).imageUrl(seedDto.getImageUrl()).build();
+    return MonsterEntity.builder()
+        .name(seedDto.getNom())
+        .element(Elementary.valueOf(seedDto.getElement()))
+        .stats(stats)
+        .rank(Rank.valueOf(seedDto.getRang()))
+        .visualDescription(seedDto.getDescriptionVisuelle())
+        .cardDescription(seedDto.getDescriptionCarte())
+        .imageUrl(seedDto.getImageUrl())
+        .build();
   }
 
   /** Convertit un SkillSeedDto en SkillEntity */
   private SkillEntity convertToSkillEntity(String monsterId, SkillSeedDto seedDto) {
-    RatioDto ratio = RatioDto.builder().stat(Stat.valueOf(seedDto.getRatio().getStat()))
-        .percent(seedDto.getRatio().getPercent()).build();
+    RatioDto ratio =
+        RatioDto.builder()
+            .stat(Stat.valueOf(seedDto.getRatio().getStat()))
+            .percent(seedDto.getRatio().getPercent())
+            .build();
 
-    return SkillEntity.builder().monsterId(monsterId).name(seedDto.getName())
-        .description(seedDto.getDescription()).damage(seedDto.getDamage().longValue()).ratio(ratio)
-        .cooldown(seedDto.getCooldown().longValue()).lvlMax(seedDto.getLvlMax().longValue())
-        .rank(Rank.valueOf(seedDto.getRank())).build();
+    return SkillEntity.builder()
+        .monsterId(monsterId)
+        .name(seedDto.getName())
+        .description(seedDto.getDescription())
+        .damage(seedDto.getDamage().longValue())
+        .ratio(ratio)
+        .cooldown(seedDto.getCooldown().longValue())
+        .lvlMax(seedDto.getLvlMax().longValue())
+        .rank(Rank.valueOf(seedDto.getRank()))
+        .build();
   }
 
   private void logConstraintViolations(Throwable error) {
@@ -173,10 +191,15 @@ public class DatabaseSeeder implements CommandLineRunner {
 
     for (ConstraintViolation<?> violation : violationException.getConstraintViolations()) {
       String bean =
-          violation.getRootBeanClass() != null ? violation.getRootBeanClass().getSimpleName()
+          violation.getRootBeanClass() != null
+              ? violation.getRootBeanClass().getSimpleName()
               : "Unknown";
-      logger.error("- {}.{}: {} (invalid value: {})", bean, violation.getPropertyPath(),
-          violation.getMessage(), violation.getInvalidValue());
+      logger.error(
+          "- {}.{}: {} (invalid value: {})",
+          bean,
+          violation.getPropertyPath(),
+          violation.getMessage(),
+          violation.getInvalidValue());
     }
   }
 

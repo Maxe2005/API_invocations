@@ -63,6 +63,7 @@ public class InvocationBufferDto {
 
   @Column(length = 2000)
   private String failureReason;
+
   private int attemptCount;
   private LocalDateTime createdAt;
   private LocalDateTime lastAttemptAt;

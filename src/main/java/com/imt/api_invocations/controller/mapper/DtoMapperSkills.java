@@ -25,23 +25,36 @@ public class DtoMapperSkills {
       throw new IllegalArgumentException("All fields must be provided for creation");
     }
     validateSkillFields(httpDto);
-    return SkillEntity.builder().monsterId(httpDto.getMonsterId()).name(httpDto.getName())
-        .description(httpDto.getDescription()).damage(httpDto.getDamage()).ratio(httpDto.getRatio())
-        .cooldown(httpDto.getCooldown()).lvlMax(httpDto.getLvlMax()).rank(httpDto.getRank())
+    return SkillEntity.builder()
+        .monsterId(httpDto.getMonsterId())
+        .name(httpDto.getName())
+        .description(httpDto.getDescription())
+        .damage(httpDto.getDamage())
+        .ratio(httpDto.getRatio())
+        .cooldown(httpDto.getCooldown())
+        .lvlMax(httpDto.getLvlMax())
+        .rank(httpDto.getRank())
         .build();
   }
 
   /** Convert nested monster skill payload to SkillEntity before monsterId is known. */
   public SkillEntity toSkillEntityForMonsterCreation(SkillBaseDto skillDto) {
     validateSkillFields(skillDto);
-    return SkillEntity.builder().name(skillDto.getName()).description(skillDto.getDescription())
-        .damage(skillDto.getDamage()).ratio(skillDto.getRatio()).cooldown(skillDto.getCooldown())
-        .lvlMax(skillDto.getLvlMax()).rank(skillDto.getRank()).build();
+    return SkillEntity.builder()
+        .name(skillDto.getName())
+        .description(skillDto.getDescription())
+        .damage(skillDto.getDamage())
+        .ratio(skillDto.getRatio())
+        .cooldown(skillDto.getCooldown())
+        .lvlMax(skillDto.getLvlMax())
+        .rank(skillDto.getRank())
+        .build();
   }
 
   /** Merge partial SkillsHttpDto into existing SkillEntity */
   public SkillEntity updateSkillEntity(SkillEntity existing, SkillsHttpDto partial) {
-    return SkillEntity.builder().id(existing.getId())
+    return SkillEntity.builder()
+        .id(existing.getId())
         .monsterId(
             partial.getMonsterId() != null ? partial.getMonsterId() : existing.getMonsterId())
         .name(valueOrExisting(existing.getName(), partial.getName()))
@@ -50,7 +63,8 @@ public class DtoMapperSkills {
         .ratio(mergeRatio(existing.getRatio(), partial.getRatio()))
         .cooldown(mergePositive(existing.getCooldown(), partial.getCooldown()))
         .lvlMax(mergePositive(existing.getLvlMax(), partial.getLvlMax()))
-        .rank(partial.getRank() != null ? partial.getRank() : existing.getRank()).build();
+        .rank(partial.getRank() != null ? partial.getRank() : existing.getRank())
+        .build();
   }
 
   /**
@@ -59,7 +73,8 @@ public class DtoMapperSkills {
    * update ratio percent)\n
    */
   public SkillEntity updateSkillEntity(SkillEntity existing, SkillsHttpUpdateDto partial) {
-    return SkillEntity.builder().id(existing.getId())
+    return SkillEntity.builder()
+        .id(existing.getId())
         .monsterId(
             partial.getMonsterId() != null ? partial.getMonsterId() : existing.getMonsterId())
         .name(partial.getName() != null ? partial.getName() : existing.getName())
@@ -69,15 +84,22 @@ public class DtoMapperSkills {
         .ratio(mergeRatioWithUpdate(existing.getRatio(), partial.getRatio()))
         .cooldown(partial.getCooldown() != null ? partial.getCooldown() : existing.getCooldown())
         .lvlMax(partial.getLvlMax() != null ? partial.getLvlMax() : existing.getLvlMax())
-        .rank(partial.getRank() != null ? partial.getRank() : existing.getRank()).build();
+        .rank(partial.getRank() != null ? partial.getRank() : existing.getRank())
+        .build();
   }
 
   /** Convert SkillEntity to SkillsDto */
   public SkillsWithIdDto toSkillsDto(SkillEntity skillEntity) {
-    return SkillsWithIdDto.builder().id(skillEntity.getId()).name(skillEntity.getName())
-        .description(skillEntity.getDescription()).damage(skillEntity.getDamage())
-        .ratio(skillEntity.getRatio()).cooldown(skillEntity.getCooldown())
-        .lvlMax(skillEntity.getLvlMax()).rank(skillEntity.getRank()).build();
+    return SkillsWithIdDto.builder()
+        .id(skillEntity.getId())
+        .name(skillEntity.getName())
+        .description(skillEntity.getDescription())
+        .damage(skillEntity.getDamage())
+        .ratio(skillEntity.getRatio())
+        .cooldown(skillEntity.getCooldown())
+        .lvlMax(skillEntity.getLvlMax())
+        .rank(skillEntity.getRank())
+        .build();
   }
 
   private long mergePositive(long existing, long candidate) {
@@ -93,7 +115,8 @@ public class DtoMapperSkills {
     }
     return RatioDto.builder()
         .stat(partial.getStat() != null ? partial.getStat() : existing.getStat())
-        .percent(partial.getPercent() > 0 ? partial.getPercent() : existing.getPercent()).build();
+        .percent(partial.getPercent() > 0 ? partial.getPercent() : existing.getPercent())
+        .build();
   }
 
   private void validateRatio(RatioDto ratio) {
@@ -103,7 +126,9 @@ public class DtoMapperSkills {
   }
 
   private void validateSkillFields(SkillBaseDto skillDto) {
-    if (skillDto.getRatio() == null || skillDto.getRank() == null || isBlank(skillDto.getName())
+    if (skillDto.getRatio() == null
+        || skillDto.getRank() == null
+        || isBlank(skillDto.getName())
         || isBlank(skillDto.getDescription())) {
       throw new IllegalArgumentException("All fields must be provided for creation");
     }
@@ -128,8 +153,10 @@ public class DtoMapperSkills {
       return existing;
     }
     if (existing == null) {
-      return RatioDto.builder().stat(partial.getStat())
-          .percent(partial.getPercent() != null ? partial.getPercent() : 0).build();
+      return RatioDto.builder()
+          .stat(partial.getStat())
+          .percent(partial.getPercent() != null ? partial.getPercent() : 0)
+          .build();
     }
     return RatioDto.builder()
         .stat(partial.getStat() != null ? partial.getStat() : existing.getStat())

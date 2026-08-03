@@ -19,126 +19,183 @@ import org.junit.jupiter.api.Test;
 @DisplayName("DtoMapperMonster - Tests Unitaires")
 class DtoMapperMonsterTest {
 
-    private final DtoMapperMonster mapper = new DtoMapperMonster(new DtoMapperSkills());
+  private final DtoMapperMonster mapper = new DtoMapperMonster(new DtoMapperSkills());
 
-    private MonsterHttpDto validHttpDto() {
-        return MonsterHttpDto.builder().name("Pyrolosse").element(Elementary.FIRE)
-                .stats(StatsDto.builder().hp(100).atk(50).def(40).vit(30).build())
-                .rank(Rank.COMMON).visualDescription("Un dragon de feu")
-                .cardDescription("Dragon légendaire").imageUrl("http://img/pyrolosse.png").build();
-    }
+  private MonsterHttpDto validHttpDto() {
+    return MonsterHttpDto.builder()
+        .name("Pyrolosse")
+        .element(Elementary.FIRE)
+        .stats(StatsDto.builder().hp(100).atk(50).def(40).vit(30).build())
+        .rank(Rank.COMMON)
+        .visualDescription("Un dragon de feu")
+        .cardDescription("Dragon légendaire")
+        .imageUrl("http://img/pyrolosse.png")
+        .build();
+  }
 
-    @Test
-    @DisplayName("toMonsterEntity mappe correctement depuis MonsterHttpDto")
-    void should_MapToEntity_When_HttpDtoIsValid() {
-        MonsterEntity result = mapper.toMonsterEntity(validHttpDto());
+  @Test
+  @DisplayName("toMonsterEntity mappe correctement depuis MonsterHttpDto")
+  void should_MapToEntity_When_HttpDtoIsValid() {
+    MonsterEntity result = mapper.toMonsterEntity(validHttpDto());
 
-        assertThat(result.getName()).isEqualTo("Pyrolosse");
-        assertThat(result.getElement()).isEqualTo(Elementary.FIRE);
-        assertThat(result.getStats().getHp()).isEqualTo(100);
-        assertThat(result.getRank()).isEqualTo(Rank.COMMON);
-        assertThat(result.getVisualDescription()).isEqualTo("Un dragon de feu");
-        assertThat(result.getImageUrl()).isEqualTo("http://img/pyrolosse.png");
-        assertThat(result.getSkills()).isEmpty();
-    }
+    assertThat(result.getName()).isEqualTo("Pyrolosse");
+    assertThat(result.getElement()).isEqualTo(Elementary.FIRE);
+    assertThat(result.getStats().getHp()).isEqualTo(100);
+    assertThat(result.getRank()).isEqualTo(Rank.COMMON);
+    assertThat(result.getVisualDescription()).isEqualTo("Un dragon de feu");
+    assertThat(result.getImageUrl()).isEqualTo("http://img/pyrolosse.png");
+    assertThat(result.getSkills()).isEmpty();
+  }
 
-    @Test
-    @DisplayName("toMonsterEntity lance IllegalArgumentException si champs manquants")
-    void should_ThrowIllegalArgumentException_When_RequiredFieldMissing() {
-        MonsterHttpDto missingElement =
-                MonsterHttpDto.builder().name("Pyrolosse").element(null)
-                        .stats(StatsDto.builder().hp(100).atk(50).def(40).vit(30).build())
-                        .rank(Rank.COMMON).visualDescription("desc").cardDescription("card")
-                        .imageUrl("url").build();
+  @Test
+  @DisplayName("toMonsterEntity lance IllegalArgumentException si champs manquants")
+  void should_ThrowIllegalArgumentException_When_RequiredFieldMissing() {
+    MonsterHttpDto missingElement =
+        MonsterHttpDto.builder()
+            .name("Pyrolosse")
+            .element(null)
+            .stats(StatsDto.builder().hp(100).atk(50).def(40).vit(30).build())
+            .rank(Rank.COMMON)
+            .visualDescription("desc")
+            .cardDescription("card")
+            .imageUrl("url")
+            .build();
 
-        assertThatThrownBy(() -> mapper.toMonsterEntity(missingElement))
-                .isInstanceOf(IllegalArgumentException.class)
-                .hasMessageContaining("All fields must be provided");
-    }
+    assertThatThrownBy(() -> mapper.toMonsterEntity(missingElement))
+        .isInstanceOf(IllegalArgumentException.class)
+        .hasMessageContaining("All fields must be provided");
+  }
 
-    @Test
-    @DisplayName("updateMonsterEntity(HttpDto) fusionne partiel et existant, en gardant les stats non fournies")
-    void should_MergePartialHttpDtoIntoExisting_When_UpdateCalled() {
-        MonsterEntity existing = MonsterEntity.builder().id("m-1").name("Ancien")
-                .element(Elementary.WATER)
-                .stats(StatsDto.builder().hp(120).atk(60).def(50).vit(35).build())
-                .rank(Rank.RARE).visualDescription("old-visual").cardDescription("old-card")
-                .imageUrl("old-url").build();
-        MonsterHttpDto partial = MonsterHttpDto.builder()
-                .stats(StatsDto.builder().hp(999).atk(0).def(0).vit(44).build()).build();
+  @Test
+  @DisplayName(
+      "updateMonsterEntity(HttpDto) fusionne partiel et existant, en gardant les stats non fournies")
+  void should_MergePartialHttpDtoIntoExisting_When_UpdateCalled() {
+    MonsterEntity existing =
+        MonsterEntity.builder()
+            .id("m-1")
+            .name("Ancien")
+            .element(Elementary.WATER)
+            .stats(StatsDto.builder().hp(120).atk(60).def(50).vit(35).build())
+            .rank(Rank.RARE)
+            .visualDescription("old-visual")
+            .cardDescription("old-card")
+            .imageUrl("old-url")
+            .build();
+    MonsterHttpDto partial =
+        MonsterHttpDto.builder()
+            .stats(StatsDto.builder().hp(999).atk(0).def(0).vit(44).build())
+            .build();
 
-        MonsterEntity result = mapper.updateMonsterEntity(existing, partial);
+    MonsterEntity result = mapper.updateMonsterEntity(existing, partial);
 
-        assertThat(result.getId()).isEqualTo("m-1");
-        assertThat(result.getElement()).isEqualTo(Elementary.WATER);
-        assertThat(result.getStats().getHp()).isEqualTo(999);
-        assertThat(result.getStats().getAtk()).isEqualTo(60);
-        assertThat(result.getStats().getVit()).isEqualTo(44);
-        assertThat(result.getRank()).isEqualTo(Rank.RARE);
-    }
+    assertThat(result.getId()).isEqualTo("m-1");
+    assertThat(result.getElement()).isEqualTo(Elementary.WATER);
+    assertThat(result.getStats().getHp()).isEqualTo(999);
+    assertThat(result.getStats().getAtk()).isEqualTo(60);
+    assertThat(result.getStats().getVit()).isEqualTo(44);
+    assertThat(result.getRank()).isEqualTo(Rank.RARE);
+  }
 
-    @Test
-    @DisplayName("updateMonsterEntity(HttpUpdateDto) ne touche que les champs explicitement fournis")
-    void should_MergePartialUpdateDtoIntoExisting_When_UpdateCalled() {
-        MonsterEntity existing = MonsterEntity.builder().id("m-2").name("Ancien")
-                .element(Elementary.EARTH)
-                .stats(StatsDto.builder().hp(200).atk(90).def(70).vit(55).build())
-                .rank(Rank.EPIC).visualDescription("old-visual").cardDescription("old-card")
-                .imageUrl("old-url").build();
-        MonsterHttpUpdateDto partial = MonsterHttpUpdateDto.builder()
-                .stats(StatsUpdateDto.builder().hp(321L).build()).build();
+  @Test
+  @DisplayName("updateMonsterEntity(HttpUpdateDto) ne touche que les champs explicitement fournis")
+  void should_MergePartialUpdateDtoIntoExisting_When_UpdateCalled() {
+    MonsterEntity existing =
+        MonsterEntity.builder()
+            .id("m-2")
+            .name("Ancien")
+            .element(Elementary.EARTH)
+            .stats(StatsDto.builder().hp(200).atk(90).def(70).vit(55).build())
+            .rank(Rank.EPIC)
+            .visualDescription("old-visual")
+            .cardDescription("old-card")
+            .imageUrl("old-url")
+            .build();
+    MonsterHttpUpdateDto partial =
+        MonsterHttpUpdateDto.builder().stats(StatsUpdateDto.builder().hp(321L).build()).build();
 
-        MonsterEntity result = mapper.updateMonsterEntity(existing, partial);
+    MonsterEntity result = mapper.updateMonsterEntity(existing, partial);
 
-        assertThat(result.getId()).isEqualTo("m-2");
-        assertThat(result.getName()).isEqualTo("Ancien");
-        assertThat(result.getStats().getHp()).isEqualTo(321L);
-        assertThat(result.getStats().getAtk()).isEqualTo(90);
-        assertThat(result.getRank()).isEqualTo(Rank.EPIC);
-    }
+    assertThat(result.getId()).isEqualTo("m-2");
+    assertThat(result.getName()).isEqualTo("Ancien");
+    assertThat(result.getStats().getHp()).isEqualTo(321L);
+    assertThat(result.getStats().getAtk()).isEqualTo(90);
+    assertThat(result.getRank()).isEqualTo(Rank.EPIC);
+  }
 
-    @Test
-    @DisplayName("toGlobalMonsterWithIdDto mappe correctement vers le DTO de sortie")
-    void should_MapToOutputDto_When_MonsterEntityProvided() {
-        MonsterEntity entity = MonsterEntity.builder().id("m-42").name("Terrastone")
-                .element(Elementary.EARTH)
-                .stats(StatsDto.builder().hp(200).atk(90).def(70).vit(55).build())
-                .rank(Rank.EPIC).visualDescription("desc").cardDescription("card").imageUrl("url")
-                .build();
+  @Test
+  @DisplayName("toGlobalMonsterWithIdDto mappe correctement vers le DTO de sortie")
+  void should_MapToOutputDto_When_MonsterEntityProvided() {
+    MonsterEntity entity =
+        MonsterEntity.builder()
+            .id("m-42")
+            .name("Terrastone")
+            .element(Elementary.EARTH)
+            .stats(StatsDto.builder().hp(200).atk(90).def(70).vit(55).build())
+            .rank(Rank.EPIC)
+            .visualDescription("desc")
+            .cardDescription("card")
+            .imageUrl("url")
+            .build();
 
-        GlobalMonsterWithIdDto result = mapper.toGlobalMonsterWithIdDto(entity, List.of());
+    GlobalMonsterWithIdDto result = mapper.toGlobalMonsterWithIdDto(entity, List.of());
 
-        assertThat(result.getId()).isEqualTo("m-42");
-        assertThat(result.getElement()).isEqualTo(Elementary.EARTH);
-        assertThat(result.getStats().getHp()).isEqualTo(200);
-        assertThat(result.getSkills()).isEmpty();
-        assertThat(result.getRank()).isEqualTo(Rank.EPIC);
-    }
+    assertThat(result.getId()).isEqualTo("m-42");
+    assertThat(result.getElement()).isEqualTo(Elementary.EARTH);
+    assertThat(result.getStats().getHp()).isEqualTo(200);
+    assertThat(result.getSkills()).isEmpty();
+    assertThat(result.getRank()).isEqualTo(Rank.EPIC);
+  }
 
-    @Test
-    @DisplayName("toGlobalMonsterWithIdDto(entity, includeSkills=true) mappe les skills de l'entité")
-    void should_IncludeMappedSkills_When_IncludeSkillsIsTrue() {
-        SkillEntity skill = SkillEntity.builder().id("s-1").name("Griffe").damage(10).cooldown(1)
-                .lvlMax(5).rank(Rank.COMMON).build();
-        MonsterEntity entity = MonsterEntity.builder().id("m-1").name("Pyrolosse")
-                .element(Elementary.FIRE).rank(Rank.COMMON).skills(List.of(skill)).build();
+  @Test
+  @DisplayName("toGlobalMonsterWithIdDto(entity, includeSkills=true) mappe les skills de l'entité")
+  void should_IncludeMappedSkills_When_IncludeSkillsIsTrue() {
+    SkillEntity skill =
+        SkillEntity.builder()
+            .id("s-1")
+            .name("Griffe")
+            .damage(10)
+            .cooldown(1)
+            .lvlMax(5)
+            .rank(Rank.COMMON)
+            .build();
+    MonsterEntity entity =
+        MonsterEntity.builder()
+            .id("m-1")
+            .name("Pyrolosse")
+            .element(Elementary.FIRE)
+            .rank(Rank.COMMON)
+            .skills(List.of(skill))
+            .build();
 
-        GlobalMonsterWithIdDto result = mapper.toGlobalMonsterWithIdDto(entity, true);
+    GlobalMonsterWithIdDto result = mapper.toGlobalMonsterWithIdDto(entity, true);
 
-        assertThat(result.getSkills()).hasSize(1);
-        assertThat(result.getSkills().get(0).getId()).isEqualTo("s-1");
-    }
+    assertThat(result.getSkills()).hasSize(1);
+    assertThat(result.getSkills().get(0).getId()).isEqualTo("s-1");
+  }
 
-    @Test
-    @DisplayName("toGlobalMonsterWithIdDto(entity, includeSkills=false) ne mappe aucun skill")
-    void should_ExcludeSkills_When_IncludeSkillsIsFalse() {
-        SkillEntity skill = SkillEntity.builder().id("s-1").name("Griffe").damage(10).cooldown(1)
-                .lvlMax(5).rank(Rank.COMMON).build();
-        MonsterEntity entity = MonsterEntity.builder().id("m-1").name("Pyrolosse")
-                .element(Elementary.FIRE).rank(Rank.COMMON).skills(List.of(skill)).build();
+  @Test
+  @DisplayName("toGlobalMonsterWithIdDto(entity, includeSkills=false) ne mappe aucun skill")
+  void should_ExcludeSkills_When_IncludeSkillsIsFalse() {
+    SkillEntity skill =
+        SkillEntity.builder()
+            .id("s-1")
+            .name("Griffe")
+            .damage(10)
+            .cooldown(1)
+            .lvlMax(5)
+            .rank(Rank.COMMON)
+            .build();
+    MonsterEntity entity =
+        MonsterEntity.builder()
+            .id("m-1")
+            .name("Pyrolosse")
+            .element(Elementary.FIRE)
+            .rank(Rank.COMMON)
+            .skills(List.of(skill))
+            .build();
 
-        GlobalMonsterWithIdDto result = mapper.toGlobalMonsterWithIdDto(entity, false);
+    GlobalMonsterWithIdDto result = mapper.toGlobalMonsterWithIdDto(entity, false);
 
-        assertThat(result.getSkills()).isEmpty();
-    }
+    assertThat(result.getSkills()).isEmpty();
+  }
 }

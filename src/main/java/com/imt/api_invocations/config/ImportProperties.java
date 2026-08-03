@@ -6,9 +6,9 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;
 
 /**
- * Bounds applied when reading a monster ZIP archive ({@code POST
- * /api/invocation/monsters/import}), to defend against zip-bomb style archives (few compressed
- * bytes expanding to a huge amount of data) or archives with an excessive number of entries.
+ * Bounds applied when reading a monster ZIP archive ({@code POST /api/invocation/monsters/import}),
+ * to defend against zip-bomb style archives (few compressed bytes expanding to a huge amount of
+ * data) or archives with an excessive number of entries.
  */
 @Component
 @ConfigurationProperties(prefix = "app.import")

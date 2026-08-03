@@ -22,7 +22,8 @@ public class InvocationBufferRepository {
   }
 
   public List<InvocationBufferDto> findRecreatable() {
-    return invocationBufferJpaRepository.findByStatusIn(List.of(InvocationStatus.PENDING,
-        InvocationStatus.MONSTER_CREATED, InvocationStatus.FAILED));
+    return invocationBufferJpaRepository.findByStatusIn(
+        List.of(
+            InvocationStatus.PENDING, InvocationStatus.MONSTER_CREATED, InvocationStatus.FAILED));
   }
 }
