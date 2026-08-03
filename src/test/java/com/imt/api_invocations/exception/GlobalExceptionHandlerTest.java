@@ -36,8 +36,8 @@ class GlobalExceptionHandlerTest {
 
       assertThat(response.getStatusCode().value()).isEqualTo(500);
       assertThat(response.getBody()).isNotNull();
-      assertThat(response.getBody().getTheErrorsYOUMade()).hasSize(1);
-      assertThat(response.getBody().getTheErrorsYOUMade().get(0).statusCode()).isEqualTo(500);
+      assertThat(response.getBody().getErrors()).hasSize(1);
+      assertThat(response.getBody().getErrors().get(0).statusCode()).isEqualTo(500);
     }
 
     @Test
@@ -47,7 +47,7 @@ class GlobalExceptionHandlerTest {
 
       ResponseEntity<Errors> response = exceptionHandler.handleUnexpectedException(exception);
 
-      assertThat(response.getBody().getTheErrorsYOUMade().get(0).message())
+      assertThat(response.getBody().getErrors().get(0).message())
           .doesNotContain("Détail interne sensible");
     }
   }
@@ -69,9 +69,9 @@ class GlobalExceptionHandlerTest {
       // Assert
       assertThat(response.getStatusCode().value()).isEqualTo(502);
       assertThat(response.getBody()).isNotNull();
-      assertThat(response.getBody().getTheErrorsYOUMade()).hasSize(1);
+      assertThat(response.getBody().getErrors()).hasSize(1);
 
-      CustomError error = response.getBody().getTheErrorsYOUMade().get(0);
+      CustomError error = response.getBody().getErrors().get(0);
       assertThat(error.statusCode()).isEqualTo(502);
       assertThat(error.message()).contains("Erreur de communication avec API externe");
       assertThat(error.message()).contains(errorMessage);
@@ -89,7 +89,7 @@ class GlobalExceptionHandlerTest {
 
       // Assert
       assertThat(response.getBody()).isNotNull();
-      CustomError error = response.getBody().getTheErrorsYOUMade().get(0);
+      CustomError error = response.getBody().getErrors().get(0);
       assertThat(error.message()).contains(errorMessage);
     }
 
@@ -104,8 +104,8 @@ class GlobalExceptionHandlerTest {
 
       // Assert
       assertThat(response.getBody()).isNotNull();
-      assertThat(response.getBody().getTheErrorsYOUMade()).isNotNull();
-      assertThat(response.getBody().getTheErrorsYOUMade()).isNotEmpty();
+      assertThat(response.getBody().getErrors()).isNotNull();
+      assertThat(response.getBody().getErrors()).isNotEmpty();
     }
   }
 
@@ -126,9 +126,9 @@ class GlobalExceptionHandlerTest {
       // Assert
       assertThat(response.getStatusCode().value()).isEqualTo(400);
       assertThat(response.getBody()).isNotNull();
-      assertThat(response.getBody().getTheErrorsYOUMade()).hasSize(1);
+      assertThat(response.getBody().getErrors()).hasSize(1);
 
-      CustomError error = response.getBody().getTheErrorsYOUMade().get(0);
+      CustomError error = response.getBody().getErrors().get(0);
       assertThat(error.statusCode()).isEqualTo(400);
       assertThat(error.message()).isEqualTo(errorMessage);
     }
@@ -145,7 +145,7 @@ class GlobalExceptionHandlerTest {
       // Assert
       assertThat(response.getStatusCode().value()).isEqualTo(400);
       assertThat(response.getBody()).isNotNull();
-      CustomError error = response.getBody().getTheErrorsYOUMade().get(0);
+      CustomError error = response.getBody().getErrors().get(0);
       assertThat(error.message()).isNotNull();
     }
 
@@ -161,7 +161,7 @@ class GlobalExceptionHandlerTest {
       // Assert
       assertThat(response.getStatusCode().value()).isEqualTo(400);
       assertThat(response.getBody()).isNotNull();
-      assertThat(response.getBody().getTheErrorsYOUMade()).hasSize(1);
+      assertThat(response.getBody().getErrors()).hasSize(1);
     }
 
     @Test
@@ -175,8 +175,8 @@ class GlobalExceptionHandlerTest {
 
       // Assert
       assertThat(response.getBody()).isNotNull();
-      assertThat(response.getBody().getTheErrorsYOUMade()).isNotNull();
-      assertThat(response.getBody().getTheErrorsYOUMade()).isNotEmpty();
+      assertThat(response.getBody().getErrors()).isNotNull();
+      assertThat(response.getBody().getErrors()).isNotEmpty();
     }
   }
 
@@ -219,9 +219,9 @@ class GlobalExceptionHandlerTest {
 
       // Assert
       assertThat(response.getBody()).isNotNull();
-      assertThat(response.getBody().getTheErrorsYOUMade()).hasSize(1);
+      assertThat(response.getBody().getErrors()).hasSize(1);
 
-      CustomError error = response.getBody().getTheErrorsYOUMade().get(0);
+      CustomError error = response.getBody().getErrors().get(0);
       assertThat(error.statusCode()).isEqualTo(400);
       assertThat(error.message()).contains(validationMessage);
     }
@@ -239,7 +239,7 @@ class GlobalExceptionHandlerTest {
       // Assert
       assertThat(response.getStatusCode().value()).isEqualTo(400);
       assertThat(response.getBody()).isNotNull();
-      assertThat(response.getBody().getTheErrorsYOUMade()).isNotEmpty();
+      assertThat(response.getBody().getErrors()).isNotEmpty();
     }
 
     @Test
@@ -254,7 +254,7 @@ class GlobalExceptionHandlerTest {
 
       // Assert
       assertThat(response.getBody()).isNotNull();
-      CustomError error = response.getBody().getTheErrorsYOUMade().get(0);
+      CustomError error = response.getBody().getErrors().get(0);
       assertThat(error.statusCode()).isEqualTo(400);
     }
   }
@@ -290,13 +290,13 @@ class GlobalExceptionHandlerTest {
       assertThat(response2.getBody()).isNotNull();
       assertThat(response3.getBody()).isNotNull();
 
-      assertThat(response1.getBody().getTheErrorsYOUMade()).isNotNull();
-      assertThat(response2.getBody().getTheErrorsYOUMade()).isNotNull();
-      assertThat(response3.getBody().getTheErrorsYOUMade()).isNotNull();
+      assertThat(response1.getBody().getErrors()).isNotNull();
+      assertThat(response2.getBody().getErrors()).isNotNull();
+      assertThat(response3.getBody().getErrors()).isNotNull();
 
-      assertThat(response1.getBody().getTheErrorsYOUMade()).allMatch(e -> e.statusCode() > 0);
-      assertThat(response2.getBody().getTheErrorsYOUMade()).allMatch(e -> e.statusCode() > 0);
-      assertThat(response3.getBody().getTheErrorsYOUMade()).allMatch(e -> e.statusCode() > 0);
+      assertThat(response1.getBody().getErrors()).allMatch(e -> e.statusCode() > 0);
+      assertThat(response2.getBody().getErrors()).allMatch(e -> e.statusCode() > 0);
+      assertThat(response3.getBody().getErrors()).allMatch(e -> e.statusCode() > 0);
     }
 
     @Test
@@ -310,7 +310,7 @@ class GlobalExceptionHandlerTest {
 
       // Assert
       assertThat(response.getBody()).isNotNull();
-      CustomError error = response.getBody().getTheErrorsYOUMade().get(0);
+      CustomError error = response.getBody().getErrors().get(0);
 
       assertThat(error.statusCode()).isGreaterThan(0);
       assertThat(error.message()).isNotNull();
@@ -332,9 +332,9 @@ class GlobalExceptionHandlerTest {
 
       // Assert
       assertThat(response1.getStatusCode().value())
-          .isEqualTo(response1.getBody().getTheErrorsYOUMade().get(0).statusCode());
+          .isEqualTo(response1.getBody().getErrors().get(0).statusCode());
       assertThat(response2.getStatusCode().value())
-          .isEqualTo(response2.getBody().getTheErrorsYOUMade().get(0).statusCode());
+          .isEqualTo(response2.getBody().getErrors().get(0).statusCode());
     }
   }
 
@@ -354,8 +354,8 @@ class GlobalExceptionHandlerTest {
 
       // Assert
       assertThat(response.getBody()).isNotNull();
-      assertThat(response.getBody().getTheErrorsYOUMade()).hasSize(1);
-      CustomError error = response.getBody().getTheErrorsYOUMade().get(0);
+      assertThat(response.getBody().getErrors()).hasSize(1);
+      CustomError error = response.getBody().getErrors().get(0);
       assertThat(error.message()).contains(longMessage);
     }
 
@@ -371,7 +371,7 @@ class GlobalExceptionHandlerTest {
 
       // Assert
       assertThat(response.getBody()).isNotNull();
-      CustomError error = response.getBody().getTheErrorsYOUMade().get(0);
+      CustomError error = response.getBody().getErrors().get(0);
       assertThat(error.message()).isEqualTo(messageWithSpecialChars);
     }
 
@@ -390,10 +390,8 @@ class GlobalExceptionHandlerTest {
       // Assert
       assertThat(response1.getStatusCode().value()).isEqualTo(502);
       assertThat(response2.getStatusCode().value()).isEqualTo(400);
-      assertThat(response1.getBody().getTheErrorsYOUMade().get(0).message())
-          .contains("External API error");
-      assertThat(response2.getBody().getTheErrorsYOUMade().get(0).message())
-          .contains("Invalid argument");
+      assertThat(response1.getBody().getErrors().get(0).message()).contains("External API error");
+      assertThat(response2.getBody().getErrors().get(0).message()).contains("Invalid argument");
     }
   }
 }
