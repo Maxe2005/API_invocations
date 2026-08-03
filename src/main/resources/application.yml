@@ -21,9 +21,11 @@ spring:
     baseline-on-migrate: true
   
 app:
+  # Auth activée par défaut (profil docker/prod) ; le profil `local` la désactive
+  # explicitement pour le développement sans dépendre d'API_authentification.
   auth:
-    enabled: false
-  
+    enabled: true
+
   # Numeric constraints for game entities
   constraints:
     stats:
