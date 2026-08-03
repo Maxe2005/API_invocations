@@ -148,17 +148,35 @@ public class InvocationService {
       markFailed(bufferEntry, e.getMessage());
 
       if (createdMonsterId != null) {
-        logger.warn("Déclenchement de la compensation: suppression du monstre {}",
-            createdMonsterId);
-        try {
-          monstersApiClient.deleteMonster(createdMonsterId);
-        } catch (Exception compensationError) {
-          logger.error("Échec de la compensation pour le monstre {}", createdMonsterId,
-              compensationError);
-        }
+        compensate(bufferEntry, createdMonsterId, e.getMessage());
       }
 
       throw e;
+    }
+  }
+
+  /**
+   * Tente de supprimer le monstre orphelin créé avant l'échec, avec une deuxième tentative
+   * immédiate en cas d'échec de la première. Si les deux tentatives échouent, la buffer entry est
+   * marquée avec une raison explicite mentionnant le monstre orphelin, pour rester traçable même
+   * sans retry différé ni alerting dédié.
+   */
+  private void compensate(InvocationBufferDto bufferEntry, String createdMonsterId,
+      String originalFailureReason) {
+    logger.warn("Déclenchement de la compensation: suppression du monstre {}", createdMonsterId);
+
+    boolean deleted = monstersApiClient.deleteMonster(createdMonsterId);
+    if (!deleted) {
+      logger.warn("Nouvelle tentative de compensation pour le monstre {}", createdMonsterId);
+      deleted = monstersApiClient.deleteMonster(createdMonsterId);
+    }
+
+    if (!deleted) {
+      String reason = originalFailureReason + " | COMPENSATION ÉCHOUÉE après 2 tentatives : "
+          + "le monstre " + createdMonsterId + " est probablement orphelin (créé mais non "
+          + "supprimé et jamais ajouté au joueur) et nécessite une intervention manuelle.";
+      logger.error(reason);
+      markFailed(bufferEntry, reason);
     }
   }
 

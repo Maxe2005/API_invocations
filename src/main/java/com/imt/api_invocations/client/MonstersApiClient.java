@@ -83,14 +83,17 @@ public class MonstersApiClient {
    * Supprime un monstre (utilisé pour la compensation en cas d'échec).
    *
    * @param monsterId L'ID du monstre à supprimer
+   * @return {@code true} si la suppression a réussi, {@code false} sinon (jamais d'exception
+   *     propagée, pour ne pas masquer l'erreur d'origine ayant déclenché la compensation)
    */
-  public void deleteMonster(String monsterId) {
+  public boolean deleteMonster(String monsterId) {
     String url = apiProperties.getMonstersBaseUrl() + DELETE_MONSTER_ENDPOINT + monsterId;
 
     try {
       logger.warn("Compensation: suppression du monstre ID: {}", monsterId);
       restTemplate.delete(url);
       logger.info("Monstre supprimé avec succès: {}", monsterId);
+      return true;
     } catch (RestClientException e) {
       // Logged but not rethrown to avoid masking the original error during
       // compensation
@@ -99,6 +102,7 @@ public class MonstersApiClient {
           monsterId,
           e.getMessage(),
           e);
+      return false;
     }
   }
 }

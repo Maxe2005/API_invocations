@@ -1,7 +1,6 @@
 package com.imt.api_invocations.client;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatCode;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -109,37 +108,39 @@ class MonstersApiClientTest {
             String monsterId = "monster-to-delete";
             doNothing().when(restTemplate).delete(anyString());
 
-            monstersApiClient.deleteMonster(monsterId);
+            boolean result = monstersApiClient.deleteMonster(monsterId);
 
+            assertThat(result).isTrue();
             verify(restTemplate, times(1))
                     .delete("http://api_monsters:8080/api/monsters/delete/" + monsterId);
         }
 
         @Test
-        @DisplayName("Ne doit pas lancer d'exception sur échec de suppression")
+        @DisplayName("Ne doit pas lancer d'exception sur échec de suppression, et retourne false")
         void should_NotThrowException_When_DeleteFails() {
             when(apiProperties.getMonstersBaseUrl()).thenReturn("http://api_monsters:8080");
             String monsterId = "monster-to-delete";
             doThrow(new RestClientException("Delete failed")).when(restTemplate)
                     .delete(anyString());
 
-            assertThatCode(() -> monstersApiClient.deleteMonster(monsterId))
-                    .doesNotThrowAnyException();
+            boolean result = monstersApiClient.deleteMonster(monsterId);
 
+            assertThat(result).isFalse();
             verify(restTemplate, times(1))
                     .delete("http://api_monsters:8080/api/monsters/delete/" + monsterId);
         }
 
         @Test
-        @DisplayName("Doit logger un warning mais continuer sur échec de compensation")
+        @DisplayName("Doit logger un warning mais continuer sur échec de compensation, et retourne false")
         void should_LogWarningButContinue_When_CompensationFails() {
             when(apiProperties.getMonstersBaseUrl()).thenReturn("http://api_monsters:8080");
             String monsterId = "monster-to-delete";
             doThrow(new HttpServerErrorException(HttpStatus.INTERNAL_SERVER_ERROR))
                     .when(restTemplate).delete(anyString());
 
-            assertThatCode(() -> monstersApiClient.deleteMonster(monsterId))
-                    .doesNotThrowAnyException();
+            boolean result = monstersApiClient.deleteMonster(monsterId);
+
+            assertThat(result).isFalse();
         }
     }
 }

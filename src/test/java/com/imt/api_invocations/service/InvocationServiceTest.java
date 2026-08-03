@@ -185,11 +185,44 @@ class InvocationServiceTest {
                     .thenReturn(new CreateMonsterResponse(createdMonsterId, "created"));
             when(playerApiClient.addMonsterToPlayer(eq(playerId), eq(createdMonsterId)))
                     .thenThrow(new ExternalApiException("Player API error"));
+            when(monstersApiClient.deleteMonster(createdMonsterId)).thenReturn(true);
 
             assertThatThrownBy(() -> invocationService.globalInvoke(playerId))
                     .isInstanceOf(ExternalApiException.class);
 
             verify(monstersApiClient, times(1)).deleteMonster(createdMonsterId);
+        }
+
+        @Test
+        @DisplayName("Retente une fois la compensation si la première suppression échoue, "
+                + "et trace l'échec si les deux échouent")
+        void should_RetryCompensationOnce_When_FirstDeleteFails() {
+            String playerId = "player-789";
+            String createdMonsterId = "created-monster-999";
+
+            when(invocationProperties.getMaxAttempts()).thenReturn(5);
+            when(monsterService.hasAvailableData(any(Rank.class))).thenReturn(true);
+            when(monsterService.getRandomMonsterByRank(any(Rank.class))).thenReturn(testMonster);
+            when(skillsService.getRandomSkillsForMonster(anyString(), eq(3)))
+                    .thenReturn(testSkills);
+            when(invocationServiceMapper.toGlobalMonsterDto(testMonster, testSkills))
+                    .thenReturn(testGlobalMonster);
+            when(invocationServiceMapper.toCreateMonsterRequest(eq(testGlobalMonster),
+                    eq(playerId))).thenReturn(
+                            com.imt.api_invocations.client.dto.monsters.CreateMonsterRequest
+                                    .builder().playerId(playerId).build());
+            when(invocationBufferRepository.save(any(InvocationBufferDto.class)))
+                    .thenAnswer(invocation -> invocation.getArgument(0));
+            when(monstersApiClient.createMonster(any()))
+                    .thenReturn(new CreateMonsterResponse(createdMonsterId, "created"));
+            when(playerApiClient.addMonsterToPlayer(eq(playerId), eq(createdMonsterId)))
+                    .thenThrow(new ExternalApiException("Player API error"));
+            when(monstersApiClient.deleteMonster(createdMonsterId)).thenReturn(false, true);
+
+            assertThatThrownBy(() -> invocationService.globalInvoke(playerId))
+                    .isInstanceOf(ExternalApiException.class);
+
+            verify(monstersApiClient, times(2)).deleteMonster(createdMonsterId);
         }
 
         @Test
