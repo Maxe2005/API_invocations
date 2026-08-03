@@ -17,13 +17,12 @@ import org.springframework.web.client.RestTemplate;
 @Slf4j
 @Component
 @RequiredArgsConstructor
-public class AuthApiClient implements ExternalApiClient {
+public class AuthApiClient {
 
   private final RestTemplate restTemplate;
   private final ExternalApiProperties externalApiProperties;
 
-  @Override
-  public String getApiName() {
+  private String getApiName() {
     return "Auth API";
   }
 

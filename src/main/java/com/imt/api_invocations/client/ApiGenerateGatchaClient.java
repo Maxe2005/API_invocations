@@ -14,7 +14,7 @@ import org.springframework.web.client.RestClientResponseException;
 import org.springframework.web.client.RestTemplate;
 
 @Component
-public class ApiGenerateGatchaClient implements ExternalApiClient {
+public class ApiGenerateGatchaClient {
 
   private static final Logger logger = LoggerFactory.getLogger(ApiGenerateGatchaClient.class);
 
@@ -26,8 +26,7 @@ public class ApiGenerateGatchaClient implements ExternalApiClient {
     this.apiProperties = apiProperties;
   }
 
-  @Override
-  public String getApiName() {
+  private String getApiName() {
     return "GenerateGatcha API";
   }
 
