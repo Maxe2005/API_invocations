@@ -48,6 +48,10 @@ app:
       min-percent: 0.0
       max-percent: 100.0
 
+  # Plafond de tentatives (appel initial + replays) avant abandon définitif d'une invocation bufferisée
+  invocation:
+    max-attempts: 5
+
 # Configuration des APIs externes
 external:
   api:

@@ -4,5 +4,6 @@ public enum InvocationStatus {
   PENDING,
   MONSTER_CREATED,
   COMPLETED,
-  FAILED
+  FAILED,
+  ABANDONED
 }

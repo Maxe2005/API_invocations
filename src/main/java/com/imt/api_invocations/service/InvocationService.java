@@ -9,6 +9,7 @@ import com.imt.api_invocations.client.dto.monsters.CreateMonsterResponse;
 import com.imt.api_invocations.client.dto.monsters.CreateMonsterSkillRequest;
 import com.imt.api_invocations.client.dto.player.PlayerAddMonsterRequest;
 import com.imt.api_invocations.client.dto.player.PlayerResponse;
+import com.imt.api_invocations.config.InvocationProperties;
 import com.imt.api_invocations.controller.dto.output.GlobalMonsterWithIdDto;
 import com.imt.api_invocations.dto.GlobalMonsterDto;
 import com.imt.api_invocations.dto.SkillBaseDto;
@@ -38,17 +39,20 @@ public class InvocationService {
   private final PlayerApiClient playerApiClient;
   private final InvocationBufferRepository invocationBufferRepository;
   private final InvocationServiceMapper invocationServiceMapper;
+  private final InvocationProperties invocationProperties;
 
   public InvocationService(MonsterService monsterService, SkillsService skillsService,
       MonstersApiClient monstersApiClient, PlayerApiClient playerApiClient,
       InvocationBufferRepository invocationBufferRepository,
-      InvocationServiceMapper invocationServiceMapper) {
+      InvocationServiceMapper invocationServiceMapper,
+      InvocationProperties invocationProperties) {
     this.monsterService = monsterService;
     this.skillsService = skillsService;
     this.monstersApiClient = monstersApiClient;
     this.playerApiClient = playerApiClient;
     this.invocationBufferRepository = invocationBufferRepository;
     this.invocationServiceMapper = invocationServiceMapper;
+    this.invocationProperties = invocationProperties;
   }
 
   public GlobalMonsterDto invoke() {
@@ -94,8 +98,22 @@ public class InvocationService {
     invocationBufferRepository.save(entry);
   }
 
+  private void markAbandoned(InvocationBufferDto entry, String reason) {
+    entry.setStatus(InvocationStatus.ABANDONED);
+    entry.setFailureReason(reason);
+    invocationBufferRepository.save(entry);
+  }
+
   private String executeInvocation(GlobalMonsterDto monster, String playerId,
       InvocationBufferDto bufferEntry) {
+    if (bufferEntry.getAttemptCount() >= invocationProperties.getMaxAttempts()) {
+      String reason = "Nombre maximal de tentatives (" + invocationProperties.getMaxAttempts()
+          + ") atteint pour l'invocation " + bufferEntry.getId() + ", abandon définitif";
+      logger.warn(reason);
+      markAbandoned(bufferEntry, reason);
+      throw new ExternalApiException(reason);
+    }
+
     if (bufferEntry.getMonsterRequest() == null) {
       bufferEntry.setMonsterRequest(
           invocationServiceMapper.toCreateMonsterRequest(monster, playerId));

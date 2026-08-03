@@ -15,6 +15,7 @@ import com.imt.api_invocations.client.MonstersApiClient;
 import com.imt.api_invocations.client.PlayerApiClient;
 import com.imt.api_invocations.client.dto.monsters.CreateMonsterResponse;
 import com.imt.api_invocations.client.dto.player.PlayerResponse;
+import com.imt.api_invocations.config.InvocationProperties;
 import com.imt.api_invocations.controller.dto.output.GlobalMonsterWithIdDto;
 import com.imt.api_invocations.dto.GlobalMonsterDto;
 import com.imt.api_invocations.dto.RatioDto;
@@ -61,6 +62,9 @@ class InvocationServiceTest {
 
     @Mock
     private InvocationServiceMapper invocationServiceMapper;
+
+    @Mock
+    private InvocationProperties invocationProperties;
 
     @InjectMocks
     private InvocationService invocationService;
@@ -127,6 +131,7 @@ class InvocationServiceTest {
             String playerId = "player-123";
             String createdMonsterId = "created-monster-456";
 
+            when(invocationProperties.getMaxAttempts()).thenReturn(5);
             when(monsterService.hasAvailableData(any(Rank.class))).thenReturn(true);
             when(monsterService.getRandomMonsterByRank(any(Rank.class))).thenReturn(testMonster);
             when(skillsService.getRandomSkillsForMonster(anyString(), eq(3)))
@@ -163,6 +168,7 @@ class InvocationServiceTest {
             String playerId = "player-456";
             String createdMonsterId = "created-monster-789";
 
+            when(invocationProperties.getMaxAttempts()).thenReturn(5);
             when(monsterService.hasAvailableData(any(Rank.class))).thenReturn(true);
             when(monsterService.getRandomMonsterByRank(any(Rank.class))).thenReturn(testMonster);
             when(skillsService.getRandomSkillsForMonster(anyString(), eq(3)))
@@ -191,6 +197,7 @@ class InvocationServiceTest {
         void should_NotCompensate_When_MonsterCreationFails() {
             String playerId = "player-123";
 
+            when(invocationProperties.getMaxAttempts()).thenReturn(5);
             when(monsterService.hasAvailableData(any(Rank.class))).thenReturn(true);
             when(monsterService.getRandomMonsterByRank(any(Rank.class))).thenReturn(testMonster);
             when(skillsService.getRandomSkillsForMonster(anyString(), eq(3)))
@@ -232,6 +239,26 @@ class InvocationServiceTest {
             assertThat(report.getSucceeded()).isEqualTo(0);
             assertThat(report.getFailedInvocationIds()).containsExactly("buf-1");
             verify(invocationBufferRepository).save(entryWithoutSnapshot);
+        }
+
+        @Test
+        @DisplayName("Abandonne définitivement une entrée qui a déjà atteint le plafond de tentatives")
+        void should_AbandonEntry_When_MaxAttemptsAlreadyReached() {
+            when(invocationProperties.getMaxAttempts()).thenReturn(3);
+            InvocationBufferDto exhaustedEntry = InvocationBufferDto.builder().id("buf-2")
+                    .playerId("player-2").monsterSnapshot(testGlobalMonster).attemptCount(3).build();
+            when(invocationBufferRepository.findRecreatable())
+                    .thenReturn(List.of(exhaustedEntry));
+            when(invocationBufferRepository.save(any(InvocationBufferDto.class)))
+                    .thenAnswer(invocation -> invocation.getArgument(0));
+
+            InvocationReplayReport report = invocationService.replayBufferedInvocations();
+
+            assertThat(report.getSucceeded()).isEqualTo(0);
+            assertThat(report.getFailedInvocationIds()).containsExactly("buf-2");
+            assertThat(exhaustedEntry.getStatus())
+                    .isEqualTo(com.imt.api_invocations.enums.InvocationStatus.ABANDONED);
+            verify(monstersApiClient, never()).createMonster(any());
         }
     }
 }
