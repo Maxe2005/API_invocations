@@ -19,7 +19,13 @@ spring:
   flyway:
     enabled: true
     baseline-on-migrate: true
-  
+  servlet:
+    multipart:
+      # Borne la taille de l'archive ZIP acceptée par /api/invocation/monsters/import,
+      # en complément des limites décompressées (app.import.*) contre les zip bombs.
+      max-file-size: 50MB
+      max-request-size: 55MB
+
 app:
   # Auth activée par défaut (profil docker/prod) ; le profil `local` la désactive
   # explicitement pour le développement sans dépendre d'API_authentification.

@@ -1,6 +1,7 @@
 package com.imt.api_invocations.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.imt.api_invocations.config.ImportProperties;
 import com.imt.api_invocations.controller.mapper.DtoMapperMonster;
 import com.imt.api_invocations.persistence.entity.MonsterEntity;
 import java.io.ByteArrayOutputStream;
@@ -36,12 +37,14 @@ public class MonsterImportExportService {
     private static final int SIGNED_URL_BATCH = 40;
 
     private final ApiGenerateGatchaClient generateGatchaClient;
+    private final ImportProperties importProperties;
 
     public MonsterImportExportService(MonsterService monsterService, DtoMapperMonster dtoMapper,
-            ApiGenerateGatchaClient generateGatchaClient) {
+            ApiGenerateGatchaClient generateGatchaClient, ImportProperties importProperties) {
         this.monsterService = monsterService;
         this.dtoMapper = dtoMapper;
         this.generateGatchaClient = generateGatchaClient;
+        this.importProperties = importProperties;
     }
 
     public void writeMonstersExport(OutputStream out, java.util.List<String> ids)
@@ -194,6 +197,9 @@ public class MonsterImportExportService {
         Map<String, byte[]> jsonMap = new HashMap<>();
         Map<String, byte[]> imageMap = new HashMap<>();
 
+        int entryCount = 0;
+        long totalUncompressedBytes = 0;
+
         try (ZipInputStream zis = new ZipInputStream(is)) {
             ZipEntry entry;
             while ((entry = zis.getNextEntry()) != null) {
@@ -201,15 +207,36 @@ public class MonsterImportExportService {
                     zis.closeEntry();
                     continue;
                 }
+
+                entryCount++;
+                if (entryCount > importProperties.getMaxEntries()) {
+                    throw new IllegalArgumentException(
+                            "Archive rejetée : nombre d'entrées supérieur à la limite autorisée ("
+                                    + importProperties.getMaxEntries() + ")");
+                }
+
                 String name = entry.getName();
                 int idx = name.indexOf('/');
                 String folder = idx > 0 ? name.substring(0, idx) : "root";
                 String filename = idx > 0 ? name.substring(idx + 1) : name;
 
                 ByteArrayOutputStream baos = new ByteArrayOutputStream();
-                byte[] buffer = new byte[4096];
+                byte[] buffer = new byte[8192];
                 int len;
+                long entryBytes = 0;
                 while ((len = zis.read(buffer)) != -1) {
+                    entryBytes += len;
+                    if (entryBytes > importProperties.getMaxEntryUncompressedBytes()) {
+                        throw new IllegalArgumentException("Archive rejetée : l'entrée '" + name
+                                + "' dépasse la taille décompressée maximale autorisée par fichier ("
+                                + importProperties.getMaxEntryUncompressedBytes() + " octets)");
+                    }
+                    totalUncompressedBytes += len;
+                    if (totalUncompressedBytes > importProperties.getMaxTotalUncompressedBytes()) {
+                        throw new IllegalArgumentException(
+                                "Archive rejetée : taille décompressée cumulée supérieure à la limite autorisée ("
+                                        + importProperties.getMaxTotalUncompressedBytes() + " octets)");
+                    }
                     baos.write(buffer, 0, len);
                 }
                 byte[] data = baos.toByteArray();
