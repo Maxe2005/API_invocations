@@ -24,6 +24,35 @@ class GlobalExceptionHandlerTest {
     }
 
     @Nested
+    @DisplayName("Tests de handleUnexpectedException()")
+    class HandleUnexpectedExceptionTests {
+
+        @Test
+        @DisplayName("Doit retourner HTTP 500 pour une exception non gérée explicitement")
+        void should_Return500_When_UnhandledExceptionThrown() {
+            IllegalStateException exception = new IllegalStateException("Catalogue vide");
+
+            ResponseEntity<Errors> response = exceptionHandler.handleUnexpectedException(exception);
+
+            assertThat(response.getStatusCode().value()).isEqualTo(500);
+            assertThat(response.getBody()).isNotNull();
+            assertThat(response.getBody().getTheErrorsYOUMade()).hasSize(1);
+            assertThat(response.getBody().getTheErrorsYOUMade().get(0).statusCode()).isEqualTo(500);
+        }
+
+        @Test
+        @DisplayName("Ne doit pas exposer le message brut de l'exception au client")
+        void should_NotLeakRawExceptionMessage_When_UnhandledExceptionThrown() {
+            RuntimeException exception = new RuntimeException("Détail interne sensible");
+
+            ResponseEntity<Errors> response = exceptionHandler.handleUnexpectedException(exception);
+
+            assertThat(response.getBody().getTheErrorsYOUMade().get(0).message())
+                    .doesNotContain("Détail interne sensible");
+        }
+    }
+
+    @Nested
     @DisplayName("Tests de handleExternalApiException()")
     class HandleExternalApiExceptionTests {
 
