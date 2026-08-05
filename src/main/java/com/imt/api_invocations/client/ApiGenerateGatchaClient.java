@@ -4,6 +4,8 @@ import com.imt.api_invocations.client.dto.gatcha.SignedUrlRequest;
 import com.imt.api_invocations.client.dto.gatcha.SignedUrlResponse;
 import com.imt.api_invocations.config.ExternalApiProperties;
 import com.imt.api_invocations.exception.ExternalApiException;
+import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
+import io.github.resilience4j.retry.annotation.Retry;
 import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -30,6 +32,9 @@ public class ApiGenerateGatchaClient {
     return "GenerateGatcha API";
   }
 
+  // Lecture idempotente : retry + circuit breaker peuvent s'appliquer sans risque de doublon.
+  @Retry(name = "generateGatchaApi")
+  @CircuitBreaker(name = "generateGatchaApi")
   public List<SignedUrlResponse> getSignedUrls(List<SignedUrlRequest> requests) {
     String base = apiProperties.getGenerateGatchaBaseUrl();
     String url = base + "/api/v1/monsters/images/signed-urls";

@@ -4,6 +4,7 @@ import com.imt.api_invocations.client.dto.player.PlayerAddMonsterRequest;
 import com.imt.api_invocations.client.dto.player.PlayerResponse;
 import com.imt.api_invocations.config.ExternalApiProperties;
 import com.imt.api_invocations.exception.ExternalApiException;
+import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
@@ -38,6 +39,9 @@ public class PlayerApiClient {
    * @return Le joueur mis à jour
    * @throws ExternalApiException En cas d'erreur de communication
    */
+  // Pas de @Retry ici : ajouter deux fois le même monstre au joueur si l'appel précédent a en
+  // réalité réussi (réponse perdue) dupliquerait l'inventaire. Voir TODO.md pour l'idempotence.
+  @CircuitBreaker(name = "playerApi")
   public PlayerResponse addMonsterToPlayer(String playerId, String monsterId) {
     String url = apiProperties.getPlayerBaseUrl() + "/api/players/" + playerId + "/monsters";
 
