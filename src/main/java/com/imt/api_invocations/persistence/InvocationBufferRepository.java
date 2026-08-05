@@ -26,4 +26,8 @@ public class InvocationBufferRepository {
         List.of(
             InvocationStatus.PENDING, InvocationStatus.MONSTER_CREATED, InvocationStatus.FAILED));
   }
+
+  public InvocationBufferDto findByIdempotencyKey(String idempotencyKey) {
+    return invocationBufferJpaRepository.findByIdempotencyKey(idempotencyKey).orElse(null);
+  }
 }

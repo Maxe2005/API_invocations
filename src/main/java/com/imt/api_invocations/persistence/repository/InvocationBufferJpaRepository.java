@@ -4,9 +4,12 @@ import com.imt.api_invocations.enums.InvocationStatus;
 import com.imt.api_invocations.persistence.dto.InvocationBufferDto;
 import java.util.Collection;
 import java.util.List;
+import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface InvocationBufferJpaRepository extends JpaRepository<InvocationBufferDto, String> {
 
   List<InvocationBufferDto> findByStatusIn(Collection<InvocationStatus> statuses);
+
+  Optional<InvocationBufferDto> findByIdempotencyKey(String idempotencyKey);
 }

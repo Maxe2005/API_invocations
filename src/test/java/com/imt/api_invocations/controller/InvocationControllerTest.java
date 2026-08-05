@@ -1,6 +1,9 @@
 package com.imt.api_invocations.controller;
 
 import static org.hamcrest.Matchers.is;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.ArgumentMatchers.isNull;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -63,7 +66,7 @@ class InvocationControllerTest {
   @Test
   @DisplayName("POST /global-invoque/{playerId} renvoie 200 avec le monstre créé")
   void should_Return200_When_GlobalInvokeSucceeds() throws Exception {
-    when(invocationService.globalInvoke("player-1"))
+    when(invocationService.globalInvoke(eq("player-1"), isNull()))
         .thenReturn(
             GlobalMonsterWithIdDto.builder()
                 .id("m-1")
@@ -81,7 +84,7 @@ class InvocationControllerTest {
   @Test
   @DisplayName("POST /global-invoque/{playerId} renvoie 502 si l'API externe échoue")
   void should_Return502_When_ExternalApiFails() throws Exception {
-    when(invocationService.globalInvoke("player-1"))
+    when(invocationService.globalInvoke(eq("player-1"), isNull()))
         .thenThrow(new ExternalApiException("Monsters API", 502, null, "boom"));
 
     mockMvc
@@ -90,12 +93,30 @@ class InvocationControllerTest {
   }
 
   @Test
+  @DisplayName("POST /global-invoque/{playerId} transmet le header Idempotency-Key au service")
+  void should_ForwardIdempotencyKey_When_HeaderProvided() throws Exception {
+    when(invocationService.globalInvoke(eq("player-1"), eq("key-123")))
+        .thenReturn(
+            GlobalMonsterWithIdDto.builder()
+                .id("m-1")
+                .name("Pyrolosse")
+                .rank(Rank.COMMON)
+                .skills(List.of())
+                .build());
+
+    mockMvc
+        .perform(
+            post("/api/invocation/global-invoque/player-1").header("Idempotency-Key", "key-123"))
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$.id", is("m-1")));
+  }
+
+  @Test
   @DisplayName("POST /recreate renvoie 200 avec le rapport de rejeu")
   void should_Return200_When_RecreatingBufferedInvocations() throws Exception {
     when(invocationService.replayBufferedInvocations())
         .thenReturn(new InvocationReplayReport(3, 2, 1, List.of("buf-1")));
-    when(dtoMapperInvocation.toInvocationReplayResponse(org.mockito.ArgumentMatchers.any()))
-        .thenCallRealMethod();
+    when(dtoMapperInvocation.toInvocationReplayResponse(any())).thenCallRealMethod();
 
     mockMvc
         .perform(post("/api/invocation/recreate"))

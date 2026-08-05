@@ -65,10 +65,14 @@ public class InvocationService {
   }
 
   private InvocationBufferDto createBufferEntry(
-      String playerId, GlobalMonsterDto monster, CreateMonsterRequest monsterRequest) {
+      String playerId,
+      GlobalMonsterDto monster,
+      CreateMonsterRequest monsterRequest,
+      String idempotencyKey) {
     InvocationBufferDto bufferEntry =
         InvocationBufferDto.builder()
             .playerId(playerId)
+            .idempotencyKey(idempotencyKey)
             .monsterSnapshot(monster)
             .monsterRequest(monsterRequest)
             .status(InvocationStatus.PENDING)
@@ -205,16 +209,67 @@ public class InvocationService {
    * @throws ExternalApiException En cas d'erreur de communication avec les APIs externes
    */
   public GlobalMonsterWithIdDto globalInvoke(String playerId) {
+    return globalInvoke(playerId, null);
+  }
+
+  /**
+   * Variante idempotente de {@link #globalInvoke(String)} : si {@code idempotencyKey} est fourni et
+   * correspond à une invocation déjà bufferisée, celle-ci est réutilisée (résultat déjà disponible
+   * si {@code COMPLETED}, rejeu de l'entrée existante sinon) au lieu de tirer un nouveau monstre —
+   * pour dédupliquer les retries client (ex. timeout réseau côté client alors que le serveur a en
+   * réalité traité la requête).
+   *
+   * @param playerId L'ID du joueur qui reçoit le monstre
+   * @param idempotencyKey Clé d'idempotence optionnelle (header {@code Idempotency-Key})
+   * @return Le monstre invoqué
+   * @throws ExternalApiException En cas d'erreur de communication avec les APIs externes
+   */
+  public GlobalMonsterWithIdDto globalInvoke(String playerId, String idempotencyKey) {
     logger.info("Début de l'invocation globale pour le joueur: {}", playerId);
+
+    if (idempotencyKey != null && !idempotencyKey.isBlank()) {
+      InvocationBufferDto existing =
+          invocationBufferRepository.findByIdempotencyKey(idempotencyKey);
+      if (existing != null) {
+        logger.info(
+            "Clé d'idempotence {} déjà connue (invocation {}, statut {}) : réutilisation au lieu "
+                + "d'un nouveau tirage",
+            idempotencyKey,
+            existing.getId(),
+            existing.getStatus());
+        return resumeFromExistingEntry(existing, playerId);
+      }
+    }
 
     GlobalMonsterDto monster = invoke();
     CreateMonsterRequest monsterRequest =
         invocationServiceMapper.toCreateMonsterRequest(monster, playerId);
 
-    InvocationBufferDto bufferEntry = createBufferEntry(playerId, monster, monsterRequest);
+    InvocationBufferDto bufferEntry =
+        createBufferEntry(playerId, monster, monsterRequest, idempotencyKey);
 
     String createdMonsterId = executeInvocation(monster, playerId, bufferEntry);
     return invocationServiceMapper.toGlobalMonsterWithIdDto(monster, createdMonsterId);
+  }
+
+  private GlobalMonsterWithIdDto resumeFromExistingEntry(
+      InvocationBufferDto existing, String playerId) {
+    if (existing.getStatus() == InvocationStatus.COMPLETED) {
+      String monsterId =
+          existing.getMonsterResponse() != null
+              ? existing.getMonsterResponse().getMonsterId()
+              : null;
+      return invocationServiceMapper.toGlobalMonsterWithIdDto(
+          existing.getMonsterSnapshot(), monsterId);
+    }
+
+    GlobalMonsterDto snapshot = existing.getMonsterSnapshot();
+    if (snapshot == null) {
+      throw new ExternalApiException(
+          "Aucun instantané disponible pour rejouer l'invocation idempotente " + existing.getId());
+    }
+    String createdMonsterId = executeInvocation(snapshot, playerId, existing);
+    return invocationServiceMapper.toGlobalMonsterWithIdDto(snapshot, createdMonsterId);
   }
 
   public InvocationReplayReport replayBufferedInvocations() {

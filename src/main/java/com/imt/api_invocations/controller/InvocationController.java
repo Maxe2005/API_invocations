@@ -18,6 +18,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -63,7 +64,11 @@ public class InvocationController {
       summary = "Invoquer un monstre pour un joueur",
       description =
           "Effectue une invocation aléatoire pour un joueur spécifique. Le monstre est sauvegardé en base de données "
-              + "et associé au joueur. Retourne le monstre avec son ID et toutes ses compétences.")
+              + "et associé au joueur. Retourne le monstre avec son ID et toutes ses compétences. "
+              + "Un header Idempotency-Key optionnel permet de dédupliquer les retries client : "
+              + "un appel réutilisant une clé déjà connue réutilise l'invocation bufferisée "
+              + "correspondante (résultat déjà disponible, ou rejeu de la même entrée) au lieu de "
+              + "tirer un nouveau monstre.")
   @ApiResponses(
       value = {
         @ApiResponse(
@@ -87,8 +92,13 @@ public class InvocationController {
               required = true,
               example = "player123")
           @PathVariable
-          String playerId) {
-    GlobalMonsterWithIdDto result = invocationService.globalInvoke(playerId);
+          String playerId,
+      @Parameter(
+              description = "Clé d'idempotence optionnelle pour dédupliquer les retries client",
+              example = "6f1c9e2a-6b7a-4c9a-9b7a-2f6c9e2a6b7a")
+          @RequestHeader(value = "Idempotency-Key", required = false)
+          String idempotencyKey) {
+    GlobalMonsterWithIdDto result = invocationService.globalInvoke(playerId, idempotencyKey);
     return ResponseEntity.ok(result);
   }
 

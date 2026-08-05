@@ -247,6 +247,130 @@ class InvocationServiceTest {
     }
 
     @Test
+    @DisplayName(
+        "Réutilise le résultat existant sans nouvel appel externe si la clé d'idempotence "
+            + "correspond à une invocation déjà COMPLETED")
+    void should_ReturnExistingResult_When_IdempotencyKeyMatchesCompletedEntry() {
+      String playerId = "player-idem-1";
+      String idempotencyKey = "key-completed";
+      CreateMonsterResponse existingResponse =
+          new CreateMonsterResponse("created-monster-existing", "created");
+      InvocationBufferDto existingEntry =
+          InvocationBufferDto.builder()
+              .id("buf-existing")
+              .playerId(playerId)
+              .idempotencyKey(idempotencyKey)
+              .monsterSnapshot(testGlobalMonster)
+              .monsterResponse(existingResponse)
+              .status(com.imt.api_invocations.enums.InvocationStatus.COMPLETED)
+              .build();
+      when(invocationBufferRepository.findByIdempotencyKey(idempotencyKey))
+          .thenReturn(existingEntry);
+      when(invocationServiceMapper.toGlobalMonsterWithIdDto(
+              testGlobalMonster, "created-monster-existing"))
+          .thenReturn(
+              GlobalMonsterWithIdDto.builder()
+                  .id("created-monster-existing")
+                  .name("Pyrolosse")
+                  .skills(List.of())
+                  .build());
+
+      GlobalMonsterWithIdDto result = invocationService.globalInvoke(playerId, idempotencyKey);
+
+      assertThat(result.getId()).isEqualTo("created-monster-existing");
+      verify(monsterService, never()).getRandomMonsterByRank(any(Rank.class));
+      verify(monstersApiClient, never()).createMonster(any());
+      verify(playerApiClient, never()).addMonsterToPlayer(anyString(), anyString());
+    }
+
+    @Test
+    @DisplayName(
+        "Rejoue l'entrée existante (sans nouveau tirage) si la clé d'idempotence correspond à "
+            + "une invocation pas encore COMPLETED")
+    void should_ResumeExistingEntry_When_IdempotencyKeyMatchesIncompleteEntry() {
+      String playerId = "player-idem-2";
+      String idempotencyKey = "key-pending";
+      String createdMonsterId = "created-monster-resumed";
+      InvocationBufferDto existingEntry =
+          InvocationBufferDto.builder()
+              .id("buf-pending")
+              .playerId(playerId)
+              .idempotencyKey(idempotencyKey)
+              .monsterSnapshot(testGlobalMonster)
+              .monsterRequest(
+                  com.imt.api_invocations.client.dto.monsters.CreateMonsterRequest.builder()
+                      .playerId(playerId)
+                      .build())
+              .status(com.imt.api_invocations.enums.InvocationStatus.PENDING)
+              .attemptCount(0)
+              .build();
+      when(invocationProperties.getMaxAttempts()).thenReturn(5);
+      when(invocationBufferRepository.findByIdempotencyKey(idempotencyKey))
+          .thenReturn(existingEntry);
+      when(invocationBufferRepository.save(any(InvocationBufferDto.class)))
+          .thenAnswer(invocation -> invocation.getArgument(0));
+      when(monstersApiClient.createMonster(any()))
+          .thenReturn(new CreateMonsterResponse(createdMonsterId, "created"));
+      when(playerApiClient.addMonsterToPlayer(eq(playerId), eq(createdMonsterId)))
+          .thenReturn(new PlayerResponse());
+      when(invocationServiceMapper.toGlobalMonsterWithIdDto(testGlobalMonster, createdMonsterId))
+          .thenReturn(
+              GlobalMonsterWithIdDto.builder()
+                  .id(createdMonsterId)
+                  .name("Pyrolosse")
+                  .skills(List.of())
+                  .build());
+
+      GlobalMonsterWithIdDto result = invocationService.globalInvoke(playerId, idempotencyKey);
+
+      assertThat(result.getId()).isEqualTo(createdMonsterId);
+      verify(monsterService, never()).getRandomMonsterByRank(any(Rank.class));
+      verify(monstersApiClient, times(1)).createMonster(any());
+    }
+
+    @Test
+    @DisplayName("Crée une nouvelle entrée bufferisée portant la clé quand celle-ci est inconnue")
+    void should_CreateNewBufferEntryWithKey_When_IdempotencyKeyIsUnknown() {
+      String playerId = "player-idem-3";
+      String idempotencyKey = "key-new";
+      String createdMonsterId = "created-monster-new";
+
+      when(invocationBufferRepository.findByIdempotencyKey(idempotencyKey)).thenReturn(null);
+      when(invocationProperties.getMaxAttempts()).thenReturn(5);
+      when(monsterService.hasAvailableData(any(Rank.class))).thenReturn(true);
+      when(monsterService.getRandomMonsterByRank(any(Rank.class))).thenReturn(testMonster);
+      when(skillsService.getRandomSkillsForMonster(anyString(), eq(3))).thenReturn(testSkills);
+      when(invocationServiceMapper.toGlobalMonsterDto(testMonster, testSkills))
+          .thenReturn(testGlobalMonster);
+      when(invocationServiceMapper.toCreateMonsterRequest(eq(testGlobalMonster), eq(playerId)))
+          .thenReturn(
+              com.imt.api_invocations.client.dto.monsters.CreateMonsterRequest.builder()
+                  .playerId(playerId)
+                  .build());
+      org.mockito.ArgumentCaptor<InvocationBufferDto> bufferCaptor =
+          org.mockito.ArgumentCaptor.forClass(InvocationBufferDto.class);
+      when(invocationBufferRepository.save(bufferCaptor.capture()))
+          .thenAnswer(invocation -> invocation.getArgument(0));
+      when(monstersApiClient.createMonster(any()))
+          .thenReturn(new CreateMonsterResponse(createdMonsterId, "created"));
+      when(playerApiClient.addMonsterToPlayer(eq(playerId), eq(createdMonsterId)))
+          .thenReturn(new PlayerResponse());
+      when(invocationServiceMapper.toGlobalMonsterWithIdDto(
+              eq(testGlobalMonster), eq(createdMonsterId)))
+          .thenReturn(
+              GlobalMonsterWithIdDto.builder()
+                  .id(createdMonsterId)
+                  .name("Pyrolosse")
+                  .skills(List.of())
+                  .build());
+
+      invocationService.globalInvoke(playerId, idempotencyKey);
+
+      assertThat(bufferCaptor.getAllValues())
+          .anyMatch(entry -> idempotencyKey.equals(entry.getIdempotencyKey()));
+    }
+
+    @Test
     @DisplayName("Ne doit pas compenser si la création du monstre échoue avant tout succès")
     void should_NotCompensate_When_MonsterCreationFails() {
       String playerId = "player-123";
