@@ -4,8 +4,10 @@ import com.imt.api_invocations.controller.dto.input.MonsterHttpDto;
 import com.imt.api_invocations.controller.dto.input.MonsterHttpUpdateDto;
 import com.imt.api_invocations.controller.dto.output.CreatedMonsterResponceDto;
 import com.imt.api_invocations.controller.dto.output.GlobalMonsterWithIdDto;
+import com.imt.api_invocations.controller.dto.output.PagedMonstersResponse;
 import com.imt.api_invocations.controller.mapper.DtoMapperMonster;
 import com.imt.api_invocations.exception.ResourceNotFoundException;
+import com.imt.api_invocations.persistence.entity.MonsterEntity;
 import com.imt.api_invocations.service.MonsterService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -15,11 +17,16 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Min;
 import java.util.List;
 import java.util.Map;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -33,6 +40,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/api/invocation/monsters")
 @RequiredArgsConstructor
+@Validated
 @Tag(name = "Monsters", description = "API de gestion des monstres invocables")
 public class MonsterController {
 
@@ -129,6 +137,54 @@ public class MonsterController {
             .map(monster -> dtoMapper.toGlobalMonsterWithIdDto(monster, includeSkills))
             .toList();
     return ResponseEntity.ok(monsterDtos);
+  }
+
+  @Operation(
+      summary = "Obtenir les monstres, paginés",
+      description =
+          "Variante paginée de /all pour les gros catalogues : renvoie une page de monstres avec "
+              + "les métadonnées de pagination (numéro de page, taille, total). N'affecte pas le "
+              + "comportement de /all, qui reste non paginé.")
+  @ApiResponses(
+      value = {
+        @ApiResponse(
+            responseCode = "200",
+            description = "Page de monstres récupérée avec succès",
+            content =
+                @Content(
+                    mediaType = "application/json",
+                    schema = @Schema(implementation = PagedMonstersResponse.class))),
+        @ApiResponse(responseCode = "401", description = "Non authentifié", content = @Content)
+      })
+  @GetMapping("/all/page")
+  public ResponseEntity<PagedMonstersResponse> getAllMonstersPaged(
+      @Parameter(description = "Inclure les relations (ex: skills)", example = "skills")
+          @RequestParam(required = false)
+          String include,
+      @Parameter(description = "Numéro de page (indexé à partir de 0)", example = "0")
+          @RequestParam(defaultValue = "0")
+          @Min(0)
+          int page,
+      @Parameter(description = "Taille de page", example = "20")
+          @RequestParam(defaultValue = "20")
+          @Min(1)
+          @Max(200)
+          int size) {
+    boolean includeSkills = include != null && include.contains("skills");
+    Page<MonsterEntity> monsterPage =
+        monsterService.getAllMonstersPaged(includeSkills, PageRequest.of(page, size));
+
+    List<GlobalMonsterWithIdDto> content =
+        monsterPage.getContent().stream()
+            .map(monster -> dtoMapper.toGlobalMonsterWithIdDto(monster, includeSkills))
+            .toList();
+    return ResponseEntity.ok(
+        new PagedMonstersResponse(
+            content,
+            monsterPage.getNumber(),
+            monsterPage.getSize(),
+            monsterPage.getTotalElements(),
+            monsterPage.getTotalPages()));
   }
 
   @Operation(

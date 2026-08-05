@@ -149,6 +149,34 @@ class MonsterControllerTest {
   }
 
   @Test
+  @DisplayName("GET /all/page renvoie 200 avec les métadonnées de pagination")
+  void should_Return200_When_GettingPagedMonsters() throws Exception {
+    var pageable = org.springframework.data.domain.PageRequest.of(1, 5);
+    var page =
+        new org.springframework.data.domain.PageImpl<>(List.of(sampleEntity()), pageable, 12);
+    when(monsterService.getAllMonstersPaged(anyBoolean(), any())).thenReturn(page);
+    when(dtoMapper.toGlobalMonsterWithIdDto(any(MonsterEntity.class), anyBoolean()))
+        .thenReturn(sampleDto());
+
+    mockMvc
+        .perform(get("/api/invocation/monsters/all/page").param("page", "1").param("size", "5"))
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$.content[0].id", is("m-1")))
+        .andExpect(jsonPath("$.page", is(1)))
+        .andExpect(jsonPath("$.size", is(5)))
+        .andExpect(jsonPath("$.totalElements", is(12)))
+        .andExpect(jsonPath("$.totalPages", is(3)));
+  }
+
+  @Test
+  @DisplayName("GET /all/page renvoie 400 si size dépasse la limite autorisée")
+  void should_Return400_When_PagedSizeExceedsLimit() throws Exception {
+    mockMvc
+        .perform(get("/api/invocation/monsters/all/page").param("size", "500"))
+        .andExpect(status().isBadRequest());
+  }
+
+  @Test
   @DisplayName("PUT /{id} renvoie 404 quand le monstre n'existe pas")
   void should_Return404_When_UpdatingUnknownMonster() throws Exception {
     when(monsterService.getMonsterById("missing")).thenReturn(null);

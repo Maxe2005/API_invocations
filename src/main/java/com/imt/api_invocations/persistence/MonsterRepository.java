@@ -5,6 +5,8 @@ import com.imt.api_invocations.persistence.entity.MonsterEntity;
 import com.imt.api_invocations.persistence.repository.MonsterJpaRepository;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -44,6 +46,12 @@ public class MonsterRepository {
     return includeSkills
         ? monsterJpaRepository.findAllWithSkills()
         : monsterJpaRepository.findAllNoSkills();
+  }
+
+  public Page<MonsterEntity> findAllPaged(boolean includeSkills, Pageable pageable) {
+    return includeSkills
+        ? monsterJpaRepository.findAllWithSkillsPaged(pageable)
+        : monsterJpaRepository.findAllNoSkillsPaged(pageable);
   }
 
   public List<String> findAllMonsterIdByRank(Rank rank) {

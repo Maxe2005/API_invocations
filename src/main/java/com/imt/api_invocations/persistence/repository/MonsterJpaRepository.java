@@ -4,6 +4,8 @@ import com.imt.api_invocations.enums.Rank;
 import com.imt.api_invocations.persistence.entity.MonsterEntity;
 import java.util.List;
 import java.util.Optional;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -19,6 +21,13 @@ public interface MonsterJpaRepository extends JpaRepository<MonsterEntity, Strin
   @EntityGraph(attributePaths = "skills")
   @Query("select m from MonsterEntity m")
   List<MonsterEntity> findAllWithSkills();
+
+  @Query("select m from MonsterEntity m")
+  Page<MonsterEntity> findAllNoSkillsPaged(Pageable pageable);
+
+  @EntityGraph(attributePaths = "skills")
+  @Query("select m from MonsterEntity m")
+  Page<MonsterEntity> findAllWithSkillsPaged(Pageable pageable);
 
   @Query("select m from MonsterEntity m where m.id = :id")
   Optional<MonsterEntity> findByIdNoSkills(@Param("id") String id);

@@ -174,6 +174,21 @@ class MonsterServiceTest {
   }
 
   @Test
+  @DisplayName("getAllMonstersPaged délègue la page et le flag includeSkills au repository")
+  void should_DelegatePageAndIncludeSkills_When_GettingAllMonstersPaged() {
+    var pageable = org.springframework.data.domain.PageRequest.of(1, 10);
+    var page =
+        new org.springframework.data.domain.PageImpl<>(List.of(sampleMonster()), pageable, 25);
+    when(monsterRepository.findAllPaged(true, pageable)).thenReturn(page);
+
+    var result = monsterService.getAllMonstersPaged(true, pageable);
+
+    assertThat(result.getTotalElements()).isEqualTo(25);
+    assertThat(result.getContent()).hasSize(1);
+    verify(monsterRepository).findAllPaged(true, pageable);
+  }
+
+  @Test
   @DisplayName("getAllMonsterIdByRank délègue directement au repository")
   void should_DelegateToRepository_When_GettingAllMonsterIdByRank() {
     when(monsterRepository.findAllMonsterIdByRank(Rank.EPIC)).thenReturn(List.of("e-1", "e-2"));

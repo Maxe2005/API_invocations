@@ -10,6 +10,8 @@ import com.imt.api_invocations.persistence.entity.SkillEntity;
 import com.imt.api_invocations.service.mapper.MonsterServiceMapper;
 import com.imt.api_invocations.utils.DataServiceInterface;
 import java.util.List;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -58,6 +60,10 @@ public class MonsterService implements DataServiceInterface {
 
   public List<MonsterEntity> getAllMonsters(boolean includeSkills) {
     return monsterRepository.findAll(includeSkills);
+  }
+
+  public Page<MonsterEntity> getAllMonstersPaged(boolean includeSkills, Pageable pageable) {
+    return monsterRepository.findAllPaged(includeSkills, pageable);
   }
 
   public List<String> getAllMonsterIdByRank(Rank rank) {
