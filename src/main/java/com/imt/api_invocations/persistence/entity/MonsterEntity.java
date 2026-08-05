@@ -26,12 +26,12 @@ import org.hibernate.annotations.UuidGenerator;
 @AttributeOverride(name = "stats.vit", column = @Column(name = "stats_vit"))
 public class MonsterEntity extends MonsterBaseDto {
 
-    @Id
-    @GeneratedValue
-    @UuidGenerator
-    @Column(name = "id", nullable = false, updatable = false, length = 36)
-    private String id;
+  @Id
+  @GeneratedValue
+  @UuidGenerator
+  @Column(name = "id", nullable = false, updatable = false, length = 36)
+  private String id;
 
-    @OneToMany(mappedBy = "monster", fetch = FetchType.LAZY)
-    private List<SkillEntity> skills;
+  @OneToMany(mappedBy = "monster", fetch = FetchType.LAZY)
+  private List<SkillEntity> skills;
 }

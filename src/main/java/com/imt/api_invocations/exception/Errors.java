@@ -8,9 +8,9 @@ import lombok.Getter;
 @AllArgsConstructor
 public class Errors {
 
-  private List<CustomError> theErrorsYOUMade;
+  private List<CustomError> errors;
 
   public void addError(CustomError error) {
-    this.theErrorsYOUMade.add(error);
+    this.errors.add(error);
   }
 }

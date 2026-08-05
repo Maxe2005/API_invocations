@@ -90,7 +90,8 @@ Puis éditer `mon_nouveau_monstre.json`:
 
 ### **Modifier un monstre existant**
 1. Éditer le fichier JSON du monstre
-2. Supprimer la base de données ou sa collection
+2. Vider la table `monsters` (ou toute la base) — le seeding ne s'exécute que si `monsters` est
+   vide (voir plus bas)
 3. Relancer l'application
 
 ### **Charger un monstre spécifique** (programmativement)
@@ -160,8 +161,13 @@ List<MonsterSeedDto> retournée
     ↓
 seedMonsters() convertit en entités DB
     ↓
-Sauvegarde dans MongoDB
+Sauvegarde dans PostgreSQL (via Spring Data JPA)
 ```
+
+`DatabaseSeeder` (un `CommandLineRunner`) ne seed que si la table `monsters` est vide. Si des
+monstres existent déjà mais que la table `skills` est vide, un chemin de repli
+(`seedSkillsOnly`) associe chaque `MonsterSeedDto` à un `MonsterEntity` existant **par nom**
+(champ `nom` du JSON ↔ `name` en base) pour ne seeder que les compétences manquantes.
 
 ## Bonnes pratiques
 

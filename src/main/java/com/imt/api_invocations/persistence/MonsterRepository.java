@@ -5,6 +5,8 @@ import com.imt.api_invocations.persistence.entity.MonsterEntity;
 import com.imt.api_invocations.persistence.repository.MonsterJpaRepository;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -27,7 +29,8 @@ public class MonsterRepository {
   }
 
   public MonsterEntity findByID(String id, boolean includeSkills) {
-    return includeSkills ? monsterJpaRepository.findByIdWithSkills(id).orElse(null)
+    return includeSkills
+        ? monsterJpaRepository.findByIdWithSkills(id).orElse(null)
         : monsterJpaRepository.findByIdNoSkills(id).orElse(null);
   }
 
@@ -40,8 +43,15 @@ public class MonsterRepository {
   }
 
   public List<MonsterEntity> findAll(boolean includeSkills) {
-    return includeSkills ? monsterJpaRepository.findAllWithSkills()
+    return includeSkills
+        ? monsterJpaRepository.findAllWithSkills()
         : monsterJpaRepository.findAllNoSkills();
+  }
+
+  public Page<MonsterEntity> findAllPaged(boolean includeSkills, Pageable pageable) {
+    return includeSkills
+        ? monsterJpaRepository.findAllWithSkillsPaged(pageable)
+        : monsterJpaRepository.findAllNoSkillsPaged(pageable);
   }
 
   public List<String> findAllMonsterIdByRank(Rank rank) {
@@ -50,7 +60,8 @@ public class MonsterRepository {
 
   public MonsterEntity findByElement(String element) {
     return monsterJpaRepository.findAllNoSkills().stream()
-        .filter(monster -> monster.getElement().toString().equalsIgnoreCase(element)).findFirst()
+        .filter(monster -> monster.getElement().toString().equalsIgnoreCase(element))
+        .findFirst()
         .orElse(null);
   }
 

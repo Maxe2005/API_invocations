@@ -1,14 +1,14 @@
 package com.imt.api_invocations.service;
 
-import static com.imt.api_invocations.utils.Random.*;
+import static com.imt.api_invocations.utils.Random.getRandomRankBasedOnAvailableData;
 
 import com.imt.api_invocations.client.MonstersApiClient;
 import com.imt.api_invocations.client.PlayerApiClient;
 import com.imt.api_invocations.client.dto.monsters.CreateMonsterRequest;
 import com.imt.api_invocations.client.dto.monsters.CreateMonsterResponse;
-import com.imt.api_invocations.client.dto.monsters.CreateMonsterSkillRequest;
 import com.imt.api_invocations.client.dto.player.PlayerAddMonsterRequest;
 import com.imt.api_invocations.client.dto.player.PlayerResponse;
+import com.imt.api_invocations.config.InvocationProperties;
 import com.imt.api_invocations.controller.dto.output.GlobalMonsterWithIdDto;
 import com.imt.api_invocations.dto.GlobalMonsterDto;
 import com.imt.api_invocations.dto.SkillBaseDto;
@@ -38,17 +38,23 @@ public class InvocationService {
   private final PlayerApiClient playerApiClient;
   private final InvocationBufferRepository invocationBufferRepository;
   private final InvocationServiceMapper invocationServiceMapper;
+  private final InvocationProperties invocationProperties;
 
-  public InvocationService(MonsterService monsterService, SkillsService skillsService,
-      MonstersApiClient monstersApiClient, PlayerApiClient playerApiClient,
+  public InvocationService(
+      MonsterService monsterService,
+      SkillsService skillsService,
+      MonstersApiClient monstersApiClient,
+      PlayerApiClient playerApiClient,
       InvocationBufferRepository invocationBufferRepository,
-      InvocationServiceMapper invocationServiceMapper) {
+      InvocationServiceMapper invocationServiceMapper,
+      InvocationProperties invocationProperties) {
     this.monsterService = monsterService;
     this.skillsService = skillsService;
     this.monstersApiClient = monstersApiClient;
     this.playerApiClient = playerApiClient;
     this.invocationBufferRepository = invocationBufferRepository;
     this.invocationServiceMapper = invocationServiceMapper;
+    this.invocationProperties = invocationProperties;
   }
 
   public GlobalMonsterDto invoke() {
@@ -58,11 +64,21 @@ public class InvocationService {
     return invocationServiceMapper.toGlobalMonsterDto(monster, skills);
   }
 
-  private InvocationBufferDto createBufferEntry(String playerId, GlobalMonsterDto monster,
-      CreateMonsterRequest monsterRequest) {
-    InvocationBufferDto bufferEntry = InvocationBufferDto.builder().playerId(playerId)
-        .monsterSnapshot(monster).monsterRequest(monsterRequest).status(InvocationStatus.PENDING)
-        .attemptCount(0).createdAt(LocalDateTime.now()).build();
+  private InvocationBufferDto createBufferEntry(
+      String playerId,
+      GlobalMonsterDto monster,
+      CreateMonsterRequest monsterRequest,
+      String idempotencyKey) {
+    InvocationBufferDto bufferEntry =
+        InvocationBufferDto.builder()
+            .playerId(playerId)
+            .idempotencyKey(idempotencyKey)
+            .monsterSnapshot(monster)
+            .monsterRequest(monsterRequest)
+            .status(InvocationStatus.PENDING)
+            .attemptCount(0)
+            .createdAt(LocalDateTime.now())
+            .build();
     return invocationBufferRepository.save(bufferEntry);
   }
 
@@ -79,8 +95,8 @@ public class InvocationService {
     invocationBufferRepository.save(entry);
   }
 
-  private void markCompleted(InvocationBufferDto entry, PlayerAddMonsterRequest request,
-      PlayerResponse response) {
+  private void markCompleted(
+      InvocationBufferDto entry, PlayerAddMonsterRequest request, PlayerResponse response) {
     entry.setPlayerRequest(request);
     entry.setPlayerResponse(response);
     entry.setStatus(InvocationStatus.COMPLETED);
@@ -94,8 +110,26 @@ public class InvocationService {
     invocationBufferRepository.save(entry);
   }
 
-  private String executeInvocation(GlobalMonsterDto monster, String playerId,
-      InvocationBufferDto bufferEntry) {
+  private void markAbandoned(InvocationBufferDto entry, String reason) {
+    entry.setStatus(InvocationStatus.ABANDONED);
+    entry.setFailureReason(reason);
+    invocationBufferRepository.save(entry);
+  }
+
+  private String executeInvocation(
+      GlobalMonsterDto monster, String playerId, InvocationBufferDto bufferEntry) {
+    if (bufferEntry.getAttemptCount() >= invocationProperties.getMaxAttempts()) {
+      String reason =
+          "Nombre maximal de tentatives ("
+              + invocationProperties.getMaxAttempts()
+              + ") atteint pour l'invocation "
+              + bufferEntry.getId()
+              + ", abandon définitif";
+      logger.warn(reason);
+      markAbandoned(bufferEntry, reason);
+      throw new ExternalApiException(reason);
+    }
+
     if (bufferEntry.getMonsterRequest() == null) {
       bufferEntry.setMonsterRequest(
           invocationServiceMapper.toCreateMonsterRequest(monster, playerId));
@@ -120,8 +154,8 @@ public class InvocationService {
 
       markCompleted(bufferEntry, playerRequest, playerResponse);
 
-      logger.info("Invocation globale réussie. Monstre {} ajouté au joueur {}", createdMonsterId,
-          playerId);
+      logger.info(
+          "Invocation globale réussie. Monstre {} ajouté au joueur {}", createdMonsterId, playerId);
       return createdMonsterId;
 
     } catch (ExternalApiException e) {
@@ -130,17 +164,39 @@ public class InvocationService {
       markFailed(bufferEntry, e.getMessage());
 
       if (createdMonsterId != null) {
-        logger.warn("Déclenchement de la compensation: suppression du monstre {}",
-            createdMonsterId);
-        try {
-          monstersApiClient.deleteMonster(createdMonsterId);
-        } catch (Exception compensationError) {
-          logger.error("Échec de la compensation pour le monstre {}", createdMonsterId,
-              compensationError);
-        }
+        compensate(bufferEntry, createdMonsterId, e.getMessage());
       }
 
       throw e;
+    }
+  }
+
+  /**
+   * Tente de supprimer le monstre orphelin créé avant l'échec, avec une deuxième tentative
+   * immédiate en cas d'échec de la première. Si les deux tentatives échouent, la buffer entry est
+   * marquée avec une raison explicite mentionnant le monstre orphelin, pour rester traçable même
+   * sans retry différé ni alerting dédié.
+   */
+  private void compensate(
+      InvocationBufferDto bufferEntry, String createdMonsterId, String originalFailureReason) {
+    logger.warn("Déclenchement de la compensation: suppression du monstre {}", createdMonsterId);
+
+    boolean deleted = monstersApiClient.deleteMonster(createdMonsterId);
+    if (!deleted) {
+      logger.warn("Nouvelle tentative de compensation pour le monstre {}", createdMonsterId);
+      deleted = monstersApiClient.deleteMonster(createdMonsterId);
+    }
+
+    if (!deleted) {
+      String reason =
+          originalFailureReason
+              + " | COMPENSATION ÉCHOUÉE après 2 tentatives : "
+              + "le monstre "
+              + createdMonsterId
+              + " est probablement orphelin (créé mais non "
+              + "supprimé et jamais ajouté au joueur) et nécessite une intervention manuelle.";
+      logger.error(reason);
+      markFailed(bufferEntry, reason);
     }
   }
 
@@ -153,16 +209,67 @@ public class InvocationService {
    * @throws ExternalApiException En cas d'erreur de communication avec les APIs externes
    */
   public GlobalMonsterWithIdDto globalInvoke(String playerId) {
+    return globalInvoke(playerId, null);
+  }
+
+  /**
+   * Variante idempotente de {@link #globalInvoke(String)} : si {@code idempotencyKey} est fourni et
+   * correspond à une invocation déjà bufferisée, celle-ci est réutilisée (résultat déjà disponible
+   * si {@code COMPLETED}, rejeu de l'entrée existante sinon) au lieu de tirer un nouveau monstre —
+   * pour dédupliquer les retries client (ex. timeout réseau côté client alors que le serveur a en
+   * réalité traité la requête).
+   *
+   * @param playerId L'ID du joueur qui reçoit le monstre
+   * @param idempotencyKey Clé d'idempotence optionnelle (header {@code Idempotency-Key})
+   * @return Le monstre invoqué
+   * @throws ExternalApiException En cas d'erreur de communication avec les APIs externes
+   */
+  public GlobalMonsterWithIdDto globalInvoke(String playerId, String idempotencyKey) {
     logger.info("Début de l'invocation globale pour le joueur: {}", playerId);
+
+    if (idempotencyKey != null && !idempotencyKey.isBlank()) {
+      InvocationBufferDto existing =
+          invocationBufferRepository.findByIdempotencyKey(idempotencyKey);
+      if (existing != null) {
+        logger.info(
+            "Clé d'idempotence {} déjà connue (invocation {}, statut {}) : réutilisation au lieu "
+                + "d'un nouveau tirage",
+            idempotencyKey,
+            existing.getId(),
+            existing.getStatus());
+        return resumeFromExistingEntry(existing, playerId);
+      }
+    }
 
     GlobalMonsterDto monster = invoke();
     CreateMonsterRequest monsterRequest =
         invocationServiceMapper.toCreateMonsterRequest(monster, playerId);
 
-    InvocationBufferDto bufferEntry = createBufferEntry(playerId, monster, monsterRequest);
+    InvocationBufferDto bufferEntry =
+        createBufferEntry(playerId, monster, monsterRequest, idempotencyKey);
 
     String createdMonsterId = executeInvocation(monster, playerId, bufferEntry);
     return invocationServiceMapper.toGlobalMonsterWithIdDto(monster, createdMonsterId);
+  }
+
+  private GlobalMonsterWithIdDto resumeFromExistingEntry(
+      InvocationBufferDto existing, String playerId) {
+    if (existing.getStatus() == InvocationStatus.COMPLETED) {
+      String monsterId =
+          existing.getMonsterResponse() != null
+              ? existing.getMonsterResponse().getMonsterId()
+              : null;
+      return invocationServiceMapper.toGlobalMonsterWithIdDto(
+          existing.getMonsterSnapshot(), monsterId);
+    }
+
+    GlobalMonsterDto snapshot = existing.getMonsterSnapshot();
+    if (snapshot == null) {
+      throw new ExternalApiException(
+          "Aucun instantané disponible pour rejouer l'invocation idempotente " + existing.getId());
+    }
+    String createdMonsterId = executeInvocation(snapshot, playerId, existing);
+    return invocationServiceMapper.toGlobalMonsterWithIdDto(snapshot, createdMonsterId);
   }
 
   public InvocationReplayReport replayBufferedInvocations() {

@@ -24,16 +24,16 @@ import org.hibernate.annotations.UuidGenerator;
 @AttributeOverride(name = "ratio.percent", column = @Column(name = "ratio_percent"))
 public class SkillEntity extends SkillBaseDto {
 
-    @Id
-    @GeneratedValue
-    @UuidGenerator
-    @Column(name = "id", nullable = false, updatable = false, length = 36)
-    private String id;
+  @Id
+  @GeneratedValue
+  @UuidGenerator
+  @Column(name = "id", nullable = false, updatable = false, length = 36)
+  private String id;
 
-    @Column(name = "monster_id", nullable = false, length = 36)
-    private String monsterId;
+  @Column(name = "monster_id", nullable = false, length = 36)
+  private String monsterId;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "monster_id", insertable = false, updatable = false)
-    private MonsterEntity monster;
+  @ManyToOne(fetch = FetchType.LAZY)
+  @JoinColumn(name = "monster_id", insertable = false, updatable = false)
+  private MonsterEntity monster;
 }

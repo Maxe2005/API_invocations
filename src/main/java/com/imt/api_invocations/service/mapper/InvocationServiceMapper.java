@@ -11,28 +11,45 @@ import org.springframework.stereotype.Component;
 @Component
 public class InvocationServiceMapper {
 
-  public GlobalMonsterDto toGlobalMonsterDto(MonsterEntity monsterEntity,
-      List<SkillBaseDto> skills) {
-    return GlobalMonsterDto.builder().name(monsterEntity.getName())
-        .element(monsterEntity.getElement()).stats(monsterEntity.getStats())
-        .rank(monsterEntity.getRank()).visualDescription(monsterEntity.getVisualDescription())
-        .cardDescription(monsterEntity.getCardDescription()).imageUrl(monsterEntity.getImageUrl())
-        .skills(skills).build();
+  public GlobalMonsterDto toGlobalMonsterDto(
+      MonsterEntity monsterEntity, List<SkillBaseDto> skills) {
+    return GlobalMonsterDto.builder()
+        .name(monsterEntity.getName())
+        .element(monsterEntity.getElement())
+        .stats(monsterEntity.getStats())
+        .rank(monsterEntity.getRank())
+        .visualDescription(monsterEntity.getVisualDescription())
+        .cardDescription(monsterEntity.getCardDescription())
+        .imageUrl(monsterEntity.getImageUrl())
+        .skills(skills)
+        .build();
   }
 
   public CreateMonsterRequest toCreateMonsterRequest(GlobalMonsterDto monster, String playerId) {
-    return CreateMonsterRequest.builder().playerId(playerId).name(monster.getName())
-        .element(monster.getElement()).stats(monster.getStats()).rank(monster.getRank())
-        .cardDescription(monster.getCardDescription()).imageUrl(monster.getImageUrl())
-        .skills(monster.getSkills()).build();
+    return CreateMonsterRequest.builder()
+        .playerId(playerId)
+        .name(monster.getName())
+        .element(monster.getElement())
+        .stats(monster.getStats())
+        .rank(monster.getRank())
+        .cardDescription(monster.getCardDescription())
+        .imageUrl(monster.getImageUrl())
+        .skills(monster.getSkills())
+        .build();
   }
 
-  public GlobalMonsterWithIdDto toGlobalMonsterWithIdDto(GlobalMonsterDto monster,
-      String monsterId) {
-    return GlobalMonsterWithIdDto.builder().id(monsterId).name(monster.getName())
-        .element(monster.getElement()).stats(monster.getStats()).rank(monster.getRank())
+  public GlobalMonsterWithIdDto toGlobalMonsterWithIdDto(
+      GlobalMonsterDto monster, String monsterId) {
+    return GlobalMonsterWithIdDto.builder()
+        .id(monsterId)
+        .name(monster.getName())
+        .element(monster.getElement())
+        .stats(monster.getStats())
+        .rank(monster.getRank())
         .visualDescription(monster.getVisualDescription())
-        .cardDescription(monster.getCardDescription()).imageUrl(monster.getImageUrl())
-        .skills(List.of()).build();
+        .cardDescription(monster.getCardDescription())
+        .imageUrl(monster.getImageUrl())
+        .skills(List.of())
+        .build();
   }
 }

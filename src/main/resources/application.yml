@@ -19,11 +19,19 @@ spring:
   flyway:
     enabled: true
     baseline-on-migrate: true
-  
+  servlet:
+    multipart:
+      # Borne la taille de l'archive ZIP acceptée par /api/invocation/monsters/import,
+      # en complément des limites décompressées (app.import.*) contre les zip bombs.
+      max-file-size: 50MB
+      max-request-size: 55MB
+
 app:
+  # Auth activée par défaut (profil docker/prod) ; le profil `local` la désactive
+  # explicitement pour le développement sans dépendre d'API_authentification.
   auth:
-    enabled: false
-  
+    enabled: true
+
   # Numeric constraints for game entities
   constraints:
     stats:
@@ -40,6 +48,10 @@ app:
       min-percent: 0.0
       max-percent: 100.0
 
+  # Plafond de tentatives (appel initial + replays) avant abandon définitif d'une invocation bufferisée
+  invocation:
+    max-attempts: 5
+
 # Configuration des APIs externes
 external:
   api:
@@ -48,6 +60,55 @@ external:
     auth-base-url: http://localhost:8081
     connection-timeout: 5000
     read-timeout: 5000
+
+# Resilience4j - retry + circuit breaker sur les appels aux APIs externes.
+# Le retry n'est câblé que sur les opérations idempotentes (authApi.verifyToken,
+# generateGatchaApi.getSignedUrls) : monstersApi.createMonster et playerApi.addMonsterToPlayer
+# ne créent qu'un CircuitBreaker (pas de @Retry) pour ne pas risquer de doublon si un appel a
+# en réalité réussi côté serveur malgré une réponse perdue.
+resilience4j:
+  circuitbreaker:
+    configs:
+      default:
+        sliding-window-size: 10
+        minimum-number-of-calls: 5
+        failure-rate-threshold: 50
+        wait-duration-in-open-state: 10s
+        permitted-number-of-calls-in-half-open-state: 3
+    instances:
+      monstersApi:
+        base-config: default
+      playerApi:
+        base-config: default
+      authApi:
+        base-config: default
+      generateGatchaApi:
+        base-config: default
+  retry:
+    configs:
+      default:
+        max-attempts: 3
+        wait-duration: 300ms
+        enable-exponential-backoff: true
+        exponential-backoff-multiplier: 2
+        retry-exceptions:
+          - org.springframework.web.client.RestClientException
+        ignore-exceptions:
+          # Erreurs 4xx (ex: token invalide, requête malformée) : pas de retry, ce n'est pas transitoire.
+          - org.springframework.web.client.HttpClientErrorException
+    instances:
+      authApi:
+        base-config: default
+      generateGatchaApi:
+        base-config: default
+        # getSignedUrls encapsule déjà l'échec RestTemplate dans ExternalApiException avant qu'il
+        # ne quitte la méthode : c'est donc cette exception-là qu'il faut cibler pour que le retry
+        # se déclenche (RestClientException n'est jamais visible à ce niveau). Le filtre
+        # ignore-exceptions par défaut ne s'applique pas ici (types non liés) : toute erreur externe
+        # (y compris un éventuel 4xx) est retentée, ce qui reste sans risque puisque c'est une
+        # lecture idempotente sur une requête générée en interne (pas une saisie utilisateur).
+        retry-exceptions:
+          - com.imt.api_invocations.exception.ExternalApiException
 
 # Actuator configuration
 management:

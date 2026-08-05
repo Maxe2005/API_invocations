@@ -4,6 +4,7 @@ import com.imt.api_invocations.client.dto.monsters.CreateMonsterRequest;
 import com.imt.api_invocations.client.dto.monsters.CreateMonsterResponse;
 import com.imt.api_invocations.config.ExternalApiProperties;
 import com.imt.api_invocations.exception.ExternalApiException;
+import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
@@ -39,6 +40,9 @@ public class MonstersApiClient {
    * @return La réponse complète retournée par l'API externe
    * @throws ExternalApiException En cas d'erreur de communication
    */
+  // Pas de @Retry ici : createMonster n'est pas idempotent, retenter automatiquement risquerait de
+  // créer un doublon si l'appel précédent a en réalité réussi côté serveur (réponse perdue).
+  @CircuitBreaker(name = "monstersApi")
   public CreateMonsterResponse createMonster(CreateMonsterRequest request) {
     String url = apiProperties.getMonstersBaseUrl() + CREATE_MONSTER_ENDPOINT;
 
@@ -83,14 +87,21 @@ public class MonstersApiClient {
    * Supprime un monstre (utilisé pour la compensation en cas d'échec).
    *
    * @param monsterId L'ID du monstre à supprimer
+   * @return {@code true} si la suppression a réussi, {@code false} sinon (jamais d'exception
+   *     propagée, pour ne pas masquer l'erreur d'origine ayant déclenché la compensation)
    */
-  public void deleteMonster(String monsterId) {
+  // Pas d'annotation Resilience4j ici : le retry de la compensation est déjà géré explicitement par
+  // InvocationService.compensate() (deuxième tentative + marquage ABANDONED/traçabilité), et cette
+  // méthode avale déjà ses propres exceptions (elle ne doit jamais en laisser fuir une pendant un
+  // rollback), ce qui rendrait un CircuitBreaker Resilience4j ici inopérant.
+  public boolean deleteMonster(String monsterId) {
     String url = apiProperties.getMonstersBaseUrl() + DELETE_MONSTER_ENDPOINT + monsterId;
 
     try {
       logger.warn("Compensation: suppression du monstre ID: {}", monsterId);
       restTemplate.delete(url);
       logger.info("Monstre supprimé avec succès: {}", monsterId);
+      return true;
     } catch (RestClientException e) {
       // Logged but not rethrown to avoid masking the original error during
       // compensation
@@ -99,6 +110,7 @@ public class MonstersApiClient {
           monsterId,
           e.getMessage(),
           e);
+      return false;
     }
   }
 }

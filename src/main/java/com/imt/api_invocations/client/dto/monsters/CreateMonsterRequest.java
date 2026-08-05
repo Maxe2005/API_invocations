@@ -11,11 +11,11 @@ import lombok.experimental.SuperBuilder;
 @NoArgsConstructor
 public class CreateMonsterRequest extends GlobalMonsterDto {
 
-    private String playerId;
+  private String playerId;
 
-    @Override
-    @JsonIgnore
-    public String getVisualDescription() {
-        return super.getVisualDescription();
-    }
+  @Override
+  @JsonIgnore
+  public String getVisualDescription() {
+    return super.getVisualDescription();
+  }
 }

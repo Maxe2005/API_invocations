@@ -2,14 +2,20 @@ package com.imt.api_invocations.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.mockito.ArgumentMatchers.argThat;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import java.lang.reflect.Field;
+import com.imt.api_invocations.dto.RatioDto;
+import com.imt.api_invocations.dto.SkillBaseDto;
+import com.imt.api_invocations.enums.Rank;
+import com.imt.api_invocations.enums.Stat;
+import com.imt.api_invocations.persistence.SkillsRepository;
+import com.imt.api_invocations.persistence.entity.MonsterEntity;
+import com.imt.api_invocations.persistence.entity.SkillEntity;
+import com.imt.api_invocations.service.mapper.SkillsServiceMapper;
 import java.util.ArrayList;
 import java.util.List;
-
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -17,152 +23,89 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import com.imt.api_invocations.enums.Rank;
-import com.imt.api_invocations.enums.Stat;
-import com.imt.api_invocations.persistence.SkillsRepository;
-import com.imt.api_invocations.persistence.dto.MonsterMongoDto;
-import com.imt.api_invocations.persistence.dto.RatioDto;
-import com.imt.api_invocations.persistence.dto.SkillsMongoDto;
-import com.imt.api_invocations.service.dto.SkillForMonsterDto;
-
 @ExtendWith(MockitoExtension.class)
 @DisplayName("SkillsService - Tests Unitaires")
 class SkillsServiceTest {
 
-    @Mock
-    private SkillsRepository skillsRepository;
+  @Mock private SkillsRepository skillsRepository;
 
-    @Mock
-    private MonsterService monsterService;
+  @Mock private MonsterService monsterService;
 
-    @InjectMocks
-    private SkillsService skillsService;
+  @Mock private SkillsServiceMapper skillsServiceMapper;
 
-//     @BeforeEach
-//     void setUp() {
-//         skillsService = new SkillsService(skillsRepository, monsterService);
-//     }
+  @InjectMocks private SkillsService skillsService;
 
-//     @Test
-//     void createSkill_WhenMonsterExists() {
-//         String monsterId = "monster-id";
-//         SkillsMongoDto skill = new SkillsMongoDto(monsterId, 10.0, new RatioDto(Stat.ATK, 0.5),
-// 10.0, 5.0, Rank.COMMON);
+  private SkillEntity skill(String id, String monsterId, Rank rank) {
+    return SkillEntity.builder()
+        .id(id)
+        .monsterId(monsterId)
+        .name("Griffe")
+        .damage(10)
+        .ratio(RatioDto.builder().stat(Stat.ATK).percent(1.0).build())
+        .cooldown(2)
+        .lvlMax(5)
+        .rank(rank)
+        .build();
+  }
 
-//         when(monsterService.getMonsterById(monsterId))
-//                 .thenReturn(new MonsterMongoDto("id", Elementary.FIRE, 100.0, 10.0, 5.0, 50.0,
-// Rank.COMMON));
-//         when(skillsRepository.save(any(SkillsMongoDto.class))).thenReturn("skill-id");
+  @Test
+  @DisplayName("createSkill échoue si le monstre référencé n'existe pas")
+  void should_ThrowException_When_MonsterDoesNotExistOnCreate() {
+    SkillEntity skill = skill("s-1", "missing-monster", Rank.COMMON);
+    when(monsterService.getMonsterById("missing-monster")).thenReturn(null);
 
-        String result = skillsService.createSkill(skill);
+    assertThatThrownBy(() -> skillsService.createSkill(skill))
+        .isInstanceOf(IllegalArgumentException.class);
+    verify(skillsRepository, never()).save(skill);
+  }
 
-//         assertEquals("skill-id", result);
-//         verify(skillsRepository).save(any(SkillsMongoDto.class));
-//     }
+  @Test
+  @DisplayName("createSkill sauvegarde le skill si le monstre existe")
+  void should_SaveSkill_When_MonsterExists() {
+    SkillEntity skill = skill("s-1", "monster-1", Rank.COMMON);
+    when(monsterService.getMonsterById("monster-1")).thenReturn(MonsterEntity.builder().build());
+    when(skillsRepository.save(skill)).thenReturn("s-1");
 
-//     @Test
-//     void createSkill_WhenMonsterDoesNotExist() {
-//         String monsterId = "monster-id";
-//         SkillsMongoDto skill = new SkillsMongoDto(monsterId, 10.0, new RatioDto(Stat.ATK, 0.5),
-// 10.0, 5.0, Rank.COMMON);
-//         assertThrows(IllegalArgumentException.class, () -> skillsService.createSkill(skill));
-//         verify(skillsRepository, never()).save(any(SkillsMongoDto.class));
-//     }
+    String result = skillsService.createSkill(skill);
 
-//     @Test
-//     void getSkillById() {
-//         String id = "skill-id";
-//         SkillsMongoDto skill = new SkillsMongoDto(id, "monster-id", 10.0, new RatioDto(Stat.ATK,
-// 0.5), 10.0, 5.0,
-//                 Rank.COMMON);
+    assertThat(result).isEqualTo("s-1");
+  }
 
-//         when(skillsRepository.findByID(id)).thenReturn(skill);
+  @Test
+  @DisplayName("getRandomSkillsForMonster retourne le nombre de skills demandé")
+  void should_ReturnRequestedNumberOfSkills_When_EnoughAvailable() {
+    List<SkillEntity> skills =
+        new ArrayList<>(
+            List.of(
+                skill("s-1", "m-1", Rank.COMMON),
+                skill("s-2", "m-1", Rank.COMMON),
+                skill("s-3", "m-1", Rank.COMMON)));
+    when(skillsRepository.findByMonsterId("m-1")).thenReturn(skills);
+    when(skillsServiceMapper.toSkillBaseDtos(org.mockito.ArgumentMatchers.anyList()))
+        .thenAnswer(
+            invocation -> List.of(new SkillBaseDto(), new SkillBaseDto(), new SkillBaseDto()));
 
-//         SkillsMongoDto result = skillsService.getSkillById(id);
+    List<SkillBaseDto> result = skillsService.getRandomSkillsForMonster("m-1", 3);
 
-//         assertEquals(skill, result);
-//     }
+    assertThat(result).hasSize(3);
+  }
 
-//     @Test
-//     void updateSkill_WhenMonsterExists() {
-//         String skillId = "skill-id";
-//         String monsterId = "monster-id";
-//         SkillsMongoDto skill = new SkillsMongoDto(monsterId, 10.0, new RatioDto(Stat.ATK, 0.5),
-// 10.0, 5.0, Rank.COMMON);
+  @Test
+  @DisplayName("getRandomSkillsForMonster limite au nombre de skills disponibles")
+  void should_LimitToAvailableSkills_When_RequestedMoreThanAvailable() {
+    List<SkillEntity> skills =
+        new ArrayList<>(
+            List.of(skill("s-1", "m-1", Rank.COMMON), skill("s-2", "m-1", Rank.COMMON)));
+    when(skillsRepository.findByMonsterId("m-1")).thenReturn(skills);
+    when(skillsServiceMapper.toSkillBaseDtos(org.mockito.ArgumentMatchers.anyList()))
+        .thenAnswer(
+            invocation -> {
+              List<?> selected = invocation.getArgument(0);
+              return List.of(new SkillBaseDto(), new SkillBaseDto()).subList(0, selected.size());
+            });
 
-//         when(monsterService.getMonsterById(monsterId))
-//                 .thenReturn(new MonsterMongoDto("id", Elementary.FIRE, 100.0, 10.0, 5.0, 50.0,
-// Rank.COMMON));
+    List<SkillBaseDto> result = skillsService.getRandomSkillsForMonster("m-1", 3);
 
-        skillsService.updateSkill("target-id", payload);
-
-//         verify(skillsRepository).update(any(SkillsMongoDto.class));
-//     }
-
-//     @Test
-//     void updateSkill_WhenMonsterDoesNotExist() {
-//         String skillId = "skill-id";
-//         String monsterId = "monster-id";
-//         SkillsMongoDto skill = new SkillsMongoDto(monsterId, 10.0, new RatioDto(Stat.ATK, 0.5),
-// 10.0, 5.0, Rank.COMMON);
-//         assertThrows(IllegalArgumentException.class, () -> skillsService.updateSkill(skillId,
-// skill));
-//         verify(skillsRepository, never()).update(any(SkillsMongoDto.class));
-//     }
-
-//     @Test
-//     void getSkillByMonsterId() {
-//         String monsterId = "monster-id";
-//         SkillsMongoDto skill = new SkillsMongoDto("skill-id", monsterId, 10.0, new
-// RatioDto(Stat.ATK, 0.5), 10.0, 5.0,
-//                 Rank.COMMON);
-
-//         when(skillsRepository.findByMonsterId(monsterId)).thenReturn(List.of(skill));
-
-        List<SkillForMonsterDto> result = skillsService.getRandomSkillsForMonster("m-1", 3);
-
-        assertThat(result).hasSize(3);
-        assertThat(result).extracting(SkillForMonsterDto::getNumber).containsExactly(1, 2, 3);
-    }
-
-    @Test
-    @DisplayName("getRandomSkillsForMonster limite au nombre de skills disponibles")
-    void should_LimitToAvailableSkills_When_RequestedMoreThanAvailable() {
-        List<SkillsMongoDto> skills = new ArrayList<>(List.of(
-                new SkillsMongoDto("s-1", "m-1", 100.0, new RatioDto(Stat.ATK, 1.1), 2.0, 5.0,
-                        Rank.COMMON),
-                new SkillsMongoDto("s-2", "m-1", 130.0, new RatioDto(Stat.DEF, 1.0), 3.0, 8.0,
-                        Rank.COMMON)));
-        when(skillsRepository.findByMonsterId("m-1")).thenReturn(skills);
-
-        List<SkillForMonsterDto> result = skillsService.getRandomSkillsForMonster("m-1", 3);
-
-        assertThat(result).hasSize(2);
-        assertThat(result).extracting(SkillForMonsterDto::getNumber).containsExactly(1, 2);
-    }
-
-    @Test
-    @DisplayName("hasAvailableData retourne false si possibleSkills non initialisé")
-    void should_ReturnFalse_When_PossibleSkillsIsNull() {
-        assertThat(skillsService.hasAvailableData(Rank.COMMON)).isFalse();
-    }
-
-    @Test
-    @DisplayName("hasAvailableData retourne true/false selon la disponibilité du rank")
-    void should_ReturnAvailabilityByRank_When_PossibleSkillsInitialized() throws Exception {
-        setPossibleSkills(List.of(
-                new SkillsMongoDto("s-1", "m-1", 100.0, new RatioDto(Stat.ATK, 1.0), 2.0, 5.0,
-                        Rank.COMMON),
-                new SkillsMongoDto("s-2", "m-1", 130.0, new RatioDto(Stat.DEF, 1.0), 3.0, 8.0,
-                        Rank.RARE)));
-
-        assertThat(skillsService.hasAvailableData(Rank.COMMON)).isTrue();
-        assertThat(skillsService.hasAvailableData(Rank.EPIC)).isFalse();
-    }
-
-    private void setPossibleSkills(List<SkillsMongoDto> possibleSkills) throws Exception {
-        Field field = SkillsService.class.getDeclaredField("possibleSkills");
-        field.setAccessible(true);
-        field.set(skillsService, possibleSkills);
-    }
+    assertThat(result).hasSize(2);
+  }
 }

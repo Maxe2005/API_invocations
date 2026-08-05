@@ -38,6 +38,14 @@ public class InvocationBufferDto {
 
   private String playerId;
 
+  /**
+   * Clé d'idempotence optionnelle (header {@code Idempotency-Key} sur POST
+   * /api/invocation/global-invoque/{playerId}), pour dédupliquer les retries client sans consommer
+   * un nouveau tirage aléatoire.
+   */
+  @Column(name = "idempotency_key")
+  private String idempotencyKey;
+
   @JdbcTypeCode(SqlTypes.JSON)
   @Column(name = "monster_snapshot", columnDefinition = "jsonb")
   private GlobalMonsterDto monsterSnapshot;
@@ -63,6 +71,7 @@ public class InvocationBufferDto {
 
   @Column(length = 2000)
   private String failureReason;
+
   private int attemptCount;
   private LocalDateTime createdAt;
   private LocalDateTime lastAttemptAt;

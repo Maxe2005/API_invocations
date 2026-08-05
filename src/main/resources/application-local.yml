@@ -8,6 +8,14 @@ spring:
     properties:
       hibernate:
         format_sql: true
-  
+
+app:
+  # Désactivée en local pour ne pas dépendre d'une API_authentification qui tourne ;
+  # le profil par défaut (docker/prod) reste protégé (voir application.yml).
+  auth:
+    enabled: false
+
 server:
-  port: 8081
+  # 8090 pour ne pas entrer en collision avec le port hôte 8081 d'api-authentification
+  # dans la stack Docker (cf. root docker-compose.yaml).
+  port: 8090

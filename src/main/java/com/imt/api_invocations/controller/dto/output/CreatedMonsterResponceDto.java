@@ -11,8 +11,7 @@ import lombok.NoArgsConstructor;
 @Schema(description = "Réponse après la création d'un monstre, contenant son identifiant unique")
 public class CreatedMonsterResponceDto {
 
-    private String id;
+  private String id;
 
-    private String message;
-
+  private String message;
 }

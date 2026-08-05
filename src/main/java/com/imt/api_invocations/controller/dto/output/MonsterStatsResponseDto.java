@@ -10,23 +10,23 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class MonsterStatsResponseDto {
 
-    @JsonProperty("total_monsters")
-    private int totalMonsters;
+  @JsonProperty("total_monsters")
+  private int totalMonsters;
 
-    private StatSummary hp;
+  private StatSummary hp;
 
-    private StatSummary vit;
+  private StatSummary vit;
 
-    private StatSummary def;
+  private StatSummary def;
 
-    private StatSummary atk;
+  private StatSummary atk;
 
-    @Getter
-    @AllArgsConstructor
-    @NoArgsConstructor
-    public static class StatSummary {
-        private long min;
-        private double avg;
-        private long max;
-    }
+  @Getter
+  @AllArgsConstructor
+  @NoArgsConstructor
+  public static class StatSummary {
+    private long min;
+    private double avg;
+    private long max;
+  }
 }

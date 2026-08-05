@@ -106,6 +106,16 @@ public class GlobalExceptionHandler {
     return ResponseEntity.status(404).body(errors);
   }
 
+  @ExceptionHandler(Exception.class)
+  public ResponseEntity<Errors> handleUnexpectedException(Exception ex) {
+    logger.error("Erreur inattendue non gérée explicitement", ex);
+
+    Errors errors = new Errors(new ArrayList<>());
+    errors.addError(new CustomError(500, "Erreur interne du serveur"));
+
+    return ResponseEntity.status(500).body(errors);
+  }
+
   private void logValidationErrors(List<String> messages, Exception ex) {
     if (messages.isEmpty()) {
       logger.warn("Validation failed: {}", ex.getMessage());

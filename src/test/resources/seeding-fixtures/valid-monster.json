@@ -1,0 +1,28 @@
+{
+  "nom": "Monstre de Test",
+  "element": "FIRE",
+  "rang": "COMMON",
+  "stats": {
+    "hp": 100.0,
+    "atk": 50.0,
+    "def": 30.0,
+    "vit": 40.0
+  },
+  "description_carte": "Un monstre de test",
+  "description_visuelle": "Un monstre généré pour les tests",
+  "skills": [
+    {
+      "name": "Griffe",
+      "description": "Une attaque griffue",
+      "damage": 50.0,
+      "ratio": {
+        "stat": "ATK",
+        "percent": 100.0
+      },
+      "cooldown": 2.0,
+      "lvlMax": 5.0,
+      "rank": "COMMON"
+    }
+  ],
+  "imageUrl": "http://example.com/test.png"
+}

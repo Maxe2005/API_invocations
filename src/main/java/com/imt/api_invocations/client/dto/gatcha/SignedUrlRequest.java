@@ -10,6 +10,6 @@ import lombok.Setter;
 @NoArgsConstructor
 @AllArgsConstructor
 public class SignedUrlRequest {
-    private String id;
-    private String url;
+  private String id;
+  private String url;
 }

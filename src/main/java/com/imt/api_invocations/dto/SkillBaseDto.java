@@ -10,13 +10,14 @@ import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import jakarta.persistence.MappedSuperclass;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
 
 /**
- * Base DTO for skills with numeric validation. Uses long instead of double for
- * precise integer
+ * Base DTO for skills with numeric validation. Uses long instead of double for precise integer
  * values (damage, cooldown, lvlMax). Numeric constraints are validated against
  * NumericConstraintsConfig.
  */
@@ -27,32 +28,59 @@ import lombok.experimental.SuperBuilder;
 @Schema(description = "Informations de base d'une compétence")
 public class SkillBaseDto {
 
-    @Schema(description = "Nom de la compétence", example = "Boule de feu", requiredMode = Schema.RequiredMode.REQUIRED)
-    private String name;
+  @NotBlank(message = "Name must be provided")
+  @Schema(
+      description = "Nom de la compétence",
+      example = "Boule de feu",
+      requiredMode = Schema.RequiredMode.REQUIRED)
+  private String name;
 
-    @Column(length = 1000)
-    @Schema(description = "Description de l'effet de la compétence", example = "Lance une boule de feu enflammée qui inflige des dégâts de feu à l'ennemi")
-    private String description;
+  @NotBlank(message = "Description must be provided")
+  @Column(length = 1000)
+  @Schema(
+      description = "Description de l'effet de la compétence",
+      example = "Lance une boule de feu enflammée qui inflige des dégâts de feu à l'ennemi",
+      requiredMode = Schema.RequiredMode.REQUIRED)
+  private String description;
 
-    @IntRange(constraintType = ConstraintType.DAMAGE, fieldName = "Damage")
-    @Schema(description = "Dégâts de base de la compétence", example = "350", minimum = "1", requiredMode = Schema.RequiredMode.REQUIRED)
-    private long damage;
+  @IntRange(constraintType = ConstraintType.DAMAGE, fieldName = "Damage")
+  @Schema(
+      description = "Dégâts de base de la compétence",
+      example = "350",
+      minimum = "1",
+      requiredMode = Schema.RequiredMode.REQUIRED)
+  private long damage;
 
-    @Valid
-    @Embedded
-    @Schema(description = "Ratio de scaling sur une statistique du monstre", requiredMode = Schema.RequiredMode.REQUIRED)
-    private RatioDto ratio;
+  @NotNull(message = "Ratio must be provided")
+  @Valid
+  @Embedded
+  @Schema(
+      description = "Ratio de scaling sur une statistique du monstre",
+      requiredMode = Schema.RequiredMode.REQUIRED)
+  private RatioDto ratio;
 
-    @IntRange(constraintType = ConstraintType.COOLDOWN, fieldName = "Cooldown")
-    @Schema(description = "Temps de recharge en tours", example = "3", minimum = "0", requiredMode = Schema.RequiredMode.REQUIRED)
-    private long cooldown;
+  @IntRange(constraintType = ConstraintType.COOLDOWN, fieldName = "Cooldown")
+  @Schema(
+      description = "Temps de recharge en tours",
+      example = "3",
+      minimum = "0",
+      requiredMode = Schema.RequiredMode.REQUIRED)
+  private long cooldown;
 
-    @IntRange(constraintType = ConstraintType.LVL_MAX, fieldName = "Level max")
-    @Schema(description = "Niveau maximum de la compétence", example = "10", minimum = "1", requiredMode = Schema.RequiredMode.REQUIRED)
-    private long lvlMax;
+  @IntRange(constraintType = ConstraintType.LVL_MAX, fieldName = "Level max")
+  @Schema(
+      description = "Niveau maximum de la compétence",
+      example = "10",
+      minimum = "1",
+      requiredMode = Schema.RequiredMode.REQUIRED)
+  private long lvlMax;
 
-    @Valid
-    @Enumerated(EnumType.STRING)
-    @Schema(description = "Rang de la compétence déterminant sa puissance", implementation = Rank.class, requiredMode = Schema.RequiredMode.REQUIRED)
-    private Rank rank;
+  @NotNull(message = "Rank must be provided")
+  @Valid
+  @Enumerated(EnumType.STRING)
+  @Schema(
+      description = "Rang de la compétence déterminant sa puissance",
+      implementation = Rank.class,
+      requiredMode = Schema.RequiredMode.REQUIRED)
+  private Rank rank;
 }

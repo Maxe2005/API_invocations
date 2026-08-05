@@ -10,5 +10,4 @@ import lombok.experimental.SuperBuilder;
 @NoArgsConstructor
 @SuperBuilder
 @Schema(description = "Données pour créer un monstre avec ses compétences")
-public class MonsterHttpDto extends GlobalMonsterDto {
-}
+public class MonsterHttpDto extends GlobalMonsterDto {}

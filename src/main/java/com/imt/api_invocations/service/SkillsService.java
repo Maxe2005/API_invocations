@@ -1,6 +1,7 @@
 package com.imt.api_invocations.service;
 
-import static com.imt.api_invocations.utils.Random.*;
+import static com.imt.api_invocations.utils.Random.getRandomRankBasedOnAvailableData;
+import static com.imt.api_invocations.utils.Random.random;
 
 import com.imt.api_invocations.dto.SkillBaseDto;
 import com.imt.api_invocations.enums.Rank;
@@ -13,14 +14,15 @@ import java.util.List;
 import org.springframework.stereotype.Service;
 
 @Service
-public class SkillsService implements DataServiceInterface {
+public class SkillsService {
 
   private final SkillsRepository skillsRepository;
   private final MonsterService monsterService;
   private final SkillsServiceMapper skillsServiceMapper;
-  private List<SkillEntity> possibleSkills;
 
-  public SkillsService(SkillsRepository skillsRepository, MonsterService monsterService,
+  public SkillsService(
+      SkillsRepository skillsRepository,
+      MonsterService monsterService,
       SkillsServiceMapper skillsServiceMapper) {
     this.skillsRepository = skillsRepository;
     this.monsterService = monsterService;
@@ -60,18 +62,19 @@ public class SkillsService implements DataServiceInterface {
     return skillsRepository.deleteById(id);
   }
 
-  private List<SkillEntity> filterSkillsByRank(Rank rank) {
-    return possibleSkills.stream().filter(skill -> skill.getRank() == rank).toList();
+  private List<SkillEntity> filterSkillsByRank(List<SkillEntity> skills, Rank rank) {
+    return skills.stream().filter(skill -> skill.getRank() == rank).toList();
   }
 
   public List<SkillBaseDto> getRandomSkillsForMonster(String monsterId, int numberOfSkills)
       throws IllegalStateException {
-    possibleSkills = skillsRepository.findByMonsterId(monsterId);
+    List<SkillEntity> possibleSkills = new ArrayList<>(skillsRepository.findByMonsterId(monsterId));
+    DataServiceInterface availability = rank -> !filterSkillsByRank(possibleSkills, rank).isEmpty();
     int maxSkillsAvailable = possibleSkills.size();
     List<SkillEntity> selectedSkills = new ArrayList<>();
     for (int i = 0; i < numberOfSkills && i < maxSkillsAvailable; i++) {
-      Rank rank = getRandomRankBasedOnAvailableData(this);
-      List<SkillEntity> skillsOfRank = filterSkillsByRank(rank);
+      Rank rank = getRandomRankBasedOnAvailableData(availability);
+      List<SkillEntity> skillsOfRank = filterSkillsByRank(possibleSkills, rank);
       if (!skillsOfRank.isEmpty()) {
         SkillEntity selectedSkill = skillsOfRank.get(random(0, skillsOfRank.size() - 1));
         possibleSkills.remove(selectedSkill);
@@ -83,14 +86,5 @@ public class SkillsService implements DataServiceInterface {
     }
 
     return skillsServiceMapper.toSkillBaseDtos(selectedSkills);
-  }
-
-  @Override
-  public boolean hasAvailableData(Rank rank) {
-    if (possibleSkills == null) {
-      return false;
-    }
-    List<SkillEntity> skills = filterSkillsByRank(rank);
-    return !skills.isEmpty();
   }
 }

@@ -10,6 +10,8 @@ import com.imt.api_invocations.persistence.entity.SkillEntity;
 import com.imt.api_invocations.service.mapper.MonsterServiceMapper;
 import com.imt.api_invocations.utils.DataServiceInterface;
 import java.util.List;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -20,7 +22,9 @@ public class MonsterService implements DataServiceInterface {
   private final SkillsRepository skillsRepository;
   private final MonsterServiceMapper monsterServiceMapper;
 
-  public MonsterService(MonsterRepository monsterRepository, SkillsRepository skillsRepository,
+  public MonsterService(
+      MonsterRepository monsterRepository,
+      SkillsRepository skillsRepository,
       MonsterServiceMapper monsterServiceMapper) {
     this.monsterRepository = monsterRepository;
     this.skillsRepository = skillsRepository;
@@ -58,6 +62,10 @@ public class MonsterService implements DataServiceInterface {
     return monsterRepository.findAll(includeSkills);
   }
 
+  public Page<MonsterEntity> getAllMonstersPaged(boolean includeSkills, Pageable pageable) {
+    return monsterRepository.findAllPaged(includeSkills, pageable);
+  }
+
   public List<String> getAllMonsterIdByRank(Rank rank) {
     return monsterRepository.findAllMonsterIdByRank(rank);
   }
@@ -90,9 +98,18 @@ public class MonsterService implements DataServiceInterface {
     }
 
     skills.stream()
-        .map(skill -> SkillEntity.builder().monsterId(monsterId).name(skill.getName())
-            .description(skill.getDescription()).damage(skill.getDamage()).ratio(skill.getRatio())
-            .cooldown(skill.getCooldown()).lvlMax(skill.getLvlMax()).rank(skill.getRank()).build())
+        .map(
+            skill ->
+                SkillEntity.builder()
+                    .monsterId(monsterId)
+                    .name(skill.getName())
+                    .description(skill.getDescription())
+                    .damage(skill.getDamage())
+                    .ratio(skill.getRatio())
+                    .cooldown(skill.getCooldown())
+                    .lvlMax(skill.getLvlMax())
+                    .rank(skill.getRank())
+                    .build())
         .forEach(skillsRepository::save);
   }
 }
