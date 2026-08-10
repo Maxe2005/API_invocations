@@ -57,15 +57,26 @@ external:
   api:
     monsters-base-url: http://localhost:8083
     player-base-url: http://localhost:8082
-    auth-base-url: http://localhost:8081
     connection-timeout: 5000
     read-timeout: 5000
 
+# Vérification de token centralisée (Story 1.2 / AD-6) + sidecar dev-token-provider
+# (Story 1.1 / AD-8, n'a d'effet que si le profil Spring "dev-local" est actif).
+gatcha:
+  auth-api:
+    host: "${AUTH_API_HOST:http://host.docker.internal}"
+    port: "${AUTH_API_PORT:8080}"
+  dev-token-provider:
+    host: "${DEV_TOKEN_PROVIDER_HOST:http://dev-token-provider}"
+    port: "${DEV_TOKEN_PROVIDER_PORT:9876}"
+
 # Resilience4j - retry + circuit breaker sur les appels aux APIs externes.
-# Le retry n'est câblé que sur les opérations idempotentes (authApi.verifyToken,
-# generateGatchaApi.getSignedUrls) : monstersApi.createMonster et playerApi.addMonsterToPlayer
-# ne créent qu'un CircuitBreaker (pas de @Retry) pour ne pas risquer de doublon si un appel a
-# en réalité réussi côté serveur malgré une réponse perdue.
+# Le retry n'est câblé que sur les opérations idempotentes (generateGatchaApi.getSignedUrls) :
+# monstersApi.createMonster et playerApi.addMonsterToPlayer ne créent qu'un CircuitBreaker
+# (pas de @Retry) pour ne pas risquer de doublon si un appel a en réalité réussi côté serveur
+# malgré une réponse perdue. La vérification de token (authApi) est migrée vers
+# gatcha-common-security (Story 1.2) : elle ne passe plus par ce mécanisme (voir AD-11, Story 2.2
+# pour l'ajout futur de résilience à TokenVerificationClient lui-même).
 resilience4j:
   circuitbreaker:
     configs:
@@ -79,8 +90,6 @@ resilience4j:
       monstersApi:
         base-config: default
       playerApi:
-        base-config: default
-      authApi:
         base-config: default
       generateGatchaApi:
         base-config: default
@@ -97,8 +106,6 @@ resilience4j:
           # Erreurs 4xx (ex: token invalide, requête malformée) : pas de retry, ce n'est pas transitoire.
           - org.springframework.web.client.HttpClientErrorException
     instances:
-      authApi:
-        base-config: default
       generateGatchaApi:
         base-config: default
         # getSignedUrls encapsule déjà l'échec RestTemplate dans ExternalApiException avant qu'il
