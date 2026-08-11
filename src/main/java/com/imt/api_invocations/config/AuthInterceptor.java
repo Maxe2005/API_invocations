@@ -53,7 +53,8 @@ public class AuthInterceptor extends AbstractAuthInterceptor {
     }
 
     HttpServletRequest effectiveRequest = request;
-    if (request.getHeader(AUTH_HEADER) == null) {
+    String authHeader = request.getHeader(AUTH_HEADER);
+    if (authHeader == null || !authHeader.startsWith(BEARER_PREFIX)) {
       String cookieToken = extractTokenFromCookies(request);
       if (cookieToken != null) {
         effectiveRequest =
