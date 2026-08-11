@@ -23,10 +23,13 @@ import org.springframework.web.client.RestTemplate;
 
 /**
  * Story 1.2 : {@code AuthInterceptor} n'implémente plus lui-même la vérification (déléguée à {@code
- * AbstractAuthInterceptor}/{@code TokenVerificationClient} de gatcha-common-security) — ces tests
- * ne re-couvrent donc pas tous les cas de rejet déjà testés côté lib (4xx/5xx/injoignable),
- * seulement que la délégation a bien lieu et que le comportement additif propre à ce service
- * (passthrough OPTIONS, fallback cookie) fonctionne.
+ * AbstractAuthInterceptor}/{@code TokenVerificationClient} de gatcha-common-security). Ces tests ne
+ * cherchent donc pas à ré-explorer exhaustivement tous les cas de rejet (4xx/5xx/injoignable) —
+ * seulement à confirmer que la délégation a bien lieu et que le comportement additif propre à ce
+ * service (passthrough OPTIONS, fallback cookie) fonctionne. Note : à la date d'écriture, {@code
+ * gatcha-common-security} n'a elle-même aucun test dédié à {@code AbstractAuthInterceptor}/ {@code
+ * TokenVerificationClient} — les cas 4xx/5xx/injoignable ci-dessous (délégation confirmée) sont
+ * donc, en pratique, la seule couverture de cette logique dans tout le repo.
  */
 @ExtendWith(MockitoExtension.class)
 @DisplayName("AuthInterceptor - Tests Unitaires")
@@ -130,6 +133,25 @@ class AuthInterceptorTest {
     boolean result = interceptor.preHandle(request, response, new Object());
 
     assertThat(result).isTrue();
+    assertThat(request.getAttribute("username")).isEqualTo("Sacha");
+    assertThat(request.getAttribute("role")).isEqualTo("USER");
+  }
+
+  @Test
+  @DisplayName(
+      "Utilise le token du cookie 'token' si le header Authorization est présent mais malformé"
+          + " (non préfixé 'Bearer ')")
+  void should_UseCookieToken_When_AuthorizationHeaderMalformed() throws Exception {
+    stubAuthResponse("Sacha", "USER");
+    MockHttpServletRequest request = new MockHttpServletRequest("GET", "/api/invocation/anything");
+    request.addHeader("Authorization", "not-a-bearer-token");
+    request.setCookies(new Cookie("token", "cookie-token"));
+    MockHttpServletResponse response = new MockHttpServletResponse();
+
+    boolean result = interceptor.preHandle(request, response, new Object());
+
+    assertThat(result).isTrue();
+    assertThat(request.getAttribute("username")).isEqualTo("Sacha");
   }
 
   @Test
