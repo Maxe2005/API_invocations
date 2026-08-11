@@ -73,8 +73,8 @@ Code source (`src/main/java/com/imt/api_invocations`), tests (`src/test`), confi
 ## Excès / dette
 
 - **E1** — Double mécanisme de merge partiel pour les stats (`mergeStats` sentinelle-`0`, mort, vs `mergeStatsWithUpdate` nullable, la bonne approche) ; overload `updateMonsterEntity(MonsterEntity, MonsterHttpDto)` jamais appelé.
-- **E2** — `AuthHandler` (`utils/`) n'est référencé nulle part ailleurs que dans son propre fichier et son test — duplique `AuthApiClient.verifyToken` sans être utilisé.
-- **E3** — `ExternalApiClient` (interface ISP) implémentée seulement par `AuthApiClient`/`ApiGenerateGatchaClient`, pas par `MonstersApiClient`/`PlayerApiClient` — abstraction appliquée à moitié.
+- **E2** — `AuthHandler` (`utils/`) n'est référencé nulle part ailleurs que dans son propre fichier et son test — duplique la vérification de token sans être utilisé. *(Note Story 1.2 : le doublon visé, `AuthApiClient.verifyToken`, a depuis été supprimé au profit de `gatcha-common-security` ; à vérifier si `AuthHandler` est toujours mort.)*
+- **E3** — `ExternalApiClient` (interface ISP) implémentée seulement par `AuthApiClient`/`ApiGenerateGatchaClient`, pas par `MonstersApiClient`/`PlayerApiClient` — abstraction appliquée à moitié. *(Note Story 1.2 : `AuthApiClient` a été supprimé — seul `ApiGenerateGatchaClient` l'implémente désormais.)*
 
 ---
 
@@ -123,7 +123,7 @@ Organisée en phases exécutables dans l'ordre. Chaque item référence l'identi
 
 ### Phase 5 — Fonctionnalités manquantes (à planifier selon besoin produit)
 
-25. **[G5]** Introduire Resilience4j (retry + circuit breaker) sur `MonstersApiClient`/`PlayerApiClient`/`AuthApiClient`/`ApiGenerateGatchaClient`.
+25. **[G5]** Introduire Resilience4j (retry + circuit breaker) sur `MonstersApiClient`/`PlayerApiClient`/`ApiGenerateGatchaClient`. *(`AuthApiClient` a été supprimé par la Story 1.2 ; sa protection Resilience4j l'a été avec lui — voir Story 2.2/AD-11 pour l'équivalent côté `TokenVerificationClient`.)*
 26. **[G6]** Paginer `GET /monsters/all` (`page`/`size`) une fois le catalogue significatif.
 27. **[G7]** Fixer une limite explicite (`spring.servlet.multipart.max-file-size`) plutôt que de dépendre des défauts Spring — couplé à l'item 2 de la phase 0.
 28. **[G8]** Ajouter une clé d'idempotence (header `Idempotency-Key` ou dérivée d'un ID côté client) sur `POST /global-invoque/{playerId}` pour dédupliquer les retries client.

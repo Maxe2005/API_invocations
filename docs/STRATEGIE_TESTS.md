@@ -235,15 +235,9 @@ Cette stratégie vise à atteindre une couverture optimale et fonctionnelle de l
 
 ---
 
-#### **1.2.3 AuthApiClient** (Priorité MOYENNE)
+#### **1.2.3 ~~AuthApiClient~~ (obsolète — Story 1.2)**
 
-**Fichier** : `AuthApiClientTest.java`
-
-- ✅ Test : `authenticateService()` retourne token valide
-- ✅ Test : `authenticateService()` gère erreur 401
-- ✅ Test : `authenticateService()` gère erreur réseau
-
-**Mocks** : `RestTemplate`, `ExternalApiProperties`
+`AuthApiClient` et `AuthApiClientTest.java` ont été supprimés par la Story 1.2 : la vérification de token est désormais déléguée à `gatcha-common-security` (`AbstractAuthInterceptor`/`TokenVerificationClient`), voir `AuthInterceptorTest.java` pour la couverture actuelle du comportement additif propre à ce service (OPTIONS, fallback cookie).
 
 ---
 
