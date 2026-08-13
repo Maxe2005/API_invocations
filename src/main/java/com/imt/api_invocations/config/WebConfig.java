@@ -10,13 +10,9 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 public class WebConfig implements WebMvcConfigurer {
 
   private final AuthInterceptor authInterceptor;
-  private final AppProperties appProperties;
 
   @Override
   public void addInterceptors(InterceptorRegistry registry) {
-    if (!appProperties.getAuth().isEnabled()) {
-      return;
-    }
     registry
         .addInterceptor(authInterceptor)
         .addPathPatterns("/**") // Applique l'intercepteur à toutes les URL

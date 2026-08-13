@@ -27,11 +27,6 @@ spring:
       max-request-size: 55MB
 
 app:
-  # Auth activée par défaut (profil docker/prod) ; le profil `local` la désactive
-  # explicitement pour le développement sans dépendre d'API_authentification.
-  auth:
-    enabled: true
-
   # Numeric constraints for game entities
   constraints:
     stats:
