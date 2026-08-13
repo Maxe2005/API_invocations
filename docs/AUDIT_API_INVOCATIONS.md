@@ -14,7 +14,7 @@ Code source (`src/main/java/com/imt/api_invocations`), tests (`src/test`), confi
 - **Architecture en couches cohérente**, répétée à l'identique sur les 4 domaines (monster/skill/invocation/stats) : controller → service → repository-wrapper → JPA, avec mappers dédiés. Navigable par analogie d'un domaine à l'autre.
 - **Pattern Saga avec compensation** bien isolé dans [`InvocationService`](../src/main/java/com/imt/api_invocations/service/InvocationService.java) : buffer d'audit persistant (`invocation_buffer`, colonnes JSONB), transitions d'état explicites (`PENDING` → `MONSTER_CREATED` → `COMPLETED`/`FAILED`), rejeu possible (`replayBufferedInvocations`).
 - **Schéma piloté par Flyway** (`ddl-auto: validate`) — pas de dérive Hibernate auto-générée, changements de schéma explicites et versionnés dans [`V1__init.sql`](../src/main/resources/db/migration/V1__init.sql).
-- **Configuration centralisée** via `@ConfigurationProperties` (`ExternalApiProperties`, `NumericConstraintsConfig`, `AppProperties`) plutôt que des `@Value` éparpillés.
+- **Configuration centralisée** via `@ConfigurationProperties` (`ExternalApiProperties`, `NumericConstraintsConfig`) plutôt que des `@Value` éparpillés.
 - **`@IntRange`** : annotation de validation maison qui va chercher ses bornes dans la config centralisée plutôt que de les dupliquer dans chaque DTO.
 - **Swagger/OpenAPI soigné** : descriptions, exemples, codes de réponse par endpoint.
 - **Outillage qualité présent** : Spotless (Google Java Format) + Checkstyle + script interactif `format-lint.sh` — l'intention est là même si l'exécution ne suit pas partout (voir plus bas).
@@ -28,7 +28,7 @@ Code source (`src/main/java/com/imt/api_invocations`), tests (`src/test`), confi
 
 | # | Constat | Fichier(s) |
 |---|---|---|
-| C1 | `app.auth.enabled: false` par défaut → tous les endpoints sont ouverts sans authentification dans la config livrée. | [application.yml](../src/main/resources/application.yml#L25), [WebConfig](../src/main/java/com/imt/api_invocations/config/WebConfig.java#L17) |
+| C1 | ~~`app.auth.enabled: false` par défaut → tous les endpoints sont ouverts sans authentification dans la config livrée~~ — **résolu (Story 1.3)** : le kill-switch `app.auth.enabled` a été supprimé, la vérification réelle est systématique quel que soit le profil. | ~~[application.yml](../src/main/resources/application.yml#L25), [WebConfig](../src/main/java/com/imt/api_invocations/config/WebConfig.java#L17)~~ |
 | C2 | Zéro `@NotNull`/`@NotBlank`/`@NotEmpty` dans `dto/` et `controller/dto/`, malgré des champs marqués `REQUIRED` dans Swagger. Validation reportée à la main et incomplète dans le mapper. | [DtoMapperMonster.toMonsterEntity](../src/main/java/com/imt/api_invocations/controller/mapper/DtoMapperMonster.java#L26) |
 | C3 | IDOR sur `DELETE /api/monsters/delete/{id}` — pas de contrôle de propriétaire (déjà tracé dans [TODO.md](../TODO.md) point 2). | `MonstersApiClient` côté `API_monstres` |
 | C4 | Zip bomb / DoS : dézippage entier en mémoire sans limite de taille/entrées/ratio sur l'import de monstres. | [MonsterImportExportService.importMonstersFromStream](../src/main/java/com/imt/api_invocations/service/MonsterImportExportService.java#L193) |
@@ -84,7 +84,7 @@ Organisée en phases exécutables dans l'ordre. Chaque item référence l'identi
 
 ### Phase 0 — Sécurité immédiate (avant toute mise en prod réelle)
 
-1. **[C1]** Décider explicitement de la politique d'auth par environnement : au minimum un profil `prod`/`docker` avec `app.auth.enabled: true` par défaut, `local`/`dev` pouvant rester désactivé. Documenter le choix dans `application.yml` (commentaire) et le root `README`.
+1. ~~**[C1]** Décider explicitement de la politique d'auth par environnement~~ — **résolu (Story 1.3)** : la politique a été tranchée dans le sens strict — la vérification réelle du token est **toujours active**, dans tous les profils, aucun flag ne permet de la désactiver ; le profil `local` surcharge simplement `gatcha.auth-api.host/port` vers l'API_authentification exposée sur `localhost:8081`.
 2. **[C4]** Borner l'import ZIP avant dézippage : taille max du fichier uploadé (`spring.servlet.multipart.max-file-size`/`max-request-size` dans `application.yml`), nombre max d'entrées, et taille max décompressée cumulée dans `MonsterImportExportService.importMonstersFromStream` (abandon avec erreur explicite si dépassement).
 3. **[C5]** Remplacer l'URL hardcodée `http://localhost:9000/...` par la propriété `assets.host` déjà utilisée côté export, dans `MonsterImportExportService` ; relever le niveau de log de l'échec d'upload à `warn` a minima.
 4. **[C3]** Trancher l'item 2 de `TODO.md` (IDOR delete monstre) : soit ajouter une résolution `username` → `playerId` + contrôle de propriété avec exception explicite pour le flux de compensation de saga (token du joueur d'origine), soit documenter formellement pourquoi ce n'est pas fait maintenant. Ne pas laisser en l'état sans décision explicite.
