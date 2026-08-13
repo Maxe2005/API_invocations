@@ -21,7 +21,7 @@ L'API permet d'invoquer des monstres aléatoires avec des probabilités par rang
 
 ### Le docker (via l'orchestrateur)
 
-Ce service se lance **exclusivement** via le dépôt orchestrateur [GatchaApi](https://github.com/Maxe2005/GatchaApi) et son `docker-compose.yaml` racine (il n'y a plus de `docker-compose.yml` local dans ce dépôt). Toute la configuration (datasource, URLs des APIs externes, `app.auth.enabled`) est fournie par l'orchestrateur.
+Ce service se lance **exclusivement** via le dépôt orchestrateur [GatchaApi](https://github.com/Maxe2005/GatchaApi) et son `docker-compose.yaml` racine (il n'y a plus de `docker-compose.yml` local dans ce dépôt). Toute la configuration (datasource, URLs des APIs externes, vérification de token) est fournie par l'orchestrateur.
 
 ```bash
 # Depuis la racine du dépôt GatchaApi
@@ -31,7 +31,7 @@ make restart-api-invocations   # rebuild + restart de ce service uniquement
 
 ### L'app en local
 
-Le profil `local` pointe sur le PostgreSQL exposé par la stack racine (`localhost:5433`) et sur les APIs exposées en local (`8081`/`8082`/`8083`) :
+Le profil `local` pointe sur le PostgreSQL exposé par la stack racine (`localhost:5433`) et sur les APIs exposées en local (`8081`/`8082`/`8083`). La vérification de token reste **active** : ce profil surcharge `gatcha.auth-api.host/port` vers `http://localhost:8081` (API_authentification exposée côté hôte), donc `API_authentification` doit tourner (via `make up` sur la stack racine, ou le sidecar `dev-token-provider` pour obtenir un token) :
 
 ```bash
 ./mvnw spring-boot:run -Dspring-boot.run.arguments="--spring.profiles.active=local"
