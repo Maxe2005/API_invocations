@@ -31,7 +31,7 @@ make restart-api-invocations   # rebuild + restart de ce service uniquement
 
 ### L'app en local
 
-Le profil `local` pointe sur le PostgreSQL exposé par la stack racine (`localhost:5433`) et sur les APIs exposées en local (`8081`/`8082`/`8083`). La vérification de token reste **active** : ce profil surcharge `gatcha.auth-api.host/port` vers `http://localhost:8081` (API_authentification exposée côté hôte), donc `API_authentification` doit tourner (via `make up` sur la stack racine, ou le sidecar `dev-token-provider` pour obtenir un token) :
+Le profil `local` pointe sur le PostgreSQL exposé par la stack racine (`localhost:5433`) et sur les APIs exposées en local (`8081`/`8082`/`8083`). La vérification de token reste **active** : ce profil surcharge `gatcha.auth-api.host/port` vers `http://localhost:8081` (API_authentification exposée côté hôte), donc `API_authentification` doit tourner (via `make up` sur la stack racine) et un **vrai token** est requis (obtenu via `POST /user/login`, compte seedé). Le sidecar `dev-token-provider` n'expose aucun port côté hôte (profil Compose réservé au réseau docker) : il ne peut pas fournir de token au profil `local`, contrairement au flux dockerisé `dev-local` (voir le README racine).
 
 ```bash
 ./mvnw spring-boot:run -Dspring-boot.run.arguments="--spring.profiles.active=local"
