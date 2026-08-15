@@ -4,12 +4,12 @@ import com.imt.api_invocations.client.dto.monsters.CreateMonsterRequest;
 import com.imt.api_invocations.client.dto.monsters.CreateMonsterResponse;
 import com.imt.api_invocations.client.dto.player.PlayerAddMonsterRequest;
 import com.imt.api_invocations.client.dto.player.PlayerResponse;
+import com.imt.api_invocations.config.XRequestIdHolder;
 import com.imt.api_invocations.dto.GlobalMonsterDto;
 import com.imt.api_invocations.enums.InvocationStatus;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
@@ -69,10 +69,13 @@ public class InvocationBufferDto {
   @Enumerated(EnumType.STRING)
   private InvocationStatus status;
 
-  @Column(length = 2000)
+@Column(length = 2000)
   private String failureReason;
 
   private int attemptCount;
+
+  private String xRequestId;
+
   private LocalDateTime createdAt;
   private LocalDateTime lastAttemptAt;
 }

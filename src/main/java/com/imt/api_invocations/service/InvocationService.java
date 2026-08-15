@@ -9,6 +9,7 @@ import com.imt.api_invocations.client.dto.monsters.CreateMonsterResponse;
 import com.imt.api_invocations.client.dto.player.PlayerAddMonsterRequest;
 import com.imt.api_invocations.client.dto.player.PlayerResponse;
 import com.imt.api_invocations.config.InvocationProperties;
+import com.imt.api_invocations.config.XRequestIdHolder;
 import com.imt.api_invocations.controller.dto.output.GlobalMonsterWithIdDto;
 import com.imt.api_invocations.dto.GlobalMonsterDto;
 import com.imt.api_invocations.dto.SkillBaseDto;
@@ -23,6 +24,7 @@ import com.imt.api_invocations.service.mapper.InvocationServiceMapper;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -227,29 +229,44 @@ public class InvocationService {
   public GlobalMonsterWithIdDto globalInvoke(String playerId, String idempotencyKey) {
     logger.info("Début de l'invocation globale pour le joueur: {}", playerId);
 
-    if (idempotencyKey != null && !idempotencyKey.isBlank()) {
-      InvocationBufferDto existing =
-          invocationBufferRepository.findByIdempotencyKey(idempotencyKey);
-      if (existing != null) {
-        logger.info(
-            "Clé d'idempotence {} déjà connue (invocation {}, statut {}) : réutilisation au lieu "
-                + "d'un nouveau tirage",
-            idempotencyKey,
-            existing.getId(),
-            existing.getStatus());
-        return resumeFromExistingEntry(existing, playerId);
+    String requestId = UUID.randomUUID().toString();
+    XRequestIdHolder.setRequestId(requestId);
+    MDC.put("X-Request-Id", requestId);
+
+    try {
+      if (idempotencyKey != null && !idempotencyKey.isBlank()) {
+        InvocationBufferDto existing =
+            invocationBufferRepository.findByIdempotencyKey(idempotencyKey);
+        if (existing != null) {
+          logger.info(
+              "Clé d'idempotence {} déjà connue (invocation {}, statut {}) : réutilisation au lieu "
+                  + "d'un nouveau tirage, réutilisation de l'X-Request-Id existant : {}",
+              idempotencyKey,
+              existing.getId(),
+              existing.getStatus(),
+              existing.getXRequestId());
+          requestId = existing.getXRequestId();
+          XRequestIdHolder.setRequestId(requestId);
+          MDC.put("X-Request-Id", requestId);
+          return resumeFromExistingEntry(existing, playerId);
+        }
       }
+
+      GlobalMonsterDto monster = invoke();
+      CreateMonsterRequest monsterRequest =
+          invocationServiceMapper.toCreateMonsterRequest(monster, playerId);
+
+      InvocationBufferDto bufferEntry =
+          createBufferEntry(playerId, monster, monsterRequest, idempotencyKey);
+      bufferEntry.setXRequestId(requestId);
+      bufferEntry = invocationBufferRepository.save(bufferEntry);
+
+      String createdMonsterId = executeInvocation(monster, playerId, bufferEntry);
+      return invocationServiceMapper.toGlobalMonsterWithIdDto(monster, createdMonsterId);
+    } finally {
+      XRequestIdHolder.clearRequestId();
+      MDC.remove("X-Request-Id");
     }
-
-    GlobalMonsterDto monster = invoke();
-    CreateMonsterRequest monsterRequest =
-        invocationServiceMapper.toCreateMonsterRequest(monster, playerId);
-
-    InvocationBufferDto bufferEntry =
-        createBufferEntry(playerId, monster, monsterRequest, idempotencyKey);
-
-    String createdMonsterId = executeInvocation(monster, playerId, bufferEntry);
-    return invocationServiceMapper.toGlobalMonsterWithIdDto(monster, createdMonsterId);
   }
 
   private GlobalMonsterWithIdDto resumeFromExistingEntry(
@@ -279,16 +296,24 @@ public class InvocationService {
 
     for (InvocationBufferDto entry : entries) {
       try {
+        String currentRequestId = entry.getXRequestId();
         GlobalMonsterDto snapshot = entry.getMonsterSnapshot();
         if (snapshot == null) {
           markFailed(entry, "No monster snapshot available for replay");
           failedIds.add(entry.getId());
           continue;
         }
+        if (currentRequestId != null) {
+          XRequestIdHolder.setRequestId(currentRequestId);
+          MDC.put("X-Request-Id", currentRequestId);
+        }
         executeInvocation(snapshot, entry.getPlayerId(), entry);
         successCount++;
       } catch (ExternalApiException e) {
         failedIds.add(entry.getId());
+      } finally {
+        XRequestIdHolder.clearRequestId();
+        MDC.remove("X-Request-Id");
       }
     }
 
