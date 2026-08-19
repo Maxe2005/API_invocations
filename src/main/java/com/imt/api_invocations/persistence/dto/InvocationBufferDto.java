@@ -10,6 +10,7 @@ import com.imt.api_invocations.enums.InvocationStatus;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
@@ -74,6 +75,7 @@ public class InvocationBufferDto {
 
   private int attemptCount;
 
+  @Column(name = "x_request_id", length = 36)
   private String xRequestId;
 
   private LocalDateTime createdAt;
