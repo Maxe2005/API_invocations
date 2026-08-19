@@ -15,6 +15,7 @@ import com.imt.api_invocations.client.PlayerApiClient;
 import com.imt.api_invocations.client.dto.monsters.CreateMonsterResponse;
 import com.imt.api_invocations.client.dto.player.PlayerResponse;
 import com.imt.api_invocations.config.InvocationProperties;
+import com.imt.api_invocations.config.XRequestIdHolder;
 import com.imt.api_invocations.controller.dto.output.GlobalMonsterWithIdDto;
 import com.imt.api_invocations.dto.GlobalMonsterDto;
 import com.imt.api_invocations.dto.RatioDto;
@@ -31,6 +32,7 @@ import com.imt.api_invocations.service.dto.InvocationReplayReport;
 import com.imt.api_invocations.service.mapper.InvocationServiceMapper;
 import java.util.Arrays;
 import java.util.List;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -39,6 +41,10 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.slf4j.MDC;
+import org.springframework.mock.web.MockHttpServletRequest;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 
 @ExtendWith(MockitoExtension.class)
 @DisplayName("InvocationService - Tests Unitaires")
@@ -140,6 +146,13 @@ class InvocationServiceTest {
   @Nested
   @DisplayName("Tests de la méthode globalInvoke()")
   class GlobalInvokeTests {
+
+    @AfterEach
+    void resetCorrelationContext() {
+      XRequestIdHolder.clearRequestId();
+      MDC.remove("X-Request-Id");
+      RequestContextHolder.resetRequestAttributes();
+    }
 
     @Test
     @DisplayName("Doit réussir le workflow Saga complet")
@@ -396,6 +409,104 @@ class InvocationServiceTest {
 
       verify(monstersApiClient, never()).deleteMonster(anyString());
       verify(playerApiClient, never()).addMonsterToPlayer(anyString(), anyString());
+    }
+
+    @Test
+    @DisplayName(
+        "Réutilise l'identifiant X-Request-Id entrant pour l'invocation (matrice EXISTING_ID)")
+    void should_ReuseInboundXRequestId_When_HeaderPresent() {
+      String playerId = "player-corr-1";
+      String createdMonsterId = "created-monster-corr-1";
+
+      MockHttpServletRequest servletRequest = new MockHttpServletRequest();
+      servletRequest.addHeader("X-Request-Id", "inbound-correlation-1");
+      RequestContextHolder.setRequestAttributes(new ServletRequestAttributes(servletRequest));
+
+      when(invocationProperties.getMaxAttempts()).thenReturn(5);
+      when(monsterService.hasAvailableData(any(Rank.class))).thenReturn(true);
+      when(monsterService.getRandomMonsterByRank(any(Rank.class))).thenReturn(testMonster);
+      when(skillsService.getRandomSkillsForMonster(anyString(), eq(3))).thenReturn(testSkills);
+      when(invocationServiceMapper.toGlobalMonsterDto(testMonster, testSkills))
+          .thenReturn(testGlobalMonster);
+      when(invocationServiceMapper.toCreateMonsterRequest(eq(testGlobalMonster), eq(playerId)))
+          .thenReturn(
+              com.imt.api_invocations.client.dto.monsters.CreateMonsterRequest.builder()
+                  .playerId(playerId)
+                  .build());
+      org.mockito.ArgumentCaptor<InvocationBufferDto> bufferCaptor =
+          org.mockito.ArgumentCaptor.forClass(InvocationBufferDto.class);
+      when(invocationBufferRepository.save(bufferCaptor.capture()))
+          .thenAnswer(invocation -> invocation.getArgument(0));
+      when(monstersApiClient.createMonster(any()))
+          .thenReturn(new CreateMonsterResponse(createdMonsterId, "created"));
+      when(playerApiClient.addMonsterToPlayer(eq(playerId), eq(createdMonsterId)))
+          .thenReturn(new PlayerResponse());
+      when(invocationServiceMapper.toGlobalMonsterWithIdDto(
+              eq(testGlobalMonster), eq(createdMonsterId)))
+          .thenReturn(
+              GlobalMonsterWithIdDto.builder()
+                  .id(createdMonsterId)
+                  .name("Pyrolosse")
+                  .skills(List.of())
+                  .build());
+
+      invocationService.globalInvoke(playerId);
+
+      assertThat(bufferCaptor.getValue().getXRequestId()).isEqualTo("inbound-correlation-1");
+      assertThat(MDC.get("X-Request-Id")).isNull();
+    }
+
+    @Test
+    @DisplayName(
+        "Génère un UUID sans header entrant et le pose dans le holder + MDC pendant la saga")
+    void should_GenerateUuid_And_ExposeInHolderAndMdc_DuringSaga() {
+      String playerId = "player-corr-2";
+      String createdMonsterId = "created-monster-corr-2";
+
+      final String[] holderDuringCall = new String[1];
+      final String[] mdcDuringCall = new String[1];
+
+      when(invocationProperties.getMaxAttempts()).thenReturn(5);
+      when(monsterService.hasAvailableData(any(Rank.class))).thenReturn(true);
+      when(monsterService.getRandomMonsterByRank(any(Rank.class))).thenReturn(testMonster);
+      when(skillsService.getRandomSkillsForMonster(anyString(), eq(3))).thenReturn(testSkills);
+      when(invocationServiceMapper.toGlobalMonsterDto(testMonster, testSkills))
+          .thenReturn(testGlobalMonster);
+      when(invocationServiceMapper.toCreateMonsterRequest(eq(testGlobalMonster), eq(playerId)))
+          .thenReturn(
+              com.imt.api_invocations.client.dto.monsters.CreateMonsterRequest.builder()
+                  .playerId(playerId)
+                  .build());
+      org.mockito.ArgumentCaptor<InvocationBufferDto> bufferCaptor =
+          org.mockito.ArgumentCaptor.forClass(InvocationBufferDto.class);
+      when(invocationBufferRepository.save(bufferCaptor.capture()))
+          .thenAnswer(invocation -> invocation.getArgument(0));
+      when(monstersApiClient.createMonster(any()))
+          .thenAnswer(
+              invocation -> {
+                holderDuringCall[0] = XRequestIdHolder.getRequestId();
+                mdcDuringCall[0] = MDC.get("X-Request-Id");
+                return new CreateMonsterResponse(createdMonsterId, "created");
+              });
+      when(playerApiClient.addMonsterToPlayer(eq(playerId), eq(createdMonsterId)))
+          .thenReturn(new PlayerResponse());
+      when(invocationServiceMapper.toGlobalMonsterWithIdDto(
+              eq(testGlobalMonster), eq(createdMonsterId)))
+          .thenReturn(
+              GlobalMonsterWithIdDto.builder()
+                  .id(createdMonsterId)
+                  .name("Pyrolosse")
+                  .skills(List.of())
+                  .build());
+
+      invocationService.globalInvoke(playerId);
+
+      String bufferId = bufferCaptor.getValue().getXRequestId();
+      assertThat(bufferId).isNotNull();
+      assertThat(bufferId).hasSize(36);
+      assertThat(holderDuringCall[0]).isEqualTo(bufferId);
+      assertThat(mdcDuringCall[0]).isEqualTo(bufferId);
+      assertThat(MDC.get("X-Request-Id")).isNull();
     }
   }
 

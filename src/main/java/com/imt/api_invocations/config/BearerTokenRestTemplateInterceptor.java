@@ -88,16 +88,11 @@ public class BearerTokenRestTemplateInterceptor implements ClientHttpRequestInte
    * @return l'identifiant de correlation si trouvé, null sinon
    */
   private String extractRequestIdFromCurrentRequest() {
-    // Priorité à l'ID généré par la saga (ThreadLocal posé par globalInvoke/replay), puis fallback
-    // sur le header X-Request-Id de la requête HTTP entrante.
+    // XRequestIdHolder résout les deux cas : l'ID posé par la saga (ThreadLocal posé par
+    // globalInvoke/replay, qui réutilise le header entrant quand il existe, sinon un UUID) et, hors
+    // saga, le fallback sur le header X-Request-Id de la requête HTTP entrante. On n'ajoute un
+    // header que si l'ID résolu n'est pas vide, pour ne pas propager un header vide.
     String id = XRequestIdHolder.getRequestId();
-    if (id == null) {
-      ServletRequestAttributes attributes =
-          (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
-      if (attributes != null) {
-        id = attributes.getRequest().getHeader(X_REQUEST_ID);
-      }
-    }
-    return id;
+    return (id == null || id.isBlank()) ? null : id;
   }
 }

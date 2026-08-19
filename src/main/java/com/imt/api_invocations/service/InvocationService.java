@@ -29,11 +29,14 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.MDC;
 import org.springframework.stereotype.Service;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 
 @Service
 public class InvocationService {
 
   private static final Logger logger = LoggerFactory.getLogger(InvocationService.class);
+  private static final String X_REQUEST_ID = "X-Request-Id";
 
   private final MonsterService monsterService;
   private final SkillsService skillsService;
@@ -230,9 +233,9 @@ public class InvocationService {
   public GlobalMonsterWithIdDto globalInvoke(String playerId, String idempotencyKey) {
     logger.info("Début de l'invocation globale pour le joueur: {}", playerId);
 
-    String requestId = UUID.randomUUID().toString();
+    String requestId = resolveRequestId();
     XRequestIdHolder.setRequestId(requestId);
-    MDC.put("X-Request-Id", requestId);
+    MDC.put(X_REQUEST_ID, requestId);
 
     try {
       if (idempotencyKey != null && !idempotencyKey.isBlank()) {
@@ -266,8 +269,24 @@ public class InvocationService {
       return invocationServiceMapper.toGlobalMonsterWithIdDto(monster, createdMonsterId);
     } finally {
       XRequestIdHolder.clearRequestId();
-      MDC.remove("X-Request-Id");
+      MDC.remove(X_REQUEST_ID);
     }
+  }
+
+  /**
+   * Résout l'identifiant de corrélation d'une invocation : réutilise le header {@code X-Request-Id}
+   * de la requête entrante s'il est présent (matrice EXISTING_ID — l'ID client est conservé, pas
+   * remplacé par un nouveau UUID), sinon génère un UUID (matrice HAPPY_PATH). Tronque à 36
+   * caractères pour respecter la colonne {@code x_request_id} (VARCHAR(36)) du buffer.
+   */
+  private String resolveRequestId() {
+    if (RequestContextHolder.getRequestAttributes() instanceof ServletRequestAttributes attributes) {
+      String inbound = attributes.getRequest().getHeader(X_REQUEST_ID);
+      if (inbound != null && !inbound.isBlank()) {
+        return inbound.length() > 36 ? inbound.substring(0, 36) : inbound;
+      }
+    }
+    return UUID.randomUUID().toString();
   }
 
   private GlobalMonsterWithIdDto resumeFromExistingEntry(
