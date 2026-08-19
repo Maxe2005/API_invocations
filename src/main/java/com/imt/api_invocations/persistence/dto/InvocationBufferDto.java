@@ -74,6 +74,7 @@ public class InvocationBufferDto {
 
   private int attemptCount;
 
+  @Column(name = "x_request_id", length = 36)
   private String xRequestId;
 
   private LocalDateTime createdAt;
