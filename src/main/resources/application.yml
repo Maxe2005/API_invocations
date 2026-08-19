@@ -125,3 +125,9 @@ management:
 # Affiche les endpoints Actuator dans la doc Springdoc
 springdoc:
   show-actuator: true
+
+# Story 2.1 — corrélation X-Request-Id : le pattern console par défaut n'affiche pas le MDC, on
+# ajoute donc l'identifiant (clé MDC posée par globalInvoke/replay) à chaque ligne de log.
+logging:
+  pattern:
+    level: "%5p [%X{X-Request-Id:-}]"
